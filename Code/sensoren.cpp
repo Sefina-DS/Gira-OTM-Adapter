@@ -35,7 +35,6 @@ void bme_refresh()
         {
             temp_float = bme.readAltitude(SEALEVELPRESSURE_HPA);
             mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Meter über Meeresspiegel", String(temp_float));
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Meter über Meeresspiegel").c_str(), temp_msg);
         }
     }
 }

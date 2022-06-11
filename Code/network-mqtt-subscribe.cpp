@@ -16,6 +16,18 @@ void mqtt_filter(String topic, String msg)
     Serial.print(" || die Message : ");
     Serial.println(msg);
 
+    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation")
+    {
+        if (msg_bool == true && config.seriel == false)
+        {
+            config.seriel = true;
+        }
+        if (msg_bool == false && config.seriel == true)
+        {
+            config.seriel = false;
+        }
+    }
+
     if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Melder_Finden" ||
         topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Melder_Finden")
     {
@@ -48,8 +60,8 @@ void mqtt_filter(String topic, String msg)
             }
         }
     }
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk" || 
-    topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm")
+    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk" ||
+        topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm")
     {
         if (seri_status == 0)
         {

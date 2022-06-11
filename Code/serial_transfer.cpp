@@ -1,5 +1,6 @@
 #include "serial_transfer.hpp"
 
+boolean seri_run;
 String seri_message_receive = "";
 
 void serial_send(String msg_funktion = "")
@@ -162,5 +163,28 @@ void serial_read()
             }
             Serial.println("Nachricht wurde abgelehnt : " + seri_message_receive);
         }
+    }
+}
+
+void serial_status()
+{
+    // Output aktivieren/deaktivieren
+    if (config.seriel == true)
+    {
+        digitalWrite(output_comport_activ, LOW);
+    }
+    else
+    {
+        digitalWrite(output_comport_activ, HIGH);
+    }
+    
+    // abfragen Seriele komunikation + Variable anpassen
+    if (digitalRead(input_comport_activ) == 0)
+    {
+        seri_run = true;
+    }
+    else
+    {
+        seri_run = false;
     }
 }

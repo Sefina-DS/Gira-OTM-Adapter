@@ -5,15 +5,22 @@
 #define RXD2 17
 #define TXD2 16
 
-#define led_esp 19
-#define led_detector 27
+#define input_light 36
+#define input_ubext 39
 
-#define serial_detector_aktiv 15
-#define serial_detector_scan 18
+#define input_comport_activ 15
+#define input_webportal 13
+#define input_reset 25
 
+#define output_led_esp 19
+#define output_led_detector 27
+#define output_comport_activ 23
 
-const int input_light = 36; // Hardwareeingang von Lichtsensor
-const int input_ubext = 39;      // Hardwareeingang von Spannungsteiler
+//#define serial_detector_aktiv 15
+//#define serial_detector_scan 18
+
+// const int input_light = 36; // Hardwareeingang von Lichtsensor
+// const int input_ubext = 39;      // Hardwareeingang von Spannungsteiler
 
 // MQTT Definitionen
 

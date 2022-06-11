@@ -2,6 +2,7 @@
 
 void timer_funktion()
 {
+    String msg;
     int temp = 0;
     static int nr = 0;
     if (nr == 120)
@@ -13,15 +14,11 @@ void timer_funktion()
     Serial.println(nr);*/
     if (nr % 2 == 0)
     {
-        int input;
-        input = digitalRead(serial_detector_scan);
-        Serial.println(input);
         if (WiFi.isConnected() &&
             config.mqtt &&
             !client.connected())
         {
             mqtt_connect();
-            
         }
         if (!WiFi.isConnected() &&
             !AP_Mode)
@@ -29,10 +26,14 @@ void timer_funktion()
             wlan_connect();
         }
         if (WiFi.isConnected() &&
-            client.connected() &&
-            config.bme_280)
+            client.connected())
         {
-            bme_refresh();
+            if (seri_run == true){msg = "true";}else{msg="false";}
+            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation", String(msg));
+            if (config.bme_280)
+            {
+                bme_refresh();
+            }
         }
     }
     if (nr % 2 == 0)
@@ -55,7 +56,7 @@ void timer_funktion()
     case 112:
         seri_status = 1;
         serial_send("09");
-        temp = ((millis() / 1000) / 60 ) / 60;
+        temp = ((millis() / 1000) / 60) / 60;
         client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Betriebsstunden").c_str(), (String(temp)).c_str());
         break;
     // Statusmeldungen
@@ -93,4 +94,3 @@ void timer_funktion()
         break;
     }
 }
-

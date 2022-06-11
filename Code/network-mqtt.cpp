@@ -62,6 +62,7 @@ void mqtt_connect()
       // Subscribe Melder
       // delay(1000);
       client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Melder_Finden").c_str());
+      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation").c_str());
       client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme").c_str());
       client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Testalarm-Funk").c_str());
       client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk").c_str());

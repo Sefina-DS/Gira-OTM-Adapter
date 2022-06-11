@@ -19,15 +19,16 @@ void setup()
   Serial.begin(9600);
   Serial.println();
 
-  pinMode(led_esp, OUTPUT);
-  pinMode(led_detector, OUTPUT);
-  pinMode(serial_detector_aktiv, OUTPUT);
+  pinMode(output_led_esp, OUTPUT);
+  pinMode(output_led_detector, OUTPUT);
+  pinMode(output_comport_activ, OUTPUT);
 
-  pinMode(serial_detector_scan, INPUT);
+  pinMode(input_comport_activ, INPUT);
+  pinMode(input_webportal, INPUT);
+  pinMode(input_reset, INPUT);
 
-  digitalWrite(led_esp, HIGH);
-  digitalWrite(led_detector, HIGH);
-  digitalWrite(serial_detector_aktiv, HIGH);
+  digitalWrite(output_led_detector, HIGH);
+  digitalWrite(output_led_esp, HIGH);
 
   spiffs_starten();
 
@@ -49,6 +50,7 @@ void setup()
 
   if (config.seriel == true)
   {
+    digitalWrite(output_comport_activ, LOW);
     Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
   }
   if (config.mqtt)
@@ -63,6 +65,8 @@ void setup()
 
 void loop()
 {
+  serial_status();
+
   // Rücksetzen Alarmtimer
   if (millis() >= timer_alarm &&
       timer_alarm != 0)
