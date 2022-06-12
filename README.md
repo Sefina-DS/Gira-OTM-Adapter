@@ -1,4 +1,6 @@
 # Gira-OTM-Adapter
-https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki
+Adapterplatine für einen Gira - DualQ Rauchmelder (zum Vernetzen der Melder über MQTT und vieles mehr
 
-Adapterplatine für einen Gira - DualQ Rauchmelder
+<a href="https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki">Anleitungen (Wiki)</a>
+
+
