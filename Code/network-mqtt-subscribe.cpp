@@ -60,23 +60,34 @@ void mqtt_filter(String topic, String msg)
             }
         }
     }
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk" ||
-        topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm")
+    for (int i = 0; i < config.detector_alarm_group_size + 2; i++)
     {
-        if (seri_status == 0)
+        String topic_temp = "";
+        if (i > config.detector_alarm_group_size)
         {
-            seri_status = 1;
-            if (msg_bool == true)
+            topic_temp = config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk";
+        }
+        else
+        {
+            topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
+        }
+        if (topic == topic_temp)
+        {
+            if (seri_status == 0)
             {
-                if (timer_alarm < millis())
+                seri_status = 1;
+                if (msg_bool == true)
                 {
-                    timer_alarm = millis() + 300000;
-                    serial_send("030210"); // Alarm Funk
+                    if (timer_alarm < millis())
+                    {
+                        timer_alarm = millis() + 300000;
+                        serial_send("030210"); // Alarm Funk
+                    }
                 }
-            }
-            else
-            {
-                serial_send("030200"); // Reset Funk-Alarm + Test-Alarm
+                else
+                {
+                    serial_send("030200"); // Reset Funk-Alarm + Test-Alarm
+                }
             }
         }
     }

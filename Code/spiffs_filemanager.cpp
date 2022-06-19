@@ -61,6 +61,13 @@ void spiffs_config_save()
         return;
     }
     StaticJsonDocument<1024> doc;
+    String msg_temp = "";
+    for (int i = 0; i < config.detector_alarm_group_size; i++)
+    {
+        msg_temp += config.detector_alarm_group_int[i];
+        msg_temp += ";";
+    }
+    msg_temp += config.detector_alarm_group_int[config.detector_alarm_group_size];
 
     // Variablen werden gelesen
     doc["esp_name"] = config.esp_name;
@@ -78,6 +85,7 @@ void spiffs_config_save()
     doc["mqtt_topic_define"] = config.mqtt_topic_define;
     doc["seriel"] = config.seriel;
     doc["detector_group"] = config.detector_group;
+    doc["detector_alarm_group"] = msg_temp;
     doc["detector_location"] = config.detector_location;
     doc["bme_280"] = config.bme_280;
     doc["bme_280_temperature"] = config.bme_280_temperature;
@@ -107,6 +115,8 @@ void spiffs_config_load()
     StaticJsonDocument<1024> doc;
     DeserializationError error = deserializeJson(doc, fileTemp);
 
+    String msg_temp = "";
+
     if (error)
         Serial.println("Config- Lesefehler || Standart wird genutzt !");
 
@@ -126,6 +136,8 @@ void spiffs_config_load()
     config.mqtt_topic_define = doc["mqtt_topic_define"] | "";
     config.seriel = doc["seriel"] | false;
     config.detector_group = doc["detector_group"] | "0";
+    msg_temp = doc["detector_alarm_group"] | "0";
+    alarm_group_diagnose(msg_temp);
     config.detector_location = doc["detector_location"] | "";
     config.bme_280 = doc["bme_280"] | false;
     config.bme_280_temperature = doc["bme_280_temperature"] | false;

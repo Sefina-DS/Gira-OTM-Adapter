@@ -71,7 +71,14 @@ void mqtt_connect()
       // delay(1000);
       client.subscribe((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Melder_Finden").c_str());
       client.subscribe((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Testalarm").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str());
+
+      // Subscribe Alarmierungsgruppen
+      String topic_temp = "";
+      for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
+      {
+        topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
+        client.subscribe(topic_temp.c_str());
+      }
     }
     else
     {

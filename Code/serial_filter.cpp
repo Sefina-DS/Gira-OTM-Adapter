@@ -2,6 +2,7 @@
 
 void filter(byte msg[10], int size)
 {
+    String topic_temp = "";
     int bitTemp = 0;
     int order = 0;
     String orderSTR = "";
@@ -145,7 +146,11 @@ void filter(byte msg[10], int size)
         case 49: // 1
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "true");
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            if (timer_alarm < millis())
+            {
+                timer_alarm = millis() + 300000;
+                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            }
             break;
         case 50: // 2
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "false");
@@ -154,7 +159,11 @@ void filter(byte msg[10], int size)
         case 51: // 3
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "false");
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            if (timer_alarm < millis())
+            {
+                timer_alarm = millis() + 300000;
+                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            }
             break;
         default:
             break;
@@ -167,9 +176,14 @@ void filter(byte msg[10], int size)
             break;
         case 56: // 8
             serial_send("030200");
+            topic_temp = "";
+            for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
+            {
+                topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/";
+                client.publish((topic_temp + "Alarm").c_str(), "false");
+                client.publish((topic_temp + "Testalarm").c_str(), "false");
+            }
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Taster Melder").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Testalarm").c_str(), "false");
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm-Funk").c_str(), "false");
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Optisch").c_str(), "false");
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "false");
@@ -202,7 +216,11 @@ void filter(byte msg[10], int size)
             break;
         case 52: // 4
             client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Optisch").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            if (timer_alarm < millis())
+            {
+                timer_alarm = millis() + 300000;
+                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+            }
             break;
         default:
             break;

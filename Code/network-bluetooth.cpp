@@ -14,21 +14,17 @@ void bluetooth_config()
 
 void bluetooth_scan()
 {
-    for (;;)
+    BLEScanResults foundDevices = pBLEScan->start(1); // BLE Scanen
+
+    int j;
+    for (j = 0; j < foundDevices.getCount(); j++) // Alle Gefundene Bluetooth Device durchgehen
     {
-        BLEScanResults foundDevices = pBLEScan->start(10); // BLE Scanen
-
-        Serial.println();
-        Serial.print("Bluetooth- Scan auf Core : ");
-        Serial.println(xPortGetCoreID());
-        int j;
-        for (j = 0; j < foundDevices.getCount(); j++) // Alle Gefundene Bluetooth Device durchgehen
-        {
-            Serial.print(foundDevices.getDevice(j).getAddress().toString().c_str());
-            Serial.print(" | ");
-            Serial.println(foundDevices.getDevice(j).getRSSI());
-        }
-
-        pBLEScan->clearResults();
+        Serial.print(foundDevices.getDevice(j).getAddress().toString().c_str());
+        Serial.print(" | ");
+        Serial.print(foundDevices.getDevice(j).getName().c_str());
+        Serial.print(" | ");
+        Serial.println(foundDevices.getDevice(j).getRSSI());
     }
+    pBLEScan->stop();
+    pBLEScan->clearResults();
 }

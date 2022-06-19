@@ -32,6 +32,8 @@
 #include "network-mqtt-subscribe.hpp"
 #include "network-bluetooth.hpp"
 
+#include "sonderfunktionen.hpp"
+
 #include "serial_transfer.hpp"
 #include "serial_filter.hpp"
 

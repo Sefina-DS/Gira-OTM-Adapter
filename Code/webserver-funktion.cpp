@@ -216,6 +216,18 @@ String web_server_variablen(const String &var)
         temp = "placeholder = '" + config.detector_group + "'";
         return temp;
     }
+    if (var == "place_detector_alarm_group")
+    {
+        String msg_temp = "";
+        for (int i = 0; i < config.detector_alarm_group_size; i++)
+        {
+            msg_temp += config.detector_alarm_group_int[i];
+            msg_temp += ";";
+        }
+        msg_temp += config.detector_alarm_group_int[config.detector_alarm_group_size];
+        temp = "placeholder='" + msg_temp + "'";
+        return temp;
+    }
     if (var == "place_sensor_bme")
     {
         if (config.bme_280)
@@ -446,6 +458,7 @@ void web_server_get_analyse(String name, String msg)
         if (msg != "")
         {
             config.detector_group = msg;
+            Serial.println("Meldegruppe");
             /*if (msg.length() == 1)
             {
                 config.detector_group = "00" + msg;
@@ -454,6 +467,13 @@ void web_server_get_analyse(String name, String msg)
             {
                 config.detector_group = "0" + msg;
             }*/
+        }
+    }
+    if (name == "detector_alarm_group")
+    {
+        if (msg != "")
+        {
+            alarm_group_diagnose(msg);
         }
     }
     if (name == "bme")

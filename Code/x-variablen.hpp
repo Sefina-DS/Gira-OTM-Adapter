@@ -56,6 +56,9 @@ struct Config
     String wifi_dns;
     boolean seriel;
     String detector_group;
+    String detector_alarm_group;
+    int detector_alarm_group_int[99];
+    int detector_alarm_group_size;
     String detector_location;
     boolean bme_280;
     boolean bme_280_temperature;

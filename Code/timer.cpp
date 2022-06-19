@@ -10,6 +10,14 @@ void timer_funktion()
         nr = 0;
     }
     nr++;
+    if (WiFi.isConnected() &&
+        client.connected())
+    {
+        if (config.bluetooth)
+        {
+            bluetooth_scan();
+        }
+    }
     /*Serial.print("Timerdurchlauf : ");
     Serial.println(nr);*/
     if (nr % 2 == 0)
@@ -28,7 +36,14 @@ void timer_funktion()
         if (WiFi.isConnected() &&
             client.connected())
         {
-            if (seri_run == true){msg = "true";}else{msg="false";}
+            if (seri_run == true)
+            {
+                msg = "true";
+            }
+            else
+            {
+                msg = "false";
+            }
             mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation", String(msg));
             if (config.bme_280)
             {

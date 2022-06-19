@@ -59,7 +59,7 @@ void setup()
   }
   if (config.bluetooth)
   {
-    // bluetooth_config();
+    bluetooth_config();
   }
 }
 
