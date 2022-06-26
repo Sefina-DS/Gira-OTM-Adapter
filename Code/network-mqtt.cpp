@@ -1,5 +1,7 @@
 #include "network-mqtt.hpp"
 
+int mqtt_counter = 0;
+
 ///         MQTT Nachrichten Empfangen
 void mqtt_read(char *topic, byte *message, unsigned int length)
 {
@@ -44,10 +46,12 @@ void mqtt_connect()
 
   {
     // timer_bluetooth = 0;
+    led_flash_timer(250, 150, 3);
     Serial.print("MQTT verbinden");
     ///         Connect mit LastWill Message
     if (client.connect(config.esp_name.c_str(), (config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Online").c_str(), 1, true, "false"))
     {
+      mqtt_counter = 0;
       ///         Online Status setzen
       // timer_bluetooth = millis();
       client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Online").c_str(), "true");
@@ -82,7 +86,12 @@ void mqtt_connect()
     }
     else
     {
+      mqtt_counter ++;
       Serial.println(" / nicht erfolgreich / neuer Versuch in 5 Sekunden");
+      if (mqtt_counter == 12)
+      {
+        ESP.restart();
+      }
     }
   }
 }

@@ -19,12 +19,13 @@ void wlan_connect()
             Serial.println(WiFi.localIP());
             Serial.println();
             server->begin();
+            delay(2000);
             return;
         }
         else
         {
             Serial.print(".");
-            delay(1000);
+            led_flash_timer(500, 500, 1);
         }
     }
     Serial.println(" / fehlgeschlagen ");

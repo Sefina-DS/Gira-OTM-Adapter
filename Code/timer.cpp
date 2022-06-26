@@ -22,6 +22,7 @@ void timer_funktion()
     Serial.println(nr);*/
     if (nr % 2 == 0)
     {
+        led_flash_timer(100 ,0 ,1);
         if (WiFi.isConnected() &&
             config.mqtt &&
             !client.connected())

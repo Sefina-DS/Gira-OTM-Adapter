@@ -56,3 +56,16 @@ void alarm_group_diagnose(String msg)
         Serial.println(config.detector_alarm_group_int[i]);
     }
 }
+
+void led_flash_timer(int timer_on,int timer_off, int number)
+{
+    for (int i = 0; i < number; i++)
+    {
+        digitalWrite(output_led_detector, HIGH);
+        digitalWrite(output_led_esp, HIGH);
+        delay(timer_on);
+        digitalWrite(output_led_detector, LOW);
+        digitalWrite(output_led_esp, LOW);
+        delay(timer_off);
+    }
+}

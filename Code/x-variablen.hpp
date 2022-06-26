@@ -76,6 +76,8 @@ struct WebServer
     String navigation;
     String wifi_ssid;
 };
+
+extern int mqtt_counter;
 extern WebServer webserver;
 
 extern int seri_status;

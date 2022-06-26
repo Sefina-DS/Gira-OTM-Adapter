@@ -27,8 +27,12 @@ void setup()
   pinMode(input_webportal, INPUT);
   pinMode(input_reset, INPUT);
 
-  digitalWrite(output_led_detector, HIGH);
+  led_flash_timer(5000, 0, 1);
+  /*digitalWrite(output_led_detector, HIGH);
   digitalWrite(output_led_esp, HIGH);
+  delay(5000);
+  digitalWrite(output_led_detector, LOW);
+  digitalWrite(output_led_esp, LOW);*/
 
   spiffs_starten();
 
