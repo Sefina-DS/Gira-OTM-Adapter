@@ -6,8 +6,7 @@ void spiffs_starten()
     Serial.println(F("Starten von dem Filesystem... "));
     if (SPIFFS.begin())
     {
-        Serial.println(F("SPIFFS wurde erfolgreich gemountet."));
-        Serial.println();
+        Serial.println(F("SPIFFS wurde erfolgreich gemountet ..."));
         spiffs_config_load();
     }
     else
@@ -69,6 +68,8 @@ void spiffs_config_save()
     }
     msg_temp += config.detector_alarm_group_int[config.detector_alarm_group_size];
 
+    doc = safe_conf_sensor(doc);
+    
     // Variablen werden gelesen
     doc["esp_name"] = config.esp_name;
     doc["wifi_ssid"] = config.wifi_ssid;
@@ -87,13 +88,13 @@ void spiffs_config_save()
     doc["detector_group"] = config.detector_group;
     doc["detector_alarm_group"] = msg_temp;
     doc["detector_location"] = config.detector_location;
-    doc["bme_280"] = config.bme_280;
+    /*doc["bme_280"] = config.bme_280;
     doc["bme_280_temperature"] = config.bme_280_temperature;
     doc["bme_280_humidity"] = config.bme_280_humidity;
     doc["bme_280_pressure"] = config.bme_280_pressure;
     doc["bme_280_high"] = config.bme_280_high;
     doc["light"] = config.light;
-    doc["ubext"] = config.ubext;
+    doc["ubext"] = config.ubext;*/
     doc["bluetooth"] = bluetooth.aktiv;
 
     if (serializeJson(doc, fileTemp) == 0)
@@ -110,6 +111,8 @@ void spiffs_config_save()
 
 void spiffs_config_load()
 {
+    Serial.println("Config- wird in Variablen geschrieben ...");
+    
     File fileTemp = SPIFFS.open(safefile);
 
     StaticJsonDocument<1024> doc;
@@ -120,6 +123,8 @@ void spiffs_config_load()
     if (error)
         Serial.println("Config- Lesefehler || Standart wird genutzt !");
 
+    load_conf_sensor(doc);
+    
     // Variablen werden beschrieben
     config.esp_name = doc["esp_name"] | "";
     config.wifi_ssid = doc["wifi_ssid"] | "-";
@@ -139,13 +144,6 @@ void spiffs_config_load()
     msg_temp = doc["detector_alarm_group"] | "0";
     alarm_group_diagnose(msg_temp);
     config.detector_location = doc["detector_location"] | "";
-    config.bme_280 = doc["bme_280"] | false;
-    config.bme_280_temperature = doc["bme_280_temperature"] | false;
-    config.bme_280_humidity = doc["bme_280_humidity"] | false;
-    config.bme_280_pressure = doc["bme_280_pressure"] | false;
-    config.bme_280_high = doc["bme_280_high"] | false;
-    config.light = doc["light"] | false;
-    config.ubext = doc["ubext"] | false;
     bluetooth.aktiv = doc["bluetooth"] | false;
 
     fileTemp.close();

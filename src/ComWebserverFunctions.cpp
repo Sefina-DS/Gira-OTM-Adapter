@@ -7,6 +7,7 @@ String web_server_variablen(const String &var)
     Serial.println(var);
     
     back = web_server_bluetooth(var);
+    back = web_server_sensor(var);
     
     if ( back != "")
     {
@@ -90,6 +91,7 @@ String web_server_variablen(const String &var)
             return "display: none;";
         }
     }
+    /*
     if (var == "nav-sen-bme")
     {
         if (!config.bme_280)
@@ -101,7 +103,9 @@ String web_server_variablen(const String &var)
             return "<div class='bme280'>";
         }
     }
-    /*if (var == "nav-sen-bt")
+    */
+    /*
+    if (var == "nav-sen-bt")
     {
         if (!config.bluetooth)
         {
@@ -111,7 +115,8 @@ String web_server_variablen(const String &var)
         {
             return "<div class='bt'>";
         }
-    }*/
+    }
+    */
     if (var == "nav-sys")
     {
         if (webserver.navigation == "System")
@@ -248,6 +253,7 @@ String web_server_variablen(const String &var)
         temp = "placeholder='" + msg_temp + "'";
         return temp;
     }
+    /*
     if (var == "place_sensor_bme")
     {
         if (config.bme_280)
@@ -332,7 +338,9 @@ String web_server_variablen(const String &var)
         }
         return temp;
     }
-    /*if (var == "place_sensor_bt")
+    */
+    /*
+    if (var == "place_sensor_bt")
     {
         if (config.bluetooth)
         {
@@ -343,7 +351,8 @@ String web_server_variablen(const String &var)
             temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
         }
         return temp;
-    }*/
+    }
+    */
 
     return String();
 }
@@ -353,6 +362,7 @@ String web_server_variablen(const String &var)
 void web_server_get_analyse(String name, String msg)
 {
     web_server_bluetooth_get(name, msg);
+    web_server_sensor_get(name, msg);
     
     if (name == "navigation")
     {
@@ -510,6 +520,7 @@ void web_server_get_analyse(String name, String msg)
             alarm_group_diagnose(msg);
         }
     }
+    /*
     if (name == "bme")
     {
         if (msg == "aktiviert")
@@ -587,6 +598,7 @@ void web_server_get_analyse(String name, String msg)
             config.ubext = false;
         }
     }
+    */
     /*
     if (name == "bluetooth")
     {

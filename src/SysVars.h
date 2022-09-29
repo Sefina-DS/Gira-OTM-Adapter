@@ -56,6 +56,7 @@ struct Config
     int detector_alarm_group_int[99];
     int detector_alarm_group_size;
     String detector_location;
+    /*
     boolean bme_280;
     boolean bme_280_temperature;
     boolean bme_280_humidity;
@@ -64,6 +65,7 @@ struct Config
     boolean light;
     boolean ubext;
     boolean bluetooth;
+    */
 };
 extern Config config;
 

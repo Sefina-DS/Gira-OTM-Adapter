@@ -10,14 +10,14 @@ void timer_funktion()
         nr = 0;
     }
     nr++;
-    if (WiFi.isConnected() &&
+    /*if (WiFi.isConnected() &&
         client.connected())
     {
         if (config.bluetooth)
         {
             bluetooth_scan();
         }
-    }
+    }*/
     /*Serial.print("Timerdurchlauf : ");
     Serial.println(nr);*/
     if (nr % 2 == 0)
@@ -46,7 +46,7 @@ void timer_funktion()
                 msg = "false";
             }
             mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation", String(msg));
-            if (config.bme_280)
+            if (sensor.bme280)
             {
                 bme_refresh();
             }
@@ -54,11 +54,11 @@ void timer_funktion()
     }
     if (nr % 2 == 0)
     {
-        if (config.ubext)
+        if (sensor.ubext)
         {
             ubext_refresh();
         }
-        if (config.light)
+        if (sensor.light)
         {
             light_refresh();
         }
