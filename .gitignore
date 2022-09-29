@@ -1,0 +1,5 @@
+.pio
+.vscode
+lib
+debug.log
+workspace.code-workspace
