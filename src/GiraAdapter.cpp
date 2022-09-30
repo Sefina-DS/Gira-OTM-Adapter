@@ -16,7 +16,7 @@ unsigned long timer_alarm = 0;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
 
   pinMode(output_led_esp, OUTPUT);
@@ -43,7 +43,7 @@ void setup()
   webserver_art();
 
   Serial.println();
-  Serial.print(config.esp_name);
+  Serial.print(wifi.esp_name);
   Serial.println(" wird gestartet");
   Serial.println();
 

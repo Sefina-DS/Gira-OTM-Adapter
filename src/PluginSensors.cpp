@@ -269,6 +269,7 @@ void web_server_sensor_get(String name, String msg)
 void load_conf_sensor(StaticJsonDocument<1024> doc)
 {
     Serial.println("... Sensor- Variablen ...");
+    
     sensor.bme280 = doc["bme_280"] | false;
     sensor.bme280_temperature = doc["bme_280_temperature"] | false;
     sensor.bme280_humidity = doc["bme_280_humidity"] | false;

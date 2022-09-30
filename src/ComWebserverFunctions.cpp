@@ -8,6 +8,7 @@ String web_server_variablen(const String &var)
     
     back = web_server_bluetooth(var);
     back = web_server_sensor(var);
+    back = web_server_wifi(var);
     
     if ( back != "")
     {
@@ -47,6 +48,7 @@ String web_server_variablen(const String &var)
             return "display: none;";
         }
     }
+    /*
     if (var == "nav-net-dhcp")
     {
         if (config.wifi_dhcp)
@@ -58,6 +60,7 @@ String web_server_variablen(const String &var)
             return "<div class='dhcp'>";
         }
     }
+    */
     if (var == "nav-net-mqtt")
     {
         if (!config.mqtt)
@@ -128,6 +131,7 @@ String web_server_variablen(const String &var)
             return "display: none;";
         }
     }
+    /*
     if (var == "place_esp_name")
     {
         temp = "placeholder = '" + config.esp_name + "'";
@@ -198,6 +202,7 @@ String web_server_variablen(const String &var)
         temp = "placeholder = '" + config.wifi_dns + "'";
         return temp;
     }
+    */
     if (var == "place_mqtt")
     {
         if (config.mqtt)
@@ -363,12 +368,14 @@ void web_server_get_analyse(String name, String msg)
 {
     web_server_bluetooth_get(name, msg);
     web_server_sensor_get(name, msg);
+    web_server_wifi_get(name, msg);
     
     if (name == "navigation")
     {
         webserver.navigation = msg;
         Serial.println(webserver.navigation);
     }
+    /*
     if (name == "esp_name")
     {
         if (msg != "")
@@ -376,6 +383,7 @@ void web_server_get_analyse(String name, String msg)
             config.esp_name = msg;
         }
     }
+    */
     if (name == "config_save_restart")
     {
         if (msg == "geänderte Config übertragen und Modul neustarten !")
@@ -398,6 +406,7 @@ void web_server_get_analyse(String name, String msg)
             ESP.restart();
         }
     }
+    /* 
     if (name == "wifi_ssid")
     {
         if (msg != "")
@@ -451,6 +460,7 @@ void web_server_get_analyse(String name, String msg)
             config.wifi_dns = msg;
         }
     }
+    */
     if (name == "mqtt")
     {
         if (msg == "aktiviert")

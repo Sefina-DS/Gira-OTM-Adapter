@@ -134,3 +134,19 @@ void web_server_bluetooth_get(String name, String msg)
         }
     }
 }
+
+void load_conf_bluetooth(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Bluetooth- Variablen ...");
+    
+    bluetooth.aktiv = doc["bluetooth"] | false;
+}
+
+StaticJsonDocument<1024> safe_conf_bluetooth(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Bluetooth- Variablen ...");
+    
+    doc["bluetooth"] = bluetooth.aktiv;
+
+    return doc;
+}

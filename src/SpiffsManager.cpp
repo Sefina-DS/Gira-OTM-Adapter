@@ -68,9 +68,14 @@ void spiffs_config_save()
     }
     msg_temp += config.detector_alarm_group_int[config.detector_alarm_group_size];
 
+    // Funktionen - SAFE
+
+    doc = safe_conf_wifi(doc);
     doc = safe_conf_sensor(doc);
+    doc = safe_conf_bluetooth(doc);
     
     // Variablen werden gelesen
+    /*
     doc["esp_name"] = config.esp_name;
     doc["wifi_ssid"] = config.wifi_ssid;
     doc["wifi_pw"] = config.wifi_pw;
@@ -79,6 +84,7 @@ void spiffs_config_save()
     doc["wifi_gw"] = config.wifi_gw;
     doc["wifi_subnet"] = config.wifi_subnet;
     doc["wifi_dns"] = config.wifi_dns;
+    */
     doc["mqtt"] = config.mqtt;
     doc["mqtt_ip"] = config.mqtt_ip;
     doc["mqtt_port"] = config.mqtt_port;
@@ -88,14 +94,7 @@ void spiffs_config_save()
     doc["detector_group"] = config.detector_group;
     doc["detector_alarm_group"] = msg_temp;
     doc["detector_location"] = config.detector_location;
-    /*doc["bme_280"] = config.bme_280;
-    doc["bme_280_temperature"] = config.bme_280_temperature;
-    doc["bme_280_humidity"] = config.bme_280_humidity;
-    doc["bme_280_pressure"] = config.bme_280_pressure;
-    doc["bme_280_high"] = config.bme_280_high;
-    doc["light"] = config.light;
-    doc["ubext"] = config.ubext;*/
-    doc["bluetooth"] = bluetooth.aktiv;
+    
 
     if (serializeJson(doc, fileTemp) == 0)
     {
@@ -123,9 +122,14 @@ void spiffs_config_load()
     if (error)
         Serial.println("Config- Lesefehler || Standart wird genutzt !");
 
+    // Funktionen - LOAD
+    
     load_conf_sensor(doc);
+    load_conf_bluetooth(doc);
+    load_conf_wifi(doc);
     
     // Variablen werden beschrieben
+    /*
     config.esp_name = doc["esp_name"] | "";
     config.wifi_ssid = doc["wifi_ssid"] | "-";
     config.wifi_pw = doc["wifi_pw"] | "";
@@ -134,6 +138,7 @@ void spiffs_config_load()
     config.wifi_gw = doc["wifi_gw"] | "0.0.0.0";
     config.wifi_subnet = doc["wifi_subnet"] | "0.0.0.0";
     config.wifi_dns = doc["wifi_dns"] | "0.0.0.0";
+    */
     config.mqtt = doc["mqtt"] | false;
     config.mqtt_ip = doc["mqtt_ip"] | "x-x-x-x";
     config.mqtt_port = doc["mqtt_port"] | "1883";
@@ -144,23 +149,14 @@ void spiffs_config_load()
     msg_temp = doc["detector_alarm_group"] | "0";
     alarm_group_diagnose(msg_temp);
     config.detector_location = doc["detector_location"] | "";
-    bluetooth.aktiv = doc["bluetooth"] | false;
+    
 
     fileTemp.close();
-    if (config.esp_name == "")
-    {
-        uint32_t chipId = 0;
-        for (int i = 0; i < 17; i = i + 8)
-        {
-            chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
-        }
-        config.esp_name = chipId;
-        config.esp_name = "ESP-" + config.esp_name;
-        if (config.mqtt_topic_define == "")
+    if (config.mqtt_topic_define == "")
         {
             config.mqtt_topic_define = config.esp_name;
         }
-    }
+    
 }
 
 void spiffs_config_read()
