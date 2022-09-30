@@ -1,0 +1,85 @@
+body {
+  background-color: rgb(39, 37, 37);
+  color: rgb(140, 143, 143);
+}
+div {
+  background-color: rgb(20, 19, 19);
+  text-align: center;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 30px;
+}
+div.ueberschrift {
+  text-align: center;
+}
+table {
+  width: 500px;
+  text-align: center;
+  margin: 0 auto;
+}
+td {width: 30%;}
+table.navigation {
+  width: 300px;
+}
+input {
+  color: rgb(140, 143, 143);
+  background-color: rgb(39, 37, 37);
+}
+
+input.setting {
+  width: 100%;
+  border-radius: 4px;
+  margin: 10px auto;
+  font-size: 15px;
+  border: 0;
+  padding: 0 15px;
+}
+div.network {
+}
+div.detector {
+}
+div.sensor {
+}
+div.system {
+}
+
+table.upload {
+  width: 750px;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.upload th {
+}
+table.upload-33 {
+  width: 750px;
+  border: 1px solid white;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.upload-50 td {
+  border: 1px solid white;
+  width: 150px;
+}
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.upload-33 td {
+  width: 250px;
+}
+table.upload-50 {
+  width: 750px;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.upload-50 td {
+  width: 150px;
+}
+table.upload-50b {
+  width: 500px;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+.upload-50b td {
+  width: 250px;
+  text-align: center;
+}
