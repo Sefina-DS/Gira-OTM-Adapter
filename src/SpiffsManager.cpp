@@ -71,6 +71,7 @@ void spiffs_config_save()
     // Funktionen - SAFE
 
     doc = safe_conf_wifi(doc);
+    doc = safe_conf_mqtt(doc);
     doc = safe_conf_sensor(doc);
     doc = safe_conf_bluetooth(doc);
     
@@ -85,11 +86,13 @@ void spiffs_config_save()
     doc["wifi_subnet"] = config.wifi_subnet;
     doc["wifi_dns"] = config.wifi_dns;
     */
+    /*
     doc["mqtt"] = config.mqtt;
     doc["mqtt_ip"] = config.mqtt_ip;
     doc["mqtt_port"] = config.mqtt_port;
     doc["mqtt_topic_base"] = config.mqtt_topic_base;
     doc["mqtt_topic_define"] = config.mqtt_topic_define;
+    */
     doc["seriel"] = config.seriel;
     doc["detector_group"] = config.detector_group;
     doc["detector_alarm_group"] = msg_temp;
@@ -127,6 +130,7 @@ void spiffs_config_load()
     load_conf_sensor(doc);
     load_conf_bluetooth(doc);
     load_conf_wifi(doc);
+    load_conf_mqtt(doc);
     
     // Variablen werden beschrieben
     /*
@@ -139,11 +143,13 @@ void spiffs_config_load()
     config.wifi_subnet = doc["wifi_subnet"] | "0.0.0.0";
     config.wifi_dns = doc["wifi_dns"] | "0.0.0.0";
     */
+    /*
     config.mqtt = doc["mqtt"] | false;
     config.mqtt_ip = doc["mqtt_ip"] | "x-x-x-x";
     config.mqtt_port = doc["mqtt_port"] | "1883";
     config.mqtt_topic_base = doc["mqtt_topic_base"] | "Rauchmelder";
     config.mqtt_topic_define = doc["mqtt_topic_define"] | "";
+    */
     config.seriel = doc["seriel"] | false;
     config.detector_group = doc["detector_group"] | "0";
     msg_temp = doc["detector_alarm_group"] | "0";
@@ -152,11 +158,6 @@ void spiffs_config_load()
     
 
     fileTemp.close();
-    if (config.mqtt_topic_define == "")
-        {
-            config.mqtt_topic_define = config.esp_name;
-        }
-    
 }
 
 void spiffs_config_read()

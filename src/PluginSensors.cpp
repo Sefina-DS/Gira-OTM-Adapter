@@ -9,33 +9,33 @@ void bme_refresh()
     bme_run = bme.begin(0x76);
     if (!bme_run)
     {
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Störung");
+        client.publish((mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Störung");
         Serial.println("BME-240 ist in Störung");
     }
     else
     {
         float temp_float;
         char temp_msg[8];
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Läuft");
+        client.publish((mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Läuft");
         if (sensor.bme280_temperature)
         {
             temp_float = bme.readTemperature();
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Temperatur", String(temp_float));
+            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Temperatur", String(temp_float));
         }
         if (sensor.bme280_pressure)
         {
             temp_float = bme.readPressure() / 100.0F;
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Druck", String(temp_float));
+            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Druck", String(temp_float));
         }
         if (sensor.bme280_humidity)
         {
             temp_float = bme.readHumidity();
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Feuchte", String(temp_float));
+            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Feuchte", String(temp_float));
         }
         if (sensor.bme280_high)
         {
             temp_float = bme.readAltitude(SEALEVELPRESSURE_HPA);
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Meter über Meeresspiegel", String(temp_float));
+            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_sensor + "Meter über Meeresspiegel", String(temp_float));
         }
     }
 }
@@ -62,14 +62,14 @@ void light_refresh()
     if (temp >= 200)
     {
         temp_light = analogRead(input_light);
-        mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_light + "Lichtzahl", String(temp_light));
+        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtzahl", String(temp_light));
         temp = temp_light - 4095;
         if (temp != 0)
         {
             temp = -temp;
         }
         temp = (temp * 100) / 4095;
-        mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_light + "Lichtwert", String(temp));
+        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtwert", String(temp));
     }
 }
 
@@ -80,7 +80,7 @@ void ubext_refresh()
     int faktor = 1026;
     float temp_roh = analogRead(input_ubext);
     float temp_ubext = ((temp_roh * 100000) / faktor) / ((100000 * R2) / (R1 + R2));
-    mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
+    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
 }
 
 String web_server_sensor(const String &var)

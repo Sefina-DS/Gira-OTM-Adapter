@@ -9,6 +9,7 @@ String web_server_variablen(const String &var)
     back = web_server_bluetooth(var);
     back = web_server_sensor(var);
     back = web_server_wifi(var);
+    back = web_server_mqtt(var);
     
     if ( back != "")
     {
@@ -33,10 +34,12 @@ String web_server_variablen(const String &var)
     {
         return humanReadableSize(SPIFFS.totalBytes());
     }
+    /*
     if (var == "esp_name")
     {
         return config.esp_name;
     }
+    */
     if (var == "nav-net")
     {
         if (webserver.navigation == "Netzwerk")
@@ -61,6 +64,7 @@ String web_server_variablen(const String &var)
         }
     }
     */
+    /*
     if (var == "nav-net-mqtt")
     {
         if (!config.mqtt)
@@ -72,6 +76,7 @@ String web_server_variablen(const String &var)
             return "<div class='mqtt'>";
         }
     }
+    */
     if (var == "nav-det")
     {
         if (webserver.navigation == "Rauchmelder")
@@ -203,6 +208,7 @@ String web_server_variablen(const String &var)
         return temp;
     }
     */
+    /*
     if (var == "place_mqtt")
     {
         if (config.mqtt)
@@ -236,6 +242,7 @@ String web_server_variablen(const String &var)
         temp = "placeholder = '" + config.mqtt_topic_define + "'";
         return temp;
     }
+    */
     if (var == "place_detector_location")
     {
         temp = "placeholder = '" + config.detector_location + "'";
@@ -461,6 +468,7 @@ void web_server_get_analyse(String name, String msg)
         }
     }
     */
+    /*
     if (name == "mqtt")
     {
         if (msg == "aktiviert")
@@ -500,6 +508,7 @@ void web_server_get_analyse(String name, String msg)
             config.mqtt_topic_define = msg;
         }
     }
+    */
     if (name == "detector_location")
     {
         if (msg != "")

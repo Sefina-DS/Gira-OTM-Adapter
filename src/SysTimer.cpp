@@ -24,7 +24,7 @@ void timer_funktion()
     {
         led_flash_timer(100 ,0 ,1);
         if (WiFi.isConnected() &&
-            config.mqtt &&
+            mqtt.aktiv &&
             !client.connected())
         {
             mqtt_connect();
@@ -45,7 +45,7 @@ void timer_funktion()
             {
                 msg = "false";
             }
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation", String(msg));
+            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Komunikation", String(msg));
             if (sensor.bme280)
             {
                 bme_refresh();
@@ -73,7 +73,7 @@ void timer_funktion()
         seri_status = 1;
         serial_send("09");
         temp = ((millis() / 1000) / 60) / 60;
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Betriebsstunden").c_str(), (String(temp)).c_str());
+        client.publish((mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "Betriebsstunden").c_str(), (String(temp)).c_str());
         break;
     // Statusmeldungen
     case 13:

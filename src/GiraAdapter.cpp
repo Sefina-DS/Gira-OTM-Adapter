@@ -57,7 +57,7 @@ void setup()
     digitalWrite(output_comport_activ, LOW);
     Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
   }
-  if (config.mqtt)
+  if (mqtt.aktiv)
   {
     mqtt_config();
   }
@@ -84,7 +84,7 @@ void loop()
     timer_funktion();
   }
   // MQTT Funktion
-  if (config.mqtt)
+  if (mqtt.aktiv)
   {
     client.loop();
   }

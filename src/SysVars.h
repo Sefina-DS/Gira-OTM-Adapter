@@ -37,19 +37,8 @@
 
 struct Config
 {
-    boolean mqtt;
-    String mqtt_ip;
-    String mqtt_port;
-    String mqtt_topic_base;
-    String mqtt_topic_define;
-    String esp_name;
-    String wifi_ssid;
-    String wifi_pw;
-    boolean wifi_dhcp;
-    String wifi_ip;
-    String wifi_gw;
-    String wifi_subnet;
-    String wifi_dns;
+
+
     boolean seriel;
     String detector_group;
     String detector_alarm_group;

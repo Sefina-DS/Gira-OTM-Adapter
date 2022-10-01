@@ -2,6 +2,8 @@
 
 void mqtt_filter(String topic, String msg)
 {
+    String topic_base = mqtt.topic_base + "/";
+    String topic_ext = mqtt.topic_base + "/" + mqtt.topic_define + "/";
     boolean msg_bool;
     if (msg == "false")
     {
@@ -16,7 +18,7 @@ void mqtt_filter(String topic, String msg)
     Serial.print(" || die Message : ");
     Serial.println(msg);
 
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation")
+    if (topic == topic_ext + detector_status + "Komunikation")
     {
         if (msg_bool == true && config.seriel == false)
         {
@@ -28,8 +30,8 @@ void mqtt_filter(String topic, String msg)
         }
     }
 
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Melder_Finden" ||
-        topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Melder_Finden")
+    if (topic == topic_ext + detector_control + "Melder_Finden" ||
+        topic == topic_base + group_control + config.detector_group + "/" + "Melder_Finden")
     {
         if (seri_status == 0)
         {
@@ -44,8 +46,8 @@ void mqtt_filter(String topic, String msg)
             }
         }
     }
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Testalarm-Funk" ||
-        topic == config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Testalarm")
+    if (topic == topic_ext + detector_control + "Testalarm-Funk" ||
+        topic == topic_base + group_control + config.detector_group + "/" + "Testalarm")
     {
         if (seri_status == 0)
         {
@@ -65,11 +67,11 @@ void mqtt_filter(String topic, String msg)
         String topic_temp = "";
         if (i > config.detector_alarm_group_size)
         {
-            topic_temp = config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk";
+            topic_temp = topic_ext + detector_control + "Alarm-Funk";
         }
         else
         {
-            topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
+            topic_temp = topic_base + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
         }
         if (topic == topic_temp)
         {
@@ -92,18 +94,18 @@ void mqtt_filter(String topic, String msg)
         }
     }
 
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Reset_Test/Funk_Alarme" &&
+    if (topic == topic_ext + detector_control + "Reset_Test/Funk_Alarme" &&
         seri_status == 0)
     {
         seri_status = 1;
         if (msg_bool == true)
         {
             serial_send("030000");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Reset_Test/Funk_Alarme").c_str(), "false");
+            client.publish((topic_ext + detector_control + "Reset_Test/Funk_Alarme").c_str(), "false");
         }
     }
 
-    if (topic == config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Das_ist_ein_Test" &&
+    if (topic == topic_ext + detector_control + "Das_ist_ein_Test" &&
         seri_status == 0)
     {
         seri_status = 1;
@@ -136,6 +138,6 @@ void mqtt_filter(String topic, String msg)
             serial_send("030200"); // Wireless Alarm / Testalarm beendet
             seri_status = 0;
         }
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Das_ist_ein_Test").c_str(), "0");
+        client.publish((topic_ext + detector_control + "Das_ist_ein_Test").c_str(), "0");
     }
 }

@@ -48,7 +48,7 @@ void bluetooth_scan()
             if ( gefunden == temp)
             {
                 bluetooth.empfang[i] = empfang;
-                mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_bluetooth + temp, String(empfang));
+                mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp, String(empfang));
 /*
                 String topic = 
                 mqtt_publish()
@@ -77,7 +77,7 @@ void bluetooth_scan()
             String temp = bluetooth.adressen[i];
             if (bluetooth.empfang[i] == 0)
             {
-                mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_bluetooth + temp, String(0));
+                mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp, String(0));
             }
             else
             {

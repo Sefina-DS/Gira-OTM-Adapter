@@ -32,7 +32,7 @@ void filter(byte msg[10], int size)
             letter = msg[i];
             temp_msg += letter;
         }
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Seriennummer").c_str(), temp_msg.c_str());
+        mqtt_link("Melder-Diagnose/Seriennummer", temp_msg.c_str());
         break;
     //      C9 / 6757 = Betriebszeit
     case 6757:
@@ -43,7 +43,7 @@ void filter(byte msg[10], int size)
         }
         temp_long = strtol(temp_input8, &endptr, 16);
         temp_long = (((temp_long / 4) / 60) / 60);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Betriebsstunden").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Betriebsstunden", (String(temp_long)).c_str());
         break;
     //      CC / 6767 = Batteriespannung + 2x Temperatur
     case 6767:
@@ -53,21 +53,21 @@ void filter(byte msg[10], int size)
         }
         temp_long = strtol(temp_input2, &endptr, 16);
         temp_float = (temp_long / 2) - 20;
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Temperatur-1").c_str(), (String(temp_float)).c_str());
+        mqtt_link("Melder-Diagnose/Temperatur-1", (String(temp_float)).c_str());
         for (int i = 8; i < 10; i++)
         {
             temp_input2[i - 8] = msg[i];
         }
         temp_float = strtol(temp_input2, &endptr, 16);
         temp_float = (temp_float / 2) - 20;
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Temperatur-2").c_str(), (String(temp_float)).c_str());
+        mqtt_link("Melder-Diagnose/Temperatur-2", (String(temp_float)).c_str());
         for (int i = 2; i < 6; i++)
         {
             temp_input4[i - 2] = msg[i];
         }
         temp_float = strtol(temp_input4, &endptr, 16);
         temp_float = temp_float * 0.018369;
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Batteriespannung").c_str(), (String(temp_float)).c_str());
+        mqtt_link("Melder-Diagnose/Batteriespannung", (String(temp_float)).c_str());
         break;
     //      CB / 6766 = Rauchkammer, Verschmutzung, Anzahl Optische- Alarme
     case 6766:
@@ -76,20 +76,20 @@ void filter(byte msg[10], int size)
             temp_input2[i - 6] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Optisch-Alarm").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Optisch-Alarm", (String(temp_long)).c_str());
         for (int i = 8; i < 10; i++)
         {
             temp_input2[i - 8] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Verschmutzung_%").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Verschmutzung_%", (String(temp_long)).c_str());
         for (int i = 2; i < 6; i++)
         {
             temp_input4[i - 2] = msg[i];
         }
         temp_long = strtol(temp_input4, &endptr, 16);
         temp_float = temp_long * 0.003223;
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Rauchkammerwert").c_str(), (String(temp_float)).c_str());
+        mqtt_link("Melder-Diagnose/Rauchkammerwert", (String(temp_float)).c_str());
         break;
     //      CD / 6768 = Alarme, Testalarme
     case 6768:
@@ -98,25 +98,25 @@ void filter(byte msg[10], int size)
             temp_input2[i - 2] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Temperatur-Alarm").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Temperatur-Alarm", (String(temp_long)).c_str());
         for (int i = 4; i < 6; i++)
         {
             temp_input2[i - 4] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Test-Alarm_Local").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Test-Alarm_Local", (String(temp_long)).c_str());
         for (int i = 6; i < 8; i++)
         {
             temp_input2[i - 6] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Draht_Alarm").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Draht_Alarm", (String(temp_long)).c_str());
         for (int i = 8; i < 10; i++)
         {
             temp_input2[i - 8] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Funk_Alarm").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Funk_Alarm", (String(temp_long)).c_str());
         break;
     //      CE / 6769 = Alarme, Testalarme
     case 6769:
@@ -125,13 +125,13 @@ void filter(byte msg[10], int size)
             temp_input2[i - 2] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Test-Alarm_Kabel").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Test-Alarm_Kabel", (String(temp_long)).c_str());
         for (int i = 4; i < 6; i++)
         {
             temp_input2[i - 4] = msg[i];
         }
         temp_long = strtol(temp_input2, &endptr, 16);
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Anzahl_Test-Alarm_Funk").c_str(), (String(temp_long)).c_str());
+        mqtt_link("Melder-Diagnose/Anzahl_Test-Alarm_Funk", (String(temp_long)).c_str());
         break;
     //      C2 / 6750 || 82 / 5650 Statusmeldungen
     case 6750:
@@ -140,29 +140,29 @@ void filter(byte msg[10], int size)
         switch (bitTemp)
         {
         case 48: // 0
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "false");
+            mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "true");
+            mqtt_link("Melder-Status/Alarm Thermisch", "false");
             break;
         case 49: // 1
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "true");
+            mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "true");
+            mqtt_link("Melder-Status/Alarm Thermisch", "true");
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
             }
             break;
         case 50: // 2
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "false");
+            mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "false");
+            mqtt_link("Melder-Status/Alarm Thermisch", "false");
             break;
         case 51: // 3
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_diagnose + "Spannungsversorgung Ext.").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "true");
+            mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "false");
+            mqtt_link("Melder-Status/Alarm Thermisch", "true");
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
             }
             break;
         default:
@@ -172,21 +172,21 @@ void filter(byte msg[10], int size)
         switch (bitTemp)
         {
         case 48: // 0
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Taster Melder").c_str(), "false");
+            mqtt_link("Melder-Status/Taster Melder", "false");
             break;
         case 56: // 8
             serial_send("030200");
             topic_temp = "";
             for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
             {
-                topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/";
+                topic_temp = mqtt.topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/";
                 client.publish((topic_temp + "Alarm").c_str(), "false");
                 client.publish((topic_temp + "Testalarm").c_str(), "false");
             }
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Taster Melder").c_str(), "true");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm-Funk").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Optisch").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Thermisch").c_str(), "false");
+            mqtt_link("Melder-Status/Taster Melder", "true");
+            mqtt_link("Melder-Status/Alarm-Funk", "false");
+            mqtt_link("Melder-Status/Alarm Optisch", "false");
+            mqtt_link("Melder-Status/Alarm Thermisch", "false");
             break;
         default:
             break;
@@ -195,14 +195,14 @@ void filter(byte msg[10], int size)
         switch (bitTemp)
         {
         case 48: // 0
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Testalarm-Funk").c_str(), "false");
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm-Funk").c_str(), "false");
+            mqtt_link("Melder-Status/Testalarm-Funk", "false");
+            mqtt_link("Melder-Status/Alarm-Funk", "false");
             break;
         case 49: // 1
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm-Funk").c_str(), "true");
+            mqtt_link("Melder-Status/Alarm-Funk", "true");
             break;
         case 56: // 8
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Testalarm-Funk").c_str(), "true");
+            mqtt_link("Melder-Status/Testalarm-Funk", "true");
             break;
 
         default:
@@ -212,14 +212,14 @@ void filter(byte msg[10], int size)
         switch (bitTemp)
         {
         case 48: // 0
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Optisch").c_str(), "false");
+            mqtt_link("Melder-Status/Alarm Optisch", "false");
             break;
         case 52: // 4
-            client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Alarm Optisch").c_str(), "true");
+            mqtt_link("Melder-Status/Alarm Optisch", "true");
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
             }
             break;
         default:
@@ -234,4 +234,10 @@ void filter(byte msg[10], int size)
         Serial.println(order);
         break;
     }
+}
+
+void mqtt_link(String topic, String msg)
+{
+    String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + topic;
+    mqtt_publish(temp, msg);
 }

@@ -127,6 +127,10 @@ void scan_wifi_ssid()
 String web_server_wifi(const String &var)
 {
     String temp = "";
+    if (var == "esp_name")
+    {
+        return wifi.esp_name;
+    }
     if (var == "nav-net-dhcp")
     {
         if (wifi.dhcp)
