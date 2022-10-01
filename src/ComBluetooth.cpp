@@ -49,13 +49,6 @@ void bluetooth_scan()
             {
                 bluetooth.empfang[i] = empfang;
                 mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp, String(empfang));
-/*
-                String topic = 
-                mqtt_publish()
-                Serial.print("ES HAT GEKLAPPT : ");
-                Serial.print(temp);
-                Serial.print(" | ");
-                Serial.println(empfang);*/
             }
         }
         

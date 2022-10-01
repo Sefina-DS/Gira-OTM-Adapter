@@ -10,14 +10,7 @@ void timer_funktion()
         nr = 0;
     }
     nr++;
-    /*if (WiFi.isConnected() &&
-        client.connected())
-    {
-        if (config.bluetooth)
-        {
-            bluetooth_scan();
-        }
-    }*/
+    
     /*Serial.print("Timerdurchlauf : ");
     Serial.println(nr);*/
     if (nr % 2 == 0)

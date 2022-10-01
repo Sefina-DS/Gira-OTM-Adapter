@@ -13,11 +13,6 @@
 #define output_led_detector 27
 #define output_comport_activ 23
 
-//#define serial_detector_aktiv 15
-//#define serial_detector_scan 18
-// const int input_light = 36; // Hardwareeingang von Lichtsensor
-// const int input_ubext = 39;      // Hardwareeingang von Spannungsteiler
-
 // MQTT Definitions
 
 #define detector_diagnose "Melder-Diagnose/"
@@ -45,16 +40,7 @@ struct Config
     int detector_alarm_group_int[99];
     int detector_alarm_group_size;
     String detector_location;
-    /*
-    boolean bme_280;
-    boolean bme_280_temperature;
-    boolean bme_280_humidity;
-    boolean bme_280_pressure;
-    boolean bme_280_high;
-    boolean light;
-    boolean ubext;
-    boolean bluetooth;
-    */
+
 };
 extern Config config;
 

@@ -76,23 +76,7 @@ void spiffs_config_save()
     doc = safe_conf_bluetooth(doc);
     
     // Variablen werden gelesen
-    /*
-    doc["esp_name"] = config.esp_name;
-    doc["wifi_ssid"] = config.wifi_ssid;
-    doc["wifi_pw"] = config.wifi_pw;
-    doc["wifi_dhcp"] = config.wifi_dhcp;
-    doc["wifi_ip"] = config.wifi_ip;
-    doc["wifi_gw"] = config.wifi_gw;
-    doc["wifi_subnet"] = config.wifi_subnet;
-    doc["wifi_dns"] = config.wifi_dns;
-    */
-    /*
-    doc["mqtt"] = config.mqtt;
-    doc["mqtt_ip"] = config.mqtt_ip;
-    doc["mqtt_port"] = config.mqtt_port;
-    doc["mqtt_topic_base"] = config.mqtt_topic_base;
-    doc["mqtt_topic_define"] = config.mqtt_topic_define;
-    */
+    
     doc["seriel"] = config.seriel;
     doc["detector_group"] = config.detector_group;
     doc["detector_alarm_group"] = msg_temp;
@@ -132,24 +116,6 @@ void spiffs_config_load()
     load_conf_wifi(doc);
     load_conf_mqtt(doc);
     
-    // Variablen werden beschrieben
-    /*
-    config.esp_name = doc["esp_name"] | "";
-    config.wifi_ssid = doc["wifi_ssid"] | "-";
-    config.wifi_pw = doc["wifi_pw"] | "";
-    config.wifi_dhcp = doc["wifi_dhcp"] | true;
-    config.wifi_ip = doc["wifi_ip"] | "0.0.0.0";
-    config.wifi_gw = doc["wifi_gw"] | "0.0.0.0";
-    config.wifi_subnet = doc["wifi_subnet"] | "0.0.0.0";
-    config.wifi_dns = doc["wifi_dns"] | "0.0.0.0";
-    */
-    /*
-    config.mqtt = doc["mqtt"] | false;
-    config.mqtt_ip = doc["mqtt_ip"] | "x-x-x-x";
-    config.mqtt_port = doc["mqtt_port"] | "1883";
-    config.mqtt_topic_base = doc["mqtt_topic_base"] | "Rauchmelder";
-    config.mqtt_topic_define = doc["mqtt_topic_define"] | "";
-    */
     config.seriel = doc["seriel"] | false;
     config.detector_group = doc["detector_group"] | "0";
     msg_temp = doc["detector_alarm_group"] | "0";
