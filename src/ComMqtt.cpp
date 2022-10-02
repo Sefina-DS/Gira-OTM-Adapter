@@ -65,6 +65,13 @@ void mqtt_connect()
 
       Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
       Serial.println("");
+      
+      // Subscriben
+
+      detector_mqtt_config();
+      
+      /*
+      
       // Subscribe Melder
       // delay(1000);
       client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Melder_Finden").c_str());
@@ -85,6 +92,7 @@ void mqtt_connect()
         topic_temp = mqtt.topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
         client.subscribe(topic_temp.c_str());
       }
+      */
     }
     else
     {

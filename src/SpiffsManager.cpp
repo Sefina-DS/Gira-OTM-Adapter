@@ -73,6 +73,7 @@ void spiffs_config_save()
     doc = safe_conf_wifi(doc);
     doc = safe_conf_mqtt(doc);
     doc = safe_conf_sensor(doc);
+    doc = safe_conf_detector(doc);
     doc = safe_conf_bluetooth(doc);
     
     // Variablen werden gelesen
@@ -112,6 +113,7 @@ void spiffs_config_load()
     // Funktionen - LOAD
     
     load_conf_sensor(doc);
+    load_conf_detector(doc);
     load_conf_bluetooth(doc);
     load_conf_wifi(doc);
     load_conf_mqtt(doc);

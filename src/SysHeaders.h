@@ -34,4 +34,5 @@
 #include "ComSerialFilter.h"
 #include "AdvancedFunctions.h"
 #include "PluginSensors.h"
+#include "PluginDetector.h"
 #include "SysTimer.h"
