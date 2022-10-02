@@ -26,184 +26,15 @@ void detector_mqtt_config()
 String web_server_sensor(const String &var)
 {
     String temp = "";
-    if (var == "nav-sen-bme")
-    {
-        if (!sensor.bme280)
-        {
-            return "<br/><div class='bme280' style=' display : none;'>";
-        }
-        else
-        {
-            return "<div class='bme280'>";
-        }
-    }
-    if (var == "place_sensor_bme")
-    {
-        if (sensor.bme280)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_temperature")
-    {
-        if (sensor.bme280_temperature)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_humidity")
-    {
-        if (sensor.bme280_humidity)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_pressure")
-    {
-        if (sensor.bme280_pressure)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_high")
-    {
-        if (sensor.bme280_high)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_light")
-    {
-        if (sensor.light)
-        {
-            temp = auswahl_aktiv;
-        }
-        else
-        {
-            temp = auswahl_deaktiv;
-        }
-        return temp;
-    }
-    if (var == "place_sensor_ubext")
-    {
-        if (sensor.ubext)
-        {
-            temp = auswahl_aktiv;
-        }
-        else
-        {
-            temp = auswahl_deaktiv;
-        }
-        return temp;
-    }
+
+
 
     return String();
 }
 
 void web_server_sensor_get(String name, String msg)
 {
-    if (name == "bme")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280 = true;
-        }
-        else
-        {
-            sensor.bme280 = false;
-        }
-    }
-    if (name == "bme-temperature")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_temperature = true;
-        }
-        else
-        {
-            sensor.bme280_temperature = false;
-        }
-    }
-    if (name == "bme-humidity")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_humidity = true;
-        }
-        else
-        {
-            sensor.bme280_humidity = false;
-        }
-    }
-    if (name == "bme-temperature")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_pressure = true;
-        }
-        else
-        {
-            sensor.bme280_pressure = false;
-        }
-    }
-    if (name == "bme-high")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_high = true;
-        }
-        else
-        {
-            sensor.bme280_high = false;
-        }
-    }
-    if (name == "light")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.light = true;
-        }
-        else
-        {
-            sensor.light = false;
-        }
-    }
-    if (name == "ubext")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.ubext = true;
-        }
-        else
-        {
-            sensor.ubext = false;
-        }
-    }
+    
 }
 
 void load_conf_detector(StaticJsonDocument<1024> doc)
@@ -242,6 +73,7 @@ StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc)
 void alarm_group_diagnose(String msg)
 {
     String number_str = "";
+    int number_temp;
     int number = 999999;
     int size = 0;
     boolean mg = false;
