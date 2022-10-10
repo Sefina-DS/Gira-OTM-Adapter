@@ -23,7 +23,7 @@ void detector_mqtt_config()
     }
 }
 
-String web_server_sensor(const String &var)
+String web_server_detector(const String &var)
 {
     String temp = "";
 
@@ -32,7 +32,7 @@ String web_server_sensor(const String &var)
     return String();
 }
 
-void web_server_sensor_get(String name, String msg)
+void web_server_detector_get(String name, String msg)
 {
     
 }
@@ -43,7 +43,7 @@ void load_conf_detector(StaticJsonDocument<1024> doc)
 
     String temp;
     
-    detector.group = doc["detector_group"] | "0";
+    detector.group = doc["detector_group"] | 0;
     temp = doc["detector_alarm_group"] | "0";
     detector.location = doc["detector_location"] | "";
 
@@ -72,7 +72,41 @@ StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc)
 
 void alarm_group_diagnose(String msg)
 {
-    String number_str = "";
+    String temp_string;
+    int temp_size = 0;
+    for (int i = 0; msg[i] != 0 ; i++)
+    {
+        if (msg[i] > 47 &&
+            msg[i] < 58)
+        {
+            temp_string += msg[i];
+        }
+        else 
+        {
+            if ( temp_string != "")
+            {
+                detector.alarm_group[temp_size] = temp_string.toInt();
+                temp_size++;
+                temp_string = "";
+            }
+        }
+    }
+    if ( temp_string != "")
+    {
+        detector.alarm_group[temp_size] = temp_string.toInt();
+        temp_size++;
+        temp_string = "";
+    }
+    detector.alarm_group_size = temp_size;
+    for (int i = 0; i < temp_size; i++)
+    {
+        Serial.print("Gruppe ");
+        Serial.print(i);
+        Serial.print(" : ");
+        Serial.println(detector.alarm_group[i]);
+    }
+    
+    /*String number_str = "";
     int number_temp;
     int number = 999999;
     int size = 0;
@@ -126,4 +160,5 @@ void alarm_group_diagnose(String msg)
         Serial.print(detector.alarm_group[i]);
         Serial.print(", ");
     }
+    */
 }
