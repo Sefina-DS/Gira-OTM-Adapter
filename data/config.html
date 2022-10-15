@@ -1,381 +1,139 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <link rel="stylesheet" href="config.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="UTF-8" />
-  </head>
-  <style>
-    body {
-      background-color: rgb(39, 37, 37);
-      color: rgb(140, 143, 143);
-    }
-    div {
-      background-color: rgb(20, 19, 19);
-      text-align: center;
-      padding: 5px;
-      box-sizing: border-box;
-      border-radius: 30px;
-    }
-    div.ueberschrift {
-      text-align: center;
-    }
-    table {
-      width: 500px;
-      text-align: center;
-      margin: 0 auto;
-    }
-    table.navigation {
-      width: 300px;
-    }
+    <head>
+        <link rel="stylesheet" href="config.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta charset="UTF-8" />
+    </head>
+    <style>
+        body {
+            background-color: rgb(39, 37, 37);
+            color: rgb(140, 143, 143);
+        }
+        div {
+            background-color: rgb(20, 19, 19);
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+            border-radius: 30px;
+        }
+        div.ueberschrift {
+            text-align: center;
+        }
+        table {
+            width: 500px;
+            text-align: center;
+            margin: 0 auto;
+        }
+        table.navigation {
+            width: 300px;
+        }
 
-    div.network {
-      %nav-net%
-    }
-    div.detector {
-      %nav-det%
-    }
-    div.sensor {
-      %nav-sen%
-    }
-    div.system {
-      %nav-sys%
-    }
-  </style>
-  <body>
-    <!-- BEREICH ÜBERSCHRIFT BEGINN -->
-    <div class="ueberschrift">
-      <h1>Rauchmelderadapter - Config</h1>
-      %esp_name% | %place_detector_location%
-    </div>
-    <!-- BEREICH ÜBERSCHRIFT ENDE -->
-    <br />
-    <!-- BEREICH NAVIGATION BEGINN -->
-    <div class="navigation">
-      <table class="navigation">
-        <tr>
-          <td>
-            <form action="/get">
-              <input type="submit" value="Netzwerk" name="navigation" />
-            </form>
-          </td>
-          <td>
-            <form action="/get">
-              <input type="submit" value="Rauchmelder" name="navigation" />
-            </form>
-          </td>
-          <td>
-            <form action="/get">
-              <input type="submit" value="Sensoren" name="navigation" />
-            </form>
-          </td>
-          <td>
-            <form action="/get">
-              <input type="submit" value="System" name="navigation" />
-            </form>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <!-- BEREICH NAVIGATION ENDE -->
-    <br />
-    <!-- BEREICH NETZWERK BEGINN -->
-    <div class="network">
-      <h3>Netzwerk Einstellungen</h3>
-      <form action="/get">
-        <table>
-          <tr>
-            <td>ESP- Name :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="esp_name"
-                %place_esp_name%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>WiFi - SSID :</td>
-            <td>%place_wifi_ssid%</td>
-          </tr>
-          <tr>
-            <td>WiFi - Passwort :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="wifi_pw"
-                %place_wifi_pw%
-              />
-            </td>
-          </tr>
-        </table>
-        <table>
-          <tr>
-            <td>IP- Adressen Typ :</td>
-            <td><select name='wifi_dhcp'>%place_wifi_typ%</select></td>
-          </tr>
-        </table>
-        <!-- BEREICH NETZWERK - DHCP BEGINN -->
-        %nav-net-dhcp%
-          <table>
-          <tr>
-            <td>IP Adresse :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="wifi_ip"
-                %place_wifi_ip%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Subnet- Mask :</td>
-            <td><input
-                class="setting"
-                type="text"
-                name="wifi_subnet"
-                %place_wifi_subnet%
-              /></td>
-          </tr>
-          <tr>
-            <td>Gateway :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="wifi_gw"
-                %place_wifi_gw%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>DNS :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="wifi_dns"
-                %place_wifi_dns%
-              />
-            </td>
-          </tr>
-        </table>
+        div.network {
+            %nav-net%
+        }
+        div.detector {
+            %nav-det%
+        }
+        div.sensor {
+            %nav-sen%
+        }
+        div.system {
+            %nav-sys%
+        }
+    </style>
+    <body>
+        <!-- BEREICH ÜBERSCHRIFT BEGINN -->
+        <div class="ueberschrift">
+            <h1>Rauchmelderadapter - Config</h1>
+            %esp_name% | %place_detector_location%
         </div>
-        <!-- BEREICH NETZWERK - DHCP ENDE -->
-        <input type="submit" value="Submit" />
-      </form>
-      <br />
-      <h3>MQTT Einstellungen</h3>
-      <form action="/get">
-        <table>
-          <tr>
-            <td>MQTT :</td>
-            <td><select name='mqtt'>%place_mqtt%</select></td>
-          </tr>
-        </table>
-        <!-- BEREICH NETZWERK - MQTT BEGINN -->
-        %nav-net-mqtt%
-          <table>
-          <tr>
-            <td>IP Broker :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="mqtt_ip"
-                %place_mqtt_ip%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Port Broker :</td>
-            <td><input
-                class="setting"
-                type="text"
-                name="mqtt_port"
-                %place_mqtt_port%
-              />
-            </td>
-          </tr>
-        </table>
-        MQTT - Topic <br>
-        Achtung : Grund- Topic / Melder- Topic / <br>
-        der Aufbau darf nicht geändert werden ! <br>
-        <table>
-          <tr>
-            <td>Grund- Topic :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="mqtt_base"
-                %place_mqtt_base%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Melder- Topic :</td>
-            <td><input
-                class="setting"
-                type="text"
-                name="mqtt_define"
-                %place_mqtt_define%
-              />
-            </td>
-          </tr>
-        </table>
-        </div>
-        <!-- BEREICH NETZWERK - MQTT ENDE -->
+        <!-- BEREICH ÜBERSCHRIFT ENDE -->
         <br />
-        <input type="submit" value="Submit" />
+        <!-- BEREICH NAVIGATION BEGINN -->
+        <div class="navigation">
+            <table class="navigation">
+                <tr>
+                    <td>
+                        <form action="/get">
+                            <input type="submit" value="Netzwerk" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/get">
+                            <input type="submit" value="Rauchmelder" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/get">
+                            <input type="submit" value="Sensoren" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/get">
+                            <input type="submit" value="System" name="navigation" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- BEREICH NAVIGATION ENDE -->
+
+        <!-- BEREICH Netzwerk  -->
+        %web_network_ip%
+        %web_network_mqtt%
+
+        <!-- BEREICH Netzwerk ENDE -->
+
+
+
+
+
+        <!-- BEREICH SYSTEM BEGINN -->
+        <div class="system">
+            <h3>Systeminfos</h3>
+            <table class="upload">
+                <tr>
+                    <td>! File upload !</td>
+                </tr>
+            </table>
+            <table class="upload-33">
+                <tr>
+                    <td>Free Storage: %FREESPIFFS%</td>
+                    <td>Used Storage: %USEDSPIFFS%</td> 
+                    <td>Total Storage: %TOTALSPIFFS%</td>
+                </tr>
+            </table>
+            <table class="upload-50">
+                <tr>
+                    <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
+                    <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
+                </tr>
+            </table>
+            <table class="upload-33">
+                <tr>
+                    <td>Auf dem ESP vorhandene Daten :</td>
+                    <td>%FILELIST%</td>
+                </tr>
+            </table>
+        </div>
+        <!-- BEREICH SYSTEM ENDE -->
         <br>
-      </form>
-    </div>
-    <!-- BEREICH NETZWERK ENDE -->
-    <!-- BEREICH RAUCHMELDER BEGINN -->
-    <div class="detector">
-      <h3>Rauchmelder Einstellungen</h3>
-      <form action="/get">
-        <table>
-          <tr>
-            <td>Einbauort :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="detector_location"
-                %place_detector_location%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Meldegruppe :</td>
-            <td>
-              <input
-                class="setting"
-                type="text"
-                name="detector_group"
-                %place_detector_group%
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>Alarmierungsgruppen :</td>
-            <td>
-              <textarea 
-                rows="5" 
-                cols="40" 
-                name="detector_alarm_group" 
-                %place_detector_alarm_group%
-              ></textarea>
-            </td>
-          </tr>
-        </table>
-      
-      <!-- BEREICH NETZWERK - DHCP ENDE -->
-      <input type="submit" value="Submit" />
-    </form>
-    </div>
-    <!-- BEREICH RAUCHMELDER ENDE -->
-    <!-- BEREICH SENSOR BEGINN -->
-    <div class="sensor">
-      <h3>Sensoren - Einstellungen</h3>
-      <form action="/get">
-        <table>
-          <tr>
-            <td>BME 280 :</td>
-            <td><select name='bme'>%place_sensor_bme%</select></td>
-          </tr>
-        </table>
-        <!-- BEREICH NETZWERK - MQTT BEGINN -->
-        %nav-sen-bme%
-          <table>
-          <tr>
-            <td>Temperatur :</td>
-            <td><select name='bme-temperature'>%place_sensor_bme_temperature%</select></td>
-          </tr>
-          <tr>
-            <td>Feuchtigkeit :</td>
-            <td><select name='bme-humidity'>%place_sensor_bme_humidity%</select></td>
-          </tr>
-          <tr>
-            <td>Druck :</td>
-            <td><select name='bme-pressure'>%place_sensor_bme_pressure%</select></td>
-          </tr>
-          <tr>
-            <td>Temperatur :</td>
-            <td><select name='bme-high'>%place_sensor_bme_high%</select></td>
-          </tr>
-        </table>
-      </div>
-        <br>
-        <table>
-          <tr>
-            <td>Lichtsensor :</td>
-            <td><select name='light'>%place_sensor_light%</select></td>
-          </tr>
-        </table>
-        <br>
-        <table>
-          <tr>
-            <td>Versorgungsspannung :</td>
-            <td><select name='ubext'>%place_sensor_ubext%</select></td>
-          </tr>
-        </table>
-        <input type="submit" value="Submit" />
-        <br>
-      </form>
-    
-    
-    
-    
-    </div>
-    <!-- BEREICH SENSOR ENDE -->
-    <!-- BEREICH SYSTEM BEGINN -->
-    <div class="system">
-      <h3>Systeminfos</h3>
-      <table class="upload">
-        <tr>
-          <td>! File upload !</td>
-        </tr>
-      </table>
-      <table class="upload-33">
-        <tr>
-          <td>Free Storage: %FREESPIFFS%</td>
-          <td>Used Storage: %USEDSPIFFS%</td> 
-          <td>Total Storage: %TOTALSPIFFS%</td>
-        </tr>
-      </table>
-      <table class="upload-50">
-        <tr>
-          <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
-          <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
-        </tr>
-      </table>
-      <table class="upload-33">
-        <tr>
-          <td>Auf dem ESP vorhandene Daten :</td>
-          <td>%FILELIST%</td>
-        </tr>
-      </table>
-    </div>
-    <!-- BEREICH SYSTEM ENDE -->
-    <br>
-    <!-- BEREICH UNTEN BEGINN -->
-    <div>
-      <table class="save">
-        <tr>
-          <td><br><form action="/get"><input type="submit" name="config_save_restart" value="geänderte Config übertragen und Modul neustarten !" title="Save & Restart"></form></td>
-        </tr>
-        <tr>
-          <td><br><form action="/get"><input type="submit" name="reset_config" value="Werkseinstellungen laden !" title="Reset - Config"></form></td>
-        </tr>
-      </table>
-      <br>
-    </div>
-    <!-- BEREICH UNTEN ENDE -->
-  </body>
+        <!-- BEREICH UNTEN BEGINN -->
+        <div>
+            <table class="save">
+                <tr>
+                    <td><br><form action="/get"><input type="submit" name="config_save_restart" value="geänderte Config übertragen und Modul neustarten !" title="Save & Restart"></form></td>
+                </tr>
+                <tr>
+                    <td><br><form action="/get"><input type="submit" name="reset_config" value="Werkseinstellungen laden !" title="Reset - Config"></form></td>
+                </tr>
+            </table>
+        </div>
+
+
+
+
+
+    </body>
 </html>
