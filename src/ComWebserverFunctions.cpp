@@ -3,19 +3,38 @@
 String web_server_variablen(const String &var)
 {
     String temp = "";
-    String back = "";
     Serial.println(var);
 
-    back = web_server_bluetooth(var);
-    back = web_server_sensor(var);
-    back = web_server_wifi(var);
-    back = web_server_mqtt(var);
-
-    if (back != "")
+    // Bluetooth
+    temp = web_server_bluetooth(var);
+    if (temp != "")
     {
-        return back;
+        return temp;
+    }
+    
+    // Sensoren
+    temp = web_server_sensor(var);
+    if (temp != "")
+    {
+        return temp;
+    }
+    
+    // WIFI
+    temp = web_server_wifi(var);
+    if (temp != "")
+    {
+        return temp;
+    }
+    
+    // MQTT
+    temp = web_server_mqtt(var);
+    if (temp != "")
+    {
+        return temp;
     }
 
+
+    
     if (var == "FILELIST")
     {
         return listFiles(true);

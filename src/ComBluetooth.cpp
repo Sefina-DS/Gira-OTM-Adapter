@@ -88,7 +88,7 @@ void bluetooth_scan()
 String web_server_bluetooth(const String &var)
 {
     String temp = "";
-    Serial.println("Bluetooth WEB");
+    //Serial.println("Bluetooth WEB");
     if (var == "nav-sen-bt")
     {
         if (!bluetooth.aktiv)

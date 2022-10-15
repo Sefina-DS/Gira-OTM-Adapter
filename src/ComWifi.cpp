@@ -127,29 +127,20 @@ void scan_wifi_ssid()
 String web_server_wifi(const String &var)
 {
     String temp = "";
-    if (var == "esp_name")
+    if (var == "web_network_ip")
     {
-        return wifi.esp_name;
-    }
-    if (var == "nav-net-dhcp")
-    {
-        if (wifi.dhcp)
-        {
-            return "<br/><div class='dhcp' style=' display : none;'>";
-        }
-        else
-        {
-            return "<div class='dhcp'>";
-        }
-    }
-    if (var == "place_esp_name")
-    {
-        temp = "placeholder = '" + wifi.esp_name + "'";
-        return temp;
-    }
-    if (var == "place_wifi_ssid")
-    {
-        temp = F("<select name='wifi_ssid'>");
+        temp += F("<br/><div class='network'>");
+        temp += F("<h3>Netzwerk Einstellungen</h3>");
+        temp += F("<form action='/get'>");
+        temp += F("<table>");
+        // ESP - Name
+        temp += F("<tr><td>ESP- Name :</td>");
+        temp += F("<td><input class='setting' type='text' name='esp_name' placeholder='");
+        temp +=     wifi.esp_name;
+        temp += F("'></td></tr>");
+        // WiFi - SSID
+        temp += F("<tr><td>WiFi - SSID :</td>");
+        temp += F("<td><select name='wifi_ssid'>");
         if (wifi.ssid != "")
         {
             temp += F("<option value='");
@@ -162,57 +153,72 @@ String web_server_wifi(const String &var)
         {
             temp += F("<option selected>keins ausgewählt</option>");
         }
+        scan_wifi_ssid();
         temp += webserver.wifi_ssid;
         temp += F("</select>");
-        return temp;
-    }
-    if (var == "place_wifi_pw")
-    {
+        temp += F("</td></tr>");
+        // WiFi - Passwort
+        temp += F("<tr><td>WiFi - Passwort :</td>");
+        temp += F("<td><input class='setting' type='text' name='wifi_pw' placeholder='");
         if (wifi.pw != "")
         {
-            temp = "placeholder = '---FFF---FFF---'";
+            temp += F("---FFF---FFF---'");
         }
         else
         {
-            temp = "placeholder = 'Bitte eintragen !'";
+            temp += F("Bitte eintragen !'");
         }
-
-        return temp;
-    }
-    if (var == "place_wifi_typ")
-    {
+        temp += F("'></td></tr>");
+        // IP - Typ
+        temp += F("<tr><td>IP- Adressen Typ :</td>");
+        temp += F("<td><select name='wifi_dhcp'><option value='");
         if (wifi.dhcp)
         {
-            temp = "<option value='dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch";
+            temp += F("dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch");
         }
         else
         {
-            temp = "<option value='statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch";
+            temp += F("statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch");
         }
-
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table>");
+        // Verdeckte Einstellungen (Statische IP Config)
+        temp += F("<table ");
+        if (wifi.dhcp)
+        {
+            temp += F("style='display: none'>");
+        }
+        else
+        {
+            temp += F(">");
+        }
+            // IP - Adresse
+            temp += F("<tr><td>IP Adresse :</td>");
+            temp += F("<td><input class='setting' type='text' name='wifi_ip' placeholder='");
+            temp +=     wifi.ip;
+            temp += F("'></td></tr>");
+            // Subnet- Maske
+            temp += F("<tr><td>Subnet- Mask :</td>");
+            temp += F("<td><input class='setting' type='text' name='wifi_subnet' placeholder='");
+            temp +=     wifi.subnet;
+            temp += F("'></td></tr>");
+            // Gateway
+            temp += F("<tr><td>Gateway :</td>");
+            temp += F("<td><input class='setting' type='text' name='wifi_gw' placeholder='");
+            temp +=     wifi.gw;
+            temp += F("'></td></tr>");
+            // DNS
+            temp += F("<tr><td>DNS :</td>");
+            temp += F("<td><input class='setting' type='text' name='wifi_dns' placeholder='");
+            temp +=     wifi.dns;
+            temp += F("'></td></tr>");
+        temp += F("</table><br/>");
+        temp += F("<input type='submit' value='Submit' />");
+        temp += F("</form></div>");
         return temp;
     }
-    if (var == "place_wifi_ip")
-    {
-        temp = "placeholder = '" + wifi.ip + "'";
-        return temp;
-    }
-    if (var == "place_wifi_subnet")
-    {
-        temp = "placeholder = '" + wifi.subnet + "'";
-        return temp;
-    }
-    if (var == "place_wifi_gw")
-    {
-        temp = "placeholder = '" + wifi.gw + "'";
-        return temp;
-    }
-    if (var == "place_wifi_dns")
-    {
-        temp = "placeholder = '" + wifi.dns + "'";
-        return temp;
-    }
-
+    
     return String();
 }
 
