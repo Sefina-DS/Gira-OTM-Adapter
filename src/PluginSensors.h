@@ -19,8 +19,8 @@ void bme_refresh();
 void light_refresh();
 void ubext_refresh();
 
-String web_server_sensor(const String &var);
-void web_server_sensor_get(String name, String msg);
+String webserver_call_sensor(const String &var);
+void webserver_triger_sensor(String name, String msg);
 
 void load_conf_sensor(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc);

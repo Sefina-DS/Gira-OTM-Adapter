@@ -6,29 +6,7 @@
         <meta charset="UTF-8" />
     </head>
     <style>
-        body {
-            background-color: rgb(39, 37, 37);
-            color: rgb(140, 143, 143);
-        }
-        div {
-            background-color: rgb(20, 19, 19);
-            text-align: center;
-            padding: 5px;
-            box-sizing: border-box;
-            border-radius: 30px;
-        }
-        div.ueberschrift {
-            text-align: center;
-        }
-        table {
-            width: 500px;
-            text-align: center;
-            margin: 0 auto;
-        }
-        table.navigation {
-            width: 300px;
-        }
-
+        
         div.network {
             %navigation-network%
         }
@@ -51,7 +29,7 @@
         <!-- BEREICH ÜBERSCHRIFT ENDE -->
         <br />
         <!-- BEREICH NAVIGATION BEGINN -->
-        <div class="navigation">
+        <div class="box">
             <table class="navigation">
                 <tr>
                     <td>
@@ -86,6 +64,7 @@
         <!-- BEREICH Netzwerk ENDE -->
 
         <!-- BEREICH Sensor  -->
+        %web_sensor_sensor%
         %web_sensor_bluetooth%
 
         <!-- BEREICH Sensor ENDE -->
@@ -96,37 +75,40 @@
 
         <!-- BEREICH SYSTEM BEGINN -->
         <div class="system">
-            <h3>Systeminfos</h3>
-            <table class="upload">
-                <tr>
-                    <td>! File upload !</td>
-                </tr>
-            </table>
-            <table class="upload-33">
-                <tr>
-                    <td>Free Storage: %FREESPIFFS%</td>
-                    <td>Used Storage: %USEDSPIFFS%</td> 
-                    <td>Total Storage: %TOTALSPIFFS%</td>
-                </tr>
-            </table>
-            <table class="upload-50">
-                <tr>
-                    <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
-                    <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
-                </tr>
-            </table>
-            <table class="upload-33">
-                <tr>
-                    <td>Auf dem ESP vorhandene Daten :</td>
-                    <td>%FILELIST%</td>
-                </tr>
-            </table>
+            <br>
+            <div class="box">
+                <h3>Systeminfos</h3>
+                <table class="upload">
+                    <tr>
+                        <td>! File upload !</td>
+                    </tr>
+                </table>
+                <table class="upload-33">
+                    <tr>
+                        <td>Free Storage: %FREESPIFFS%</td>
+                        <td>Used Storage: %USEDSPIFFS%</td> 
+                        <td>Total Storage: %TOTALSPIFFS%</td>
+                    </tr>
+                </table>
+                <table class="upload-50">
+                    <tr>
+                        <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
+                        <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
+                    </tr>
+                </table>
+                <table class="upload-33">
+                    <tr>
+                        <td>Auf dem ESP vorhandene Daten :</td>
+                        <td>%FILELIST%</td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <!-- BEREICH SYSTEM ENDE -->
         <br>
         <!-- BEREICH UNTEN BEGINN -->
-        <div>
-            <table class="save">
+        <div class="save">
+            <table>
                 <tr>
                     <td><br><form action="/get"><input type="submit" name="config_save_restart" value="geänderte Config übertragen und Modul neustarten !" title="Save & Restart"></form></td>
                 </tr>

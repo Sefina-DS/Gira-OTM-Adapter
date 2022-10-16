@@ -90,7 +90,7 @@ String webserver_call_bluetooth(const String &var)
     String temp = "";
     if (var == "web_sensor_bluetooth")
     {
-        temp += F("<br/><div class='sensor'>");
+        temp += F("<div class='sensor'><br/><div class='box'>");
         temp += F("<h3>Bluetooth Einstellungen</h3>");
         temp += F("<form action='/get'>");
         temp += F("<table>");
@@ -126,7 +126,7 @@ String webserver_call_bluetooth(const String &var)
       
     temp += F("</table><br/>");
     temp += F("<input type='submit' value='Submit' />");
-    temp += F("</form></div>");
+    temp += F("</form></div></div>");
     return temp;
     }
     

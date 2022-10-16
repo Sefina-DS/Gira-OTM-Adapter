@@ -83,109 +83,132 @@ void ubext_refresh()
     mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
 }
 
-String web_server_sensor(const String &var)
+String webserver_call_sensor(const String &var)
 {
     String temp = "";
-    if (var == "nav-sen-bme")
+    if (var == "web_sensor_sensor")
     {
-        if (!sensor.bme280)
-        {
-            return "<br/><div class='bme280' style=' display : none;'>";
-        }
-        else
-        {
-            return "<div class='bme280'>";
-        }
-    }
-    if (var == "place_sensor_bme")
-    {
+        temp += F("<div class='sensor'><br/><div class='box'>");
+        temp += F("<h3>Senso Einstellungen</h3>");
+        temp += F("<form action='/get'>");
+        temp += F("<table>");
+        // BME280 Aktiv/Deaktiv
+        temp += F("<tr><td>BME 280 :</td>");
+        temp += F("<td><select name='bme'><option value='");
         if (sensor.bme280)
         {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
         }
         else
         {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
         }
-        return temp;
-    }
-    if (var == "place_sensor_bme_temperature")
-    {
-        if (sensor.bme280_temperature)
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table>");
+        // Verdeckte Einstellungen (BME 280 Aktiv)
+        temp += F("<table ");
+        if (!sensor.bme280)
         {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
+            temp += F("style='display: none'>");
         }
         else
         {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+            temp += F(">");
         }
-        return temp;
-    }
-    if (var == "place_sensor_bme_humidity")
-    {
-        if (sensor.bme280_humidity)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_pressure")
-    {
-        if (sensor.bme280_pressure)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_high")
-    {
-        if (sensor.bme280_high)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_light")
-    {
+            // Temperatur
+            temp += F("<tr><td>Temperatur :</td>");
+            temp += F("<td><select name='bme-temperature'><option value='");
+            if (sensor.bme280_temperature)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Feuchtigkeit
+            temp += F("<tr><td>Feuchtigkeit :</td>");
+            temp += F("<td><select name='bme-humidity'><option value='");
+            if (sensor.bme280_humidity)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Druck
+            temp += F("<tr><td>Druck :</td>");
+            temp += F("<td><select name='bme-pressure'><option value='");
+            if (sensor.bme280_pressure)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Höhe
+            temp += F("<tr><td>Höhe :</td>");
+            temp += F("<td><select name='bme-high'><option value='");
+            if (sensor.bme280_high)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            temp += F("</table><br/>");
+        // Light Aktiv/Deaktiv
+        temp += F("<table>");
+        temp += F("<tr><td>Lichtsensor :</td>");
+        temp += F("<td><select name='light'><option value='");
         if (sensor.light)
         {
-            temp = auswahl_aktiv;
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
         }
         else
         {
-            temp = auswahl_deaktiv;
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
         }
-        return temp;
-    }
-    if (var == "place_sensor_ubext")
-    {
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table><br/>");
+        // Spannung Aktiv/Deaktiv
+        temp += F("<table>");
+        temp += F("<tr><td>Versorgungsspannung :</td>");
+        temp += F("<td><select name='ubext'><option value='");
         if (sensor.ubext)
         {
-            temp = auswahl_aktiv;
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
         }
         else
         {
-            temp = auswahl_deaktiv;
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
         }
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table><br/>");
+        temp += F("<input type='submit' value='Submit' />");
+        temp += F("</form></div></div>");
         return temp;
     }
-
+    
     return String();
+    
 }
 
-void web_server_sensor_get(String name, String msg)
+void webserver_triger_sensor(String name, String msg)
 {
     if (name == "bme")
     {
@@ -220,7 +243,7 @@ void web_server_sensor_get(String name, String msg)
             sensor.bme280_humidity = false;
         }
     }
-    if (name == "bme-temperature")
+    if (name == "bme-pressure")
     {
         if (msg == "aktiviert")
         {

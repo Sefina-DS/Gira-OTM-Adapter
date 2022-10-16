@@ -150,6 +150,8 @@ String webserver_call(const String &var)
   // Detector
 
   // Sensor
+  temp = webserver_call_sensor(var);
+  if (temp != "") { return temp; }
   temp = webserver_call_bluetooth(var);
   if (temp != "") { return temp; }
 
@@ -189,6 +191,7 @@ void webserver_triger(String name, String msg)
     webserver_triger_spiffs(name, msg);
     webserver_triger_wifi(name, msg);
     webserver_triger_mqtt(name, msg);
+    webserver_triger_sensor(name, msg);
     webserver_triger_bluetooth(name, msg);
 
     if (name == "navigation")

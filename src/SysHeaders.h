@@ -26,7 +26,6 @@
 #include "SpiffsManager.h"
 #include "ComWifi.h"
 #include "ComWebserver.h"
-#include "ComWebserverFunctions.h"
 #include "ComMqtt.h"
 #include "ComMqttSubscribe.h"
 #include "ComBluetooth.h"
