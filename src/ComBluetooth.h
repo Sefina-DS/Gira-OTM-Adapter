@@ -8,7 +8,7 @@ struct BLUETOOTH
     int empfang[20];
     char mac_adress[20][20] = { "", };
     char mac_name[20][60] = { "", };
-    int mac_size;
+    int mac_size = 0;
     String temp_mac_klein;
     String temp_mac_gross;
     int temp_mac_a;

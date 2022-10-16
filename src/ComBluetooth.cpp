@@ -19,7 +19,7 @@ void bluetooth_config()
     pBLEScan->setInterval(100);
     pBLEScan->setWindow(99);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < bluetooth.mac_size; i++)
     {
         Serial.print("Adresse ");
         Serial.print(i);
@@ -119,42 +119,17 @@ String webserver_call_bluetooth(const String &var)
             temp += F(">");
         }
       // MQTT Broker
-      temp += F("<tr><td>IP Broker :</td>");
-      temp += F("<td><input class='setting' type='text' name='bluetodfgds' placeholder='");
-      temp +=     mqtt.ip;
-      temp += F("'></td></tr>");
+      temp += F("<tr><td>MAC Adressen :</td></tr>");
+      temp += F("<tr><td><textarea rows='20' cols='40' name='bluetooth_mac' placeholder='");
+      temp +=     bluetooth.memory_file;
+      temp += F("'></textarea></td></tr>");
       
     temp += F("</table><br/>");
     temp += F("<input type='submit' value='Submit' />");
     temp += F("</form></div>");
     return temp;
     }
-    /*
-    //Serial.println("Bluetooth WEB");
-    if (var == "nav-sen-bt")
-    {
-        if (!bluetooth.aktiv)
-        {
-            return "<br/><div class='bt' style=' display : none;'>";
-        }
-        else
-        {
-            return "<div class='bt'>";
-        }
-    }
-    if (var == "place_sensor_bt")
-    {
-        if (bluetooth.aktiv)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    */
+    
     return String();
     
 }
@@ -172,6 +147,13 @@ void webserver_triger_bluetooth(String name, String msg)
             bluetooth.aktiv = false;
         }
     }
+    if (name == "bluetooth_mac")
+    {
+        if (msg != "")
+        {
+            bluetooth_mac_diagnose(msg);
+        }
+    }
 }
 
 void load_conf_bluetooth(StaticJsonDocument<1024> doc)
@@ -179,7 +161,7 @@ void load_conf_bluetooth(StaticJsonDocument<1024> doc)
     Serial.println("... Bluetooth- Variablen ...");
     
     bluetooth.aktiv = doc["bluetooth"] | false;
-    bluetooth.memory_file = doc["bluetooth"] | "589ec621333b(G-Tag David) 589ec61a30ca(G-Tag Janin) 589ec61a30dd(G-Tag Florentine) 589ec6204371(G-Tag Hundeleine) 589ec62043c6(G-Tag Cedrik)";
+    bluetooth.memory_file = doc["bluetooth_mac"] | "";
     bluetooth_mac_diagnose(bluetooth.memory_file);
 }
 
@@ -188,6 +170,7 @@ StaticJsonDocument<1024> safe_conf_bluetooth(StaticJsonDocument<1024> doc)
     Serial.println("... Bluetooth- Variablen ...");
     
     doc["bluetooth"] = bluetooth.aktiv;
+    doc["bluetooth_mac"] = bluetooth.memory_file;
 
     return doc;
 }
@@ -210,7 +193,6 @@ void bluetooth_mac_diagnose(String msg)
         if (msg[i] == 40) // = (
         {
             bluetooth.diagnose_mac = false;
-            bluetooth.memory_file += msg[i];
         }
         if (bluetooth.diagnose_mac == true)
         {
@@ -284,6 +266,19 @@ void bluetooth_mac_diagnose(String msg)
     {
         bluetooth_mac();
     }
+    Serial.print("Bluetooth Safefile : ");
+    Serial.println(bluetooth.memory_file);
+    Serial.println("Bluetooth MAC detailiert :");
+    for (int i = 0; i < bluetooth.mac_size; i++)
+    {
+        Serial.print("Adresse ");
+        Serial.print(i);
+        Serial.print(" : ");
+        Serial.print(bluetooth.mac_adress[i]);
+        Serial.print("   |   ");
+        Serial.println(bluetooth.mac_name[i]);
+    }
+
 
 }
 
