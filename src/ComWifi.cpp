@@ -124,7 +124,7 @@ void scan_wifi_ssid()
     }
 }
 
-String web_server_wifi(const String &var)
+String webserver_call_wifi(const String &var)
 {
     String temp = "";
     if (var == "web_network_ip")
@@ -222,7 +222,7 @@ String web_server_wifi(const String &var)
     return String();
 }
 
-void web_server_wifi_get(String name, String msg)
+void webserver_triger_wifi(String name, String msg)
 {
     if (name == "esp_name")
     {

@@ -118,59 +118,73 @@ void mqtt_publish(String topic, String msg)
   client.publish(temp_topic, temp_msg);
 }
 
-String web_server_mqtt(const String &var)
+String webserver_call_mqtt(const String &var)
 {
   String temp = "";
-
-  if (var == "nav-net-mqtt")
+  if (var == "web_network_mqtt")
   {
-    if (!mqtt.aktiv)
+    temp += F("<br/><div class='network'>");
+    temp += F("<h3>MQTT Einstellungen</h3>");
+    temp += F("<form action='/get'>");
+    temp += F("<table>");
+    // MQTT Aktiv/Deaktiv
+    temp += F("<tr><td>MQTT :</td>");
+    temp += F("<td><select name='mqtt'><option value='");
+    if (mqtt.aktiv)
     {
-      return "<br/><div class='mqtt' style=' display : none;'>";
+      temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
     }
     else
     {
-      return "<div class='mqtt'>";
+      temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
     }
+    temp += F("</select>");
+    temp += F("</td></tr>");
+    temp += F("</table>");
+    // Verdeckte Einstellungen (MQTT Aktiv)
+    temp += F("<table ");
+    if (!mqtt.aktiv)
+    {
+      temp += F("style='display: none'>");
+    }
+    else
+    {
+      temp += F(">");
+    }
+      // MQTT Broker
+      temp += F("<tr><td>IP Broker :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_ip' placeholder='");
+      temp +=     mqtt.ip;
+      temp += F("'></td></tr>");
+      // Port Broker
+      temp += F("<tr><td>Port Broker :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_port' placeholder='");
+      temp +=     mqtt.port;
+      temp += F("'></td></tr>");
+      // Erklärung Topic
+      temp += F("<tr><td colspan='2'> MQTT - Topic <br>");
+      temp += F("Achtung : Grund- Topic / Melder- Topic / <br>");
+      temp += F("der Aufbau darf nicht geändert werden ! <br></tr></td>");
+      // Grund Topic
+      temp += F("<tr><td>Grund- Topic :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_base' placeholder='");
+      temp +=     mqtt.topic_base;
+      temp += F("'></td></tr>");
+      // Melder Topic
+      temp += F("<tr><td>Melder- Topic :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_define' placeholder='");
+      temp +=     mqtt.topic_define;
+      temp += F("'></td></tr>");
+    temp += F("</table><br/>");
+    temp += F("<input type='submit' value='Submit' />");
+    temp += F("</form></div>");
+    return temp;
   }
-  if (var == "place_mqtt")
-  {
-        if (mqtt.aktiv)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-
-        return temp;
-    }
-    if (var == "place_mqtt_ip")
-    {
-        temp = "placeholder = '" + mqtt.ip + "'";
-        return temp;
-    }
-    if (var == "place_mqtt_port")
-    {
-        temp = "placeholder = '" + mqtt.port + "'";
-        return temp;
-    }
-    if (var == "place_mqtt_base")
-    {
-        temp = "placeholder = '" + mqtt.topic_base + "'";
-        return temp;
-    }
-    if (var == "place_mqtt_define")
-    {
-        temp = "placeholder = '" + mqtt.topic_define + "'";
-        return temp;
-    }
-
+  
   return String();
 }
 
-void web_server_mqtt_get(String name, String msg)
+void webserver_triger_mqtt(String name, String msg)
 {
 if (name == "mqtt")
     {

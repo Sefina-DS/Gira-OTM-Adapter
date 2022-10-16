@@ -1,7 +1,7 @@
 #include "SysHeaders.h"
 
 Config config;
-WebServer webserver;
+
 AsyncWebServer *server;
 WiFiClient espClient;
 PubSubClient client(espClient);

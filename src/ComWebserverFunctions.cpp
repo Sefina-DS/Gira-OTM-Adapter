@@ -6,7 +6,7 @@ String web_server_variablen(const String &var)
     Serial.println(var);
 
     // Bluetooth
-    temp = web_server_bluetooth(var);
+    //temp = web_server_bluetooth(var);
     if (temp != "")
     {
         return temp;
@@ -20,14 +20,14 @@ String web_server_variablen(const String &var)
     }
     
     // WIFI
-    temp = web_server_wifi(var);
+    //temp = web_server_wifi(var);
     if (temp != "")
     {
         return temp;
     }
     
     // MQTT
-    temp = web_server_mqtt(var);
+    //temp = web_server_mqtt(var);
     if (temp != "")
     {
         return temp;
@@ -127,13 +127,15 @@ String web_server_variablen(const String &var)
 
 void web_server_get_analyse(String name, String msg)
 {
-    web_server_bluetooth_get(name, msg);
-    web_server_sensor_get(name, msg);
-    web_server_wifi_get(name, msg);
+    //web_server_bluetooth_get(name, msg);
+    //web_server_sensor_get(name, msg);
+    //web_server_wifi_get(name, msg);
+    //web_server_mqtt_get(name, msg);
 
     if (name == "navigation")
     {
         webserver.navigation = msg;
+        Serial.print("Navigation ist auf der Seite : ");
         Serial.println(webserver.navigation);
     }
     if (name == "config_save_restart")
@@ -190,7 +192,7 @@ void web_server_get_analyse(String name, String msg)
     }
 }
 
-void webserver_config()
+void webserver_configa()
 {
     // run handleUpload function when any file is uploaded
     server->on(

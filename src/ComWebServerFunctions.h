@@ -6,5 +6,5 @@
 String web_server_variablen(const String &var);
 void web_server_get_analyse(String name, String msg);
 
-void webserver_config();
+void webserver_configa();
 

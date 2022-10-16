@@ -21,8 +21,8 @@ extern BLUETOOTH bluetooth;
 void bluetooth_config();
 void bluetooth_scan();
 
-String web_server_bluetooth(const String &var);
-void web_server_bluetooth_get(String name, String msg);
+String webserver_call_bluetooth(const String &var);
+void webserver_triger_bluetooth(String name, String msg);
 
 void load_conf_bluetooth(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_bluetooth(StaticJsonDocument<1024> doc);

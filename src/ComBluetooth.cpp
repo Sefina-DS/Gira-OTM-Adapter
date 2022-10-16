@@ -85,9 +85,51 @@ void bluetooth_scan()
 }
 
 
-String web_server_bluetooth(const String &var)
+String webserver_call_bluetooth(const String &var)
 {
     String temp = "";
+    if (var == "web_sensor_bluetooth")
+    {
+        temp += F("<br/><div class='sensor'>");
+        temp += F("<h3>Bluetooth Einstellungen</h3>");
+        temp += F("<form action='/get'>");
+        temp += F("<table>");
+        // MQTT Aktiv/Deaktiv
+        temp += F("<tr><td>Bluetooth :</td>");
+        temp += F("<td><select name='bluetooth'><option value='");
+        if (bluetooth.aktiv)
+        {
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+        }
+        else
+        {
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+        }
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table>");
+        // Verdeckte Einstellungen (Bluetooth Aktiv)
+        temp += F("<table ");
+        if (!bluetooth.aktiv)
+        {
+            temp += F("style='display: none'>");
+        }
+        else
+        {
+            temp += F(">");
+        }
+      // MQTT Broker
+      temp += F("<tr><td>IP Broker :</td>");
+      temp += F("<td><input class='setting' type='text' name='bluetodfgds' placeholder='");
+      temp +=     mqtt.ip;
+      temp += F("'></td></tr>");
+      
+    temp += F("</table><br/>");
+    temp += F("<input type='submit' value='Submit' />");
+    temp += F("</form></div>");
+    return temp;
+    }
+    /*
     //Serial.println("Bluetooth WEB");
     if (var == "nav-sen-bt")
     {
@@ -112,11 +154,12 @@ String web_server_bluetooth(const String &var)
         }
         return temp;
     }
-
+    */
     return String();
+    
 }
 
-void web_server_bluetooth_get(String name, String msg)
+void webserver_triger_bluetooth(String name, String msg)
 {
     if (name == "bluetooth")
     {

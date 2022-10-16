@@ -7,3 +7,6 @@ void spiffs_config_save();
 void spiffs_config_load();
 void spiffs_config_read();
 
+String webserver_call_spiffs(const String &var);
+void webserver_triger_spiffs(String name, String msg);
+

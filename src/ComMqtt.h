@@ -18,8 +18,8 @@ void mqtt_connect();
 void mqtt_publish(String topic, String msg);
 void mqtt_publish_int(String topic, int msg);
 
-String web_server_mqtt(const String &var);
-void web_server_mqtt_get(String name, String msg);
+String webserver_call_mqtt(const String &var);
+void webserver_triger_mqtt(String name, String msg);
 
 void load_conf_mqtt(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc);

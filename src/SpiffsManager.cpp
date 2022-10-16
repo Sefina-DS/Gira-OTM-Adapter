@@ -144,3 +144,31 @@ void spiffs_config_read()
     Serial.println();
     fileTemp.close();
 }
+
+String webserver_call_spiffs(const String &var)
+{
+    String temp = "";
+    if (var == "FILELIST")
+    {
+        return listFiles(true);
+    }
+    if (var == "FREESPIFFS")
+    {
+        return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes()));
+    }
+    if (var == "USEDSPIFFS")
+    {
+        return humanReadableSize(SPIFFS.usedBytes());
+    }
+    if (var == "TOTALSPIFFS")
+    {
+        return humanReadableSize(SPIFFS.totalBytes());
+    }
+  
+    return String();
+}
+
+void webserver_triger_spiffs(String name, String msg)
+{
+
+}
