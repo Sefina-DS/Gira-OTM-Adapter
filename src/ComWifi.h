@@ -15,6 +15,8 @@ struct WIFI
 extern WIFI wifi;
 extern String hostname;
 
+extern boolean AP_Mode;
+
 void wlan_connect();
 void scan_wifi_ssid();
 void wlan_config();

@@ -1,5 +1,8 @@
 #pragma once
 
+#define extension "Erweiterungen/"
+#define ext_bluetooth "Bluetooth/"
+
 struct BLUETOOTH
 {
     boolean aktiv;

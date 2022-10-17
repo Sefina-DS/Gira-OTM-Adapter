@@ -7,6 +7,10 @@ struct WEBSERVER
 };
 extern WEBSERVER webserver;
 
+extern AsyncWebServer *server;
+extern const char *PARAM_MESSAGE;
+extern const char notbetrieb_html[] PROGMEM;
+
 
 void webserver_art();
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);

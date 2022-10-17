@@ -61,12 +61,7 @@ void spiffs_config_save()
     }
     StaticJsonDocument<1024> doc;
     String msg_temp = "";
-    for (int i = 0; i < config.detector_alarm_group_size; i++)
-    {
-        msg_temp += config.detector_alarm_group_int[i];
-        msg_temp += ";";
-    }
-    msg_temp += config.detector_alarm_group_int[config.detector_alarm_group_size];
+    
 
     // Funktionen - SAFE
 
@@ -79,9 +74,7 @@ void spiffs_config_save()
     // Variablen werden gelesen
     
     doc["seriel"] = config.seriel;
-    doc["detector_group"] = config.detector_group;
-    doc["detector_alarm_group"] = msg_temp;
-    doc["detector_location"] = config.detector_location;
+
     
 
     if (serializeJson(doc, fileTemp) == 0)
@@ -119,10 +112,7 @@ void spiffs_config_load()
     load_conf_mqtt(doc);
     
     config.seriel = doc["seriel"] | false;
-    config.detector_group = doc["detector_group"] | "0";
-    msg_temp = doc["detector_alarm_group"] | "0";
-    alarm_group_diagnose(msg_temp);
-    config.detector_location = doc["detector_location"] | "";
+
     
 
     fileTemp.close();

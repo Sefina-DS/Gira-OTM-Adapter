@@ -1,5 +1,7 @@
 #include "SysHeaders.h"
 
+COMSERIAL comserial;
+
 boolean seri_run;
 String seri_message_receive = "";
 

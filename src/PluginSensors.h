@@ -1,5 +1,10 @@
 #pragma once
 
+#define extension "Erweiterungen/"
+#define ext_light "Lichtsensor/"
+#define ext_sensor "BME-280/"
+#define ext_ubext "UB-Ext/"
+
 #define SEALEVELPRESSURE_HPA (1013.25)
 
 struct SENSOR

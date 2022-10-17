@@ -149,7 +149,7 @@ void filter(byte msg[10], int size)
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;
         case 50: // 2
@@ -162,7 +162,7 @@ void filter(byte msg[10], int size)
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;
         default:
@@ -177,9 +177,9 @@ void filter(byte msg[10], int size)
         case 56: // 8
             serial_send("030200");
             topic_temp = "";
-            for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
+            for (int i = 0; i < detector.alarm_group_size + 1; i++)
             {
-                topic_temp = mqtt.topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/";
+                topic_temp = mqtt.topic_base + "/" + group_control + detector.alarm_group[i] + "/";
                 client.publish((topic_temp + "Alarm").c_str(), "false");
                 client.publish((topic_temp + "Testalarm").c_str(), "false");
             }
@@ -219,7 +219,7 @@ void filter(byte msg[10], int size)
             if (timer_alarm < millis())
             {
                 timer_alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Alarm").c_str(), "true");
+                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;
         default:

@@ -15,18 +15,6 @@
 
 // MQTT Definitions
 
-#define detector_diagnose "Melder-Diagnose/"
-#define detector_status "Melder-Status/"
-#define detector_control "Melder-Steuern/"
-#define group_control "Gruppen-Steuerung/"
-#define esp_status "ESP-Status/"
-#define extension "Erweiterungen/"
-#define ext_light "Lichtsensor/"
-#define ext_sensor "BME-280/"
-#define ext_ubext "UB-Ext/"
-#define ext_bluetooth "Bluetooth/"
-
-#define safefile "/config.json"
 
 // Vars
 
@@ -35,11 +23,7 @@ struct Config
 
 
     boolean seriel;
-    String detector_group;
-    String detector_alarm_group;
-    int detector_alarm_group_int[99];
-    int detector_alarm_group_size;
-    String detector_location;
+
 
 };
 extern Config config;
@@ -52,12 +36,7 @@ extern int seri_status;
 extern String ssize;
 extern String seri_message_receive;
 
-extern boolean AP_Mode;
-
-extern AsyncWebServer *server;
-extern const char *PARAM_MESSAGE;
-extern const char notbetrieb_html[] PROGMEM;
 
 extern unsigned long timer_time;
 extern unsigned long timer_alarm;
-extern unsigned long timer_bluetooth;
+

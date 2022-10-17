@@ -24,5 +24,8 @@ void webserver_triger_mqtt(String name, String msg);
 void load_conf_mqtt(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc);
 
+void mqtt_mqtt_sub_register();
+void mqtt_mqtt_sub_read(String topic, String msg);
+
 
 

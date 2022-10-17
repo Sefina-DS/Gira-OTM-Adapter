@@ -17,7 +17,16 @@ void mqtt_read(char *topic, byte *message, unsigned int length)
 
   // Subscribe auswerten !
   topicTemp = String(topic);
-  mqtt_filter(topicTemp, messageTemp);
+
+  Serial.print("Ankomende Nachricht / das Topic : ");
+  Serial.print(topicTemp);
+  Serial.print(" || die Message : ");
+  Serial.println(messageTemp);
+  
+  // Subscriber übergeben
+  mqtt_mqtt_sub_read(topicTemp, messageTemp);
+  mqtt_detector_sub_read(topicTemp, messageTemp);
+
 }
 
 ///         MQTT einrichten
@@ -50,49 +59,28 @@ void mqtt_connect()
     // timer_bluetooth = 0;
     led_flash_timer(250, 150, 3);
     Serial.print("MQTT verbinden");
+    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status/";
     ///         Connect mit LastWill Message
-    if (client.connect(wifi.esp_name.c_str(), (mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "Online").c_str(), 1, true, "false"))
+    if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
     {
       mqtt_counter = 0;
       ///         Online Status setzen
       // timer_bluetooth = millis();
-      client.publish((mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "Online").c_str(), "true");
-      mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Einbauort", config.detector_location);
-      mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Meldegruppe", config.detector_group);
-      mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "ESP- ID", wifi.esp_name);
-      mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "Mac Adresse", WiFi.macAddress());
-      mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "IP Adresse", WiFi.localIP().toString());
+      mqtt_publish(temp_topic + "Online", "true");
+      mqtt_publish(temp_topic + "ESP- ID", wifi.esp_name);
+      mqtt_publish(temp_topic + "Mac Adresse", WiFi.macAddress());
+      mqtt_publish(temp_topic + "IP Adresse", WiFi.localIP().toString());
 
       Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
       Serial.println("");
       
       // Subscriben
+      mqtt_mqtt_sub_register();
+      mqtt_detector_sub_register();
 
       detector_mqtt_config();
-      
-      /*
-      
-      // Subscribe Melder
-      // delay(1000);
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Melder_Finden").c_str());
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Komunikation").c_str());
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme").c_str());
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Testalarm-Funk").c_str());
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Alarm-Funk").c_str());
-      client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Das_ist_ein_Test").c_str());
-      // Subscribe Gruppe
-      // delay(1000);
-      client.subscribe((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Melder_Finden").c_str());
-      client.subscribe((mqtt.topic_base + "/" + group_control + config.detector_group + "/" + "Testalarm").c_str());
 
-      // Subscribe Alarmierungsgruppen
-      String topic_temp = "";
-      for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
-      {
-        topic_temp = mqtt.topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
-        client.subscribe(topic_temp.c_str());
-      }
-      */
+      
     }
     else
     {
@@ -249,4 +237,24 @@ StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
     doc["mqtt_topic_define"] = mqtt.topic_define;
 
     return doc;
+}
+
+void mqtt_mqtt_sub_register()
+{
+  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
+  client.subscribe((temp + "Neustart-ESP").c_str());
+  mqtt_publish(temp + "Neustart-ESP", "false");
+}
+
+void mqtt_mqtt_sub_read(String topic, String msg)
+{
+  String temp;
+  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
+  if ( temp + "Neustart-ESP" == topic && msg == "true" )
+  {
+    mqtt_publish(temp + "Neustart-ESP", "false");
+    delay(3000);
+    ESP.restart();
+  }
+
 }

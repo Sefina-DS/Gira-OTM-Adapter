@@ -118,7 +118,7 @@ String webserver_call_bluetooth(const String &var)
         {
             temp += F(">");
         }
-      // MQTT Broker
+      // MAC Adressen
       temp += F("<tr><td>MAC Adressen :</td></tr>");
       temp += F("<tr><td><textarea rows='20' cols='40' name='bluetooth_mac' placeholder='");
       temp +=     bluetooth.memory_file;

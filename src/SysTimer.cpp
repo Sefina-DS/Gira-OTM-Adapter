@@ -66,7 +66,9 @@ void timer_funktion()
         seri_status = 1;
         serial_send("09");
         temp = ((millis() / 1000) / 60) / 60;
-        client.publish((mqtt.topic_base + "/" + mqtt.topic_define + "/" + esp_status + "Betriebsstunden").c_str(), (String(temp)).c_str());
+        
+        //mqtt_publish_int(mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/" + "Betriebsstunden", temp);
+
         break;
     // Statusmeldungen
     case 13:

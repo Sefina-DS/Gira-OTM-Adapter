@@ -1,5 +1,7 @@
 #pragma once
 
+#define safefile "/config.json"
+
 void spiffs_starten();
 void spiffs_format();
 void spiffs_scan();
