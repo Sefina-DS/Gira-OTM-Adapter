@@ -62,11 +62,7 @@ void loop()
   serial_status();
 
   // Rücksetzen Alarmtimer
-  if (millis() >= timer_alarm &&
-      timer_alarm != 0)
-  {
-    timer_alarm = 0;
-  }
+  if (millis() >= timer_alarm && timer_alarm != 0) timer_alarm = 0;
   // 5 Sekunden intervall
   if (millis() >= timer_time)
   {
@@ -74,17 +70,10 @@ void loop()
     timer_funktion();
   }
   // MQTT Funktion
-  if (mqtt.aktiv)
-  {
-    client.loop();
-  }
+  if (mqtt.aktiv) client.loop();
   // Seriele Funktionen
   serial_read();
-  if (seri_status > 0)
-  {
-    serial_send("");
-  }
-
+  if (seri_status > 0) serial_send("");
   // bluetooth !
   if (bluetooth.konfiguriert &&
       bluetooth.timer < millis())

@@ -174,45 +174,13 @@ String webserver_call_mqtt(const String &var)
 
 void webserver_triger_mqtt(String name, String msg)
 {
-if (name == "mqtt")
-    {
-        if (msg == "aktiviert")
-        {
-            mqtt.aktiv = true;
-        }
-        else
-        {
-            mqtt.aktiv = false;
-        }
-    }
-    if (name == "mqtt_ip")
-    {
-        if (msg != "")
-        {
-            mqtt.ip = msg;
-        }
-    }
-    if (name == "mqtt_port")
-    {
-        if (msg != "")
-        {
-            mqtt.port = msg.toInt();
-        }
-    }
-    if (name == "mqtt_base")
-    {
-        if (msg != "")
-        {
-            mqtt.topic_base = msg;
-        }
-    }
-    if (name == "mqtt_define")
-    {
-        if (msg != "")
-        {
-            mqtt.topic_define = msg;
-        }
-    }
+  if (name == "mqtt" && msg == "aktiviert")     mqtt.aktiv = true;
+  if (name == "mqtt" && msg == "deaktiviert")   mqtt.aktiv = false;
+  if (name == "mqtt_ip" && msg != "" )          mqtt.ip = msg;
+  if (name == "mqtt_port" && msg != "" )        mqtt.port = msg.toInt();
+  if (name == "mqtt_base" && msg != "" )        mqtt.topic_base = msg;
+  if (name == "mqtt_define" && msg != "" )      mqtt.topic_define = msg;
+
 }
 
 void load_conf_mqtt(StaticJsonDocument<1024> doc)
@@ -243,14 +211,16 @@ void mqtt_mqtt_sub_register()
 {
   String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
   client.subscribe((temp + "Neustart-ESP").c_str());
-  mqtt_publish(temp + "Neustart-ESP", "false");
+
 }
 
 void mqtt_mqtt_sub_read(String topic, String msg)
 {
   String temp;
   temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
-  if ( temp + "Neustart-ESP" == topic && msg == "true" )
+  
+  if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false");
+  if ( topic == temp + "Neustart-ESP" && msg == "true" )
   {
     mqtt_publish(temp + "Neustart-ESP", "false");
     delay(3000);

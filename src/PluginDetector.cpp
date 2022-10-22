@@ -2,34 +2,6 @@
 
 DETECTOR detector;
 
-/*void detector_mqtt_config()
-{
-    // subscriben 
-    client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Komunikation").c_str());
-    
-    client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Melder_Finden").c_str());
-    //mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Melder_Finden", "false");
-    client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme").c_str());
-    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme", "false");
-    client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Testalarm-Funk").c_str());
-    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Testalarm-Funk", "false");
-    client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Alarm-Funk").c_str());
-    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Alarm-Funk", "false");
-    client.subscribe((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Melder_Finden").c_str());
-    mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Melder_Finden", "false");
-    client.subscribe((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Testalarm").c_str());
-    mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Testalarm", "false");
-
-    // Subscribe Alarmierungsgruppen
-    String topic_temp = "";
-    for (int i = 0; i < detector.alarm_group_size + 1; i++)
-    {
-        topic_temp = mqtt.topic_base + "/" + group_control + detector.alarm_group[i] + "/" + "Alarm";
-        client.subscribe(topic_temp.c_str());
-        mqtt_publish(topic_temp, "false");
-    }
-}*/
-
 void load_conf_detector(StaticJsonDocument<1024> doc)
 {
     Serial.println("... Detector- Variablen ...");
@@ -58,6 +30,8 @@ void alarm_group_diagnose(String msg)
 {
     String temp_string;
     String temp_safe = "";
+    boolean temp_grp = false;
+    boolean temp_0 = false;
     int temp_size = 0;
     for (int i = 0; msg[i] != 0 ; i++)
     {
@@ -65,16 +39,16 @@ void alarm_group_diagnose(String msg)
             msg[i] < 58)
         {
             temp_string += msg[i];
-            temp_safe += msg[i];
         }
         else 
         {
             if ( temp_string != "")
             {
                 detector.alarm_group[temp_size] = temp_string.toInt();
+                if ( 0 == temp_string.toInt())              temp_0 = true;
+                if ( detector.group == temp_string.toInt()) temp_grp = true;
                 temp_size++;
                 temp_string = "";
-                temp_safe += " ";
             }
         }
     }
@@ -84,15 +58,28 @@ void alarm_group_diagnose(String msg)
         temp_size++;
         temp_string = "";
     }
+    if (temp_0 == false)
+    {
+        detector.alarm_group[temp_size] = 0;
+        temp_size++;
+        if (detector.group == 0) temp_grp = true ;
+    }
+    if (temp_grp == false)
+    {
+        detector.alarm_group[temp_size] = detector.group;
+        temp_size++;
+    }
     detector.alarm_group_size = temp_size;
-    detector.alarm_group_safe = temp_safe;
     for (int i = 0; i < temp_size; i++)
     {
         Serial.print("Gruppe ");
         Serial.print(i);
         Serial.print(" : ");
         Serial.println(detector.alarm_group[i]);
+        temp_safe += detector.alarm_group[i];
+        temp_safe += " ";
     }
+    detector.alarm_group_safe = temp_safe;
 }
 
 String webserver_call_detector(const String &var)
@@ -131,27 +118,9 @@ String webserver_call_detector(const String &var)
 
 void webserver_triger_detector(String name, String msg)
 {
-    if (name == "detector_location")
-    {
-        if (msg != "")
-        {
-            detector.location = msg;
-        }
-    }
-    if (name == "detector_group")
-    {
-        if (msg != "")
-        {
-            detector.group = msg.toInt();
-        }
-    }
-    if (name == "detector_alarm_group")
-    {
-        if (msg != "")
-        {
-            alarm_group_diagnose(msg);
-        }
-    }
+    if (name == "detector_location" && msg != "")       detector.location = msg;
+    if (name == "detector_group" && msg != "")          detector.group = msg.toInt();
+    if (name == "detector_alarm_group" && msg != "")    alarm_group_diagnose(msg);
 }
 
 void mqtt_detector_sub_register()
@@ -170,20 +139,6 @@ void mqtt_detector_sub_register()
     client.subscribe((local_topic_group + detector.group + "/" + "Testalarm_Funk").c_str());
     client.subscribe((local_topic_group + detector.group + "/" + "Alarm_Funk").c_str());
     
-    
-    //client.subscribe((mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme").c_str());
-    
-    
-    
-    
-    
-    
-    /*//mqtt_publish(local_topic_detector + "Melder_Finden", "false");
-    client.subscribe((local_topic_detector + "Testalarm_Funk").c_str());
-    //mqtt_publish(local_topic_detector + "Testalarm_Funk", "false");
-    client.subscribe((local_topic_detector + "Reset_Test/Funk_Alarme").c_str());
-    //mqtt_publish(local_topic_detector + "Reset_Test/Funk_Alarme", "false");
-    client.subscribe((local_topic_detector + "Seriele_Nachricht").c_str());*/
 }
 
 void mqtt_detector_sub_read(String topic, String msg)
@@ -193,14 +148,8 @@ void mqtt_detector_sub_read(String topic, String msg)
     String temp_topic = "";
     boolean msg_bool;
 
-    if (msg == "false")
-    {
-        msg_bool = false;
-    }
-    if (msg == "true")
-    {
-        msg_bool = true;
-    }
+    if (msg == "false") msg_bool = false;
+    if (msg == "true")  msg_bool = true;
 
     //      MELDER FINDEN
     if (topic == local_topic_detector +  "Melder_Finden" ||
