@@ -39,7 +39,7 @@ void timer_funktion()
                 msg = "false";
             }
             mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Komunikation", String(msg));
-            if (sensor.bme280)
+            if (sensor.bme != "keiner vorhanden")
             {
                 bme_refresh();
             }

@@ -3,7 +3,7 @@
 #define detector_diagnose "Melder-Diagnose/"
 #define detector_status "Melder-Status/"
 #define detector_control "Melder-Steuern/"
-#define group_control "Gruppen-Steuerung/"
+#define group_control "-Gruppen-Steuerung-/"
 
 struct DETECTOR
 {
@@ -16,7 +16,7 @@ struct DETECTOR
 };
 extern DETECTOR detector;
 
-void detector_mqtt_config();
+//void detector_mqtt_config();
 void alarm_group_diagnose(String msg);
 
 String web_server_detector(const String &var);

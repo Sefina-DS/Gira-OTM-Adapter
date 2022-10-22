@@ -78,7 +78,7 @@ void mqtt_connect()
       mqtt_mqtt_sub_register();
       mqtt_detector_sub_register();
 
-      detector_mqtt_config();
+      //detector_mqtt_config();
 
       
     }

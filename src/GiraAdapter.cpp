@@ -54,6 +54,7 @@ void setup()
   {
     bluetooth_config();
   }
+  bme_config();
 }
 
 void loop()

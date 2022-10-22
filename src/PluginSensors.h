@@ -9,18 +9,23 @@
 
 struct SENSOR
 {
-    boolean bme280;
-    boolean bme280_temperature;
-    boolean bme280_humidity;
-    boolean bme280_pressure;
-    boolean bme280_high;
+    String bme;
+    boolean bme_temperature;
+    boolean bme_humidity;
+    boolean bme_pressure;
+    boolean bme_high;
+    boolean bme_gas_ohm;
+    boolean bme_gas_score;
+    boolean bme_gas_text;
     boolean light;
     boolean ubext;
     
 };
 extern SENSOR sensor;
 
+void bme_config();
 void bme_refresh();
+void air_quality(String topic);
 void light_refresh();
 void ubext_refresh();
 
