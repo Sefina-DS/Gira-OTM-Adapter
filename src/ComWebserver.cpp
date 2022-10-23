@@ -141,6 +141,9 @@ String webserver_call(const String &var)
   Serial.print("Web-Server call mit : ");
   Serial.println(var);
   String temp = "";
+  // Überschrift
+  if (var == "header_esp_name" ) return wifi.esp_name;
+  if (var == "header_detector_location" ) return detector.location;
   // Netzwerk
   temp = webserver_call_wifi(var);
   if (temp != "") { return temp; }
@@ -205,7 +208,8 @@ void webserver_triger(String name, String msg)
     {
         if (msg == "geänderte Config übertragen und Modul neustarten !")
         {
-            spiffs_config_save();
+            spiffs_config_save_part_a();
+            spiffs_config_save_part_b();
             Serial.println("ESP wird in 6 Sekunden neugestartet !");
             delay(6000);
             ESP.restart();
@@ -215,7 +219,8 @@ void webserver_triger(String name, String msg)
     {
         if (msg == "Werkseinstellungen laden !")
         {
-            SPIFFS.remove(safefile);
+            SPIFFS.remove(safefilea);
+            SPIFFS.remove(safefileb);
             Serial.println("Savefile wurde gelöscht !");
             Serial.println();
             Serial.println("ESP wird in 6 Sekunden neugestartet !");

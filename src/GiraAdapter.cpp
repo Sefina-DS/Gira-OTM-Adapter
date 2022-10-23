@@ -27,7 +27,8 @@ void setup()
   spiffs_starten();
 
   spiffs_scan();
-  spiffs_config_read();
+  spiffs_config_read_part_a();
+  spiffs_config_read_part_b();
 
   server = new AsyncWebServer(80);
   webserver_art();

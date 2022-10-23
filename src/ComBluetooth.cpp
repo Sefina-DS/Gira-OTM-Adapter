@@ -136,24 +136,9 @@ String webserver_call_bluetooth(const String &var)
 
 void webserver_triger_bluetooth(String name, String msg)
 {
-    if (name == "bluetooth")
-    {
-        if (msg == "aktiviert")
-        {
-            bluetooth.aktiv = true;
-        }
-        else
-        {
-            bluetooth.aktiv = false;
-        }
-    }
-    if (name == "bluetooth_mac")
-    {
-        if (msg != "")
-        {
-            bluetooth_mac_diagnose(msg);
-        }
-    }
+    if (name == "bluetooth" && msg == "aktiviert") bluetooth.aktiv = true;
+    if (name == "bluetooth" && msg == "deaktiviert") bluetooth.aktiv = false;
+    if (name == "bluetooth_mac" && msg != "") bluetooth_mac_diagnose(msg);
 }
 
 void load_conf_bluetooth(StaticJsonDocument<1024> doc)
@@ -162,6 +147,8 @@ void load_conf_bluetooth(StaticJsonDocument<1024> doc)
     
     bluetooth.aktiv = doc["bluetooth"] | false;
     bluetooth.memory_file = doc["bluetooth_mac"] | "";
+    Serial.print("Bluetooth Safefile : ");
+    Serial.println(bluetooth.memory_file);
     bluetooth_mac_diagnose(bluetooth.memory_file);
 }
 
