@@ -129,35 +129,19 @@ void mqtt_detector_sub_register()
     String local_topic_group = mqtt.topic_base + "/-Gruppen-Steuerung-/";
 
     client.subscribe((local_topic_detector + "Seriele_Nachricht").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_detector + "Seriele_Nachricht");
     mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
   
     client.subscribe((local_topic_detector + "Melder_Finden").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_detector + "Melder_Finden");
     client.subscribe((local_topic_detector + "Reset_Test|Funk_Alarme").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_detector + "Reset_Test|Funk_Alarme");
     client.subscribe((local_topic_detector + "Testalarm_Funk").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_detector + "Testalarm_Funk");
     client.subscribe((local_topic_detector + "Alarm_Funk").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_detector + "Alarm_Funk");
     
     client.subscribe((local_topic_group + detector.group + "/" + "Melder_Finden").c_str());
-    Serial.print("Es wurde Subacribt : ");
-    Serial.println(local_topic_group + detector.group + "/" + "Melder_Finden");
-
+    
     for (int i = 0; i < detector.alarm_group_size; i++)
     {
         client.subscribe((local_topic_group + detector.alarm_group[i] + "/" + "Testalarm_Funk").c_str());
-        Serial.print("Es wurde Subacribt : ");
-        Serial.println(local_topic_group + detector.alarm_group[i] + "/" + "Testalarm_Funk");
         client.subscribe((local_topic_group + detector.alarm_group[i] + "/" + "Alarm_Funk").c_str());
-        Serial.print("Es wurde Subacribt : ");
-        Serial.println(local_topic_group + detector.alarm_group[i] + "/" + "Alarm_Funk");
     }    
 }
 

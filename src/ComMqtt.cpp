@@ -59,7 +59,7 @@ void mqtt_connect()
     // timer_bluetooth = 0;
     led_flash_timer(250, 150, 3);
     Serial.print("MQTT verbinden");
-    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status/";
+    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status/";
     ///         Connect mit LastWill Message
     if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
     {
@@ -209,7 +209,7 @@ StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
 
 void mqtt_mqtt_sub_register()
 {
-  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
+  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
   client.subscribe((temp + "Neustart-ESP").c_str());
 
 }
@@ -217,7 +217,7 @@ void mqtt_mqtt_sub_register()
 void mqtt_mqtt_sub_read(String topic, String msg)
 {
   String temp;
-  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/";
+  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
   
   if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false");
   if ( topic == temp + "Neustart-ESP" && msg == "true" )

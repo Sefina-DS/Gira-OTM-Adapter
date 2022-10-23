@@ -50,7 +50,17 @@ void bluetooth_scan()
             String temp_name = bluetooth.mac_name[i];
             if ( gefunden == temp_adress)
             {
+                Serial.print("Nummer ");
+                Serial.print(i);
+                Serial.print(" : ");
+                Serial.print(bluetooth.mac_adress[i]);
+                Serial.print(" | ");
+                Serial.println(gefunden);
                 bluetooth.empfang[i] = empfang;
+                Serial.print("publich an : ");
+                Serial.println(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp_name);
+                Serial.print("Empfang : ");
+                Serial.println(String(empfang));
                 mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp_name, String(empfang));
             }
         }
@@ -147,8 +157,6 @@ void load_conf_bluetooth(StaticJsonDocument<1024> doc)
     
     bluetooth.aktiv = doc["bluetooth"] | false;
     bluetooth.memory_file = doc["bluetooth_mac"] | "";
-    Serial.print("Bluetooth Safefile : ");
-    Serial.println(bluetooth.memory_file);
     bluetooth_mac_diagnose(bluetooth.memory_file);
 }
 
@@ -180,6 +188,7 @@ void bluetooth_mac_diagnose(String msg)
         if (msg[i] == 40) // = (
         {
             bluetooth.diagnose_mac = false;
+            bluetooth.memory_file += msg[i];
         }
         if (bluetooth.diagnose_mac == true)
         {
@@ -235,17 +244,22 @@ void bluetooth_mac_diagnose(String msg)
             if (msg[i] == 41)
             {
                 bluetooth.memory_file += ")";
-                bluetooth.temp_mac_gross = temp_name + " (" + bluetooth.temp_mac_gross + ")";
+                bluetooth.temp_mac_gross = temp_name;
                 temp_name = "";
                 bluetooth_mac();
             }
             else
             {
-                if (msg[i] != 40)
+                if (msg[i] == 32) 
+                {
+                    temp_name += "_";
+                    bluetooth.memory_file += "_";
+                }
+                else if (msg[i] != 40) 
                 {
                     temp_name += msg[i];
+                    bluetooth.memory_file += msg[i];
                 }
-                bluetooth.memory_file += msg[i];
             }
         }
     }

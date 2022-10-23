@@ -20,7 +20,7 @@ void setup()
 
   pinMode(input_comport_activ, INPUT);
   pinMode(input_webportal, INPUT);
-  pinMode(input_reset, INPUT);
+  pinMode(input_reset, INPUT);            // DIP 2 !
 
   led_flash_timer(5000, 0, 1);
 
@@ -29,6 +29,19 @@ void setup()
   spiffs_scan();
   spiffs_config_read_part_a();
   spiffs_config_read_part_b();
+
+  if (digitalRead(input_reset) == 0)
+  {
+    Serial.println("Config- Datein werden gelöscht : ");
+    Serial.print(safefilea);
+    Serial.println("...");
+    SPIFFS.remove(safefilea);
+    Serial.print(safefileb);
+    Serial.println("...");
+    SPIFFS.remove(safefileb);
+    Serial.println("löschen erfolgreich ... !");
+  }
+  
 
   server = new AsyncWebServer(80);
   webserver_art();
