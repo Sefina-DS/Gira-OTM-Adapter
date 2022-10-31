@@ -1,6 +1,6 @@
 #include "SysHeaders.h"
 
-int mqtt_counter = 0;
+MQTT mqtt;
 
 ///         MQTT Nachrichten Empfangen
 void mqtt_read(char *topic, byte *message, unsigned int length)
@@ -15,7 +15,16 @@ void mqtt_read(char *topic, byte *message, unsigned int length)
 
   // Subscribe auswerten !
   topicTemp = String(topic);
-  mqtt_filter(topicTemp, messageTemp);
+
+  Serial.print("Ankomende Nachricht / das Topic : ");
+  Serial.print(topicTemp);
+  Serial.print(" || die Message : ");
+  Serial.println(messageTemp);
+  
+  // Subscriber übergeben
+  mqtt_mqtt_sub_read(topicTemp, messageTemp);
+  mqtt_detector_sub_read(topicTemp, messageTemp);
+
 }
 
 ///         MQTT einrichten
@@ -23,23 +32,23 @@ void mqtt_config()
 {
   //    Serververbindungen
   Serial.print("MQTT Verbindung mit : ");
-  Serial.print(config.mqtt_ip);
+  Serial.print(mqtt.ip);
   Serial.print(" : ");
-  Serial.println(config.mqtt_port);
-  client.setServer(config.mqtt_ip.c_str(), config.mqtt_port.toInt());
+  Serial.println(mqtt.port);
+  client.setServer(mqtt.ip.c_str(), mqtt.port.toInt());
   client.setCallback(mqtt_read);
 }
 
 ///         MQTT verbinden
 void mqtt_connect()
 {
-  if (config.mqtt_topic_base == "")
+  if (mqtt.topic_base == "")
   {
-    config.mqtt_topic_base = "Rauchmelder";
+    mqtt.topic_base = "Rauchmelder";
   }
-  if (config.mqtt_topic_define == "")
+  if (mqtt.topic_define == "")
   {
-    config.mqtt_topic_define = config.esp_name;
+    mqtt.topic_define = wifi.esp_name;
   }
   if (WiFi.isConnected() == true &&
       !client.connected())
@@ -48,47 +57,35 @@ void mqtt_connect()
     // timer_bluetooth = 0;
     led_flash_timer(250, 150, 3);
     Serial.print("MQTT verbinden");
+    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status/";
     ///         Connect mit LastWill Message
-    if (client.connect(config.esp_name.c_str(), (config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Online").c_str(), 1, true, "false"))
+    if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
     {
-      mqtt_counter = 0;
+      mqtt.false_number = 0;
       ///         Online Status setzen
       // timer_bluetooth = millis();
-      client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Online").c_str(), "true");
-      mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Einbauort", config.detector_location);
-      mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Meldegruppe", config.detector_group);
-      mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "ESP- ID", config.esp_name);
-      mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "Mac Adresse", WiFi.macAddress());
-      mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + esp_status + "IP Adresse", WiFi.localIP().toString());
+      mqtt_publish(temp_topic + "Online", "true");
+      mqtt_publish(temp_topic + "ESP-ID", wifi.esp_name);
+      mqtt_publish(temp_topic + "Mac-Adresse", WiFi.macAddress());
+      mqtt_publish(temp_topic + "IP-Adresse", WiFi.localIP().toString());
 
-      Serial.println(" / erfolgreich / mit Topic : " + config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/");
+      Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
       Serial.println("");
-      // Subscribe Melder
-      // delay(1000);
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Melder_Finden").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_status + "Komunikation").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Reset_Test|Funk_Alarme").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Testalarm-Funk").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Alarm-Funk").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + detector_control + "Das_ist_ein_Test").c_str());
-      // Subscribe Gruppe
-      // delay(1000);
-      client.subscribe((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Melder_Finden").c_str());
-      client.subscribe((config.mqtt_topic_base + "/" + group_control + config.detector_group + "/" + "Testalarm").c_str());
+      
+      // Subscriben
+      mqtt_mqtt_sub_register();
+      mqtt_detector_sub_register();
 
-      // Subscribe Alarmierungsgruppen
-      String topic_temp = "";
-      for (int i = 0; i < config.detector_alarm_group_size + 1; i++)
-      {
-        topic_temp = config.mqtt_topic_base + "/" + group_control + config.detector_alarm_group_int[i] + "/" + "Alarm";
-        client.subscribe(topic_temp.c_str());
-      }
+      //detector_mqtt_config();
+
+      
     }
     else
     {
-      mqtt_counter ++;
-      Serial.println(" / nicht erfolgreich / neuer Versuch in 5 Sekunden");
-      if (mqtt_counter == 12)
+      mqtt.false_number ++;
+      Serial.print(" / nicht erfolgreich / neuer Versuch in 5 Sekunden / False-Counter : ");
+      Serial.println(mqtt.false_number);
+      if (mqtt.false_number == 12)
       {
         ESP.restart();
       }
@@ -106,4 +103,127 @@ void mqtt_publish(String topic, String msg)
   msg.toCharArray(temp_msg, msg_size + 1);
 
   client.publish(temp_topic, temp_msg);
+}
+
+String webserver_call_mqtt(const String &var)
+{
+  String temp = "";
+  if (var == "web_network_mqtt")
+  {
+    temp += F("<div class='network'><br/><div class='box'>");
+    temp += F("<h3>MQTT Einstellungen</h3>");
+    temp += F("<form action='/get'>");
+    temp += F("<table>");
+    // MQTT Aktiv/Deaktiv
+    temp += F("<tr><td>MQTT :</td>");
+    temp += F("<td><select name='mqtt'><option value='");
+    if (mqtt.aktiv)
+    {
+      temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+    }
+    else
+    {
+      temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+    }
+    temp += F("</select>");
+    temp += F("</td></tr>");
+    temp += F("</table>");
+    // Verdeckte Einstellungen (MQTT Aktiv)
+    temp += F("<table ");
+    if (!mqtt.aktiv)
+    {
+      temp += F("style='display: none'>");
+    }
+    else
+    {
+      temp += F(">");
+    }
+      // MQTT Broker
+      temp += F("<tr><td>IP Broker :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_ip' placeholder='");
+      temp +=     mqtt.ip;
+      temp += F("'></td></tr>");
+      // Port Broker
+      temp += F("<tr><td>Port Broker :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_port' placeholder='");
+      temp +=     mqtt.port;
+      temp += F("'></td></tr>");
+      // Erklärung Topic
+      temp += F("<tr><td colspan='2'> MQTT - Topic <br>");
+      temp += F("Achtung : Grund- Topic / Melder- Topic / <br>");
+      temp += F("der Aufbau darf nicht geändert werden ! <br></tr></td>");
+      // Grund Topic
+      temp += F("<tr><td>Grund- Topic :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_base' placeholder='");
+      temp +=     mqtt.topic_base;
+      temp += F("'></td></tr>");
+      // Melder Topic
+      temp += F("<tr><td>Melder- Topic :</td>");
+      temp += F("<td><input class='setting' type='text' name='mqtt_define' placeholder='");
+      temp +=     mqtt.topic_define;
+      temp += F("'></td></tr>");
+    temp += F("</table><br/>");
+    temp += F("<input type='submit' value='Submit' />");
+    temp += F("</form></div></div>");
+    return temp;
+  }
+  
+  return String();
+}
+
+void webserver_triger_mqtt(String name, String msg)
+{
+  if (name == "mqtt" && msg == "aktiviert")     mqtt.aktiv = true;
+  if (name == "mqtt" && msg == "deaktiviert")   mqtt.aktiv = false;
+  if (name == "mqtt_ip" && msg != "" )          mqtt.ip = msg;
+  if (name == "mqtt_port" && msg != "" )        mqtt.port = msg.toInt();
+  if (name == "mqtt_base" && msg != "" )        mqtt.topic_base = msg;
+  if (name == "mqtt_define" && msg != "" )      mqtt.topic_define = msg;
+
+}
+
+void load_conf_mqtt(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... MQTT- Variablen ...");
+    
+    mqtt.aktiv = doc["mqtt"] | false;
+    mqtt.ip = doc["mqtt_ip"] | "x-x-x-x";
+    mqtt.port = doc["mqtt_port"] | "1883";
+    mqtt.topic_base = doc["mqtt_topic_base"] | "Rauchmelder";
+    mqtt.topic_define = doc["mqtt_topic_define"] | "";
+}
+
+StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... MQTT- Variablen ...");
+    
+    doc["mqtt"] = mqtt.aktiv;
+    doc["mqtt_ip"] = mqtt.ip;
+    doc["mqtt_port"] = mqtt.port;
+    doc["mqtt_topic_base"] = mqtt.topic_base;
+    doc["mqtt_topic_define"] = mqtt.topic_define;
+
+    return doc;
+}
+
+void mqtt_mqtt_sub_register()
+{
+  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
+  client.subscribe((temp + "Neustart-ESP").c_str());
+
+}
+
+void mqtt_mqtt_sub_read(String topic, String msg)
+{
+  String temp;
+  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
+  
+  if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false");
+  if ( topic == temp + "Neustart-ESP" && msg == "true" )
+  {
+    mqtt_publish(temp + "Neustart-ESP", "false");
+    delay(3000);
+    ESP.restart();
+  }
+
 }

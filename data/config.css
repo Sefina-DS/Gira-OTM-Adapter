@@ -3,14 +3,13 @@ body {
   color: rgb(140, 143, 143);
 }
 div {
+}
+div.ueberschrift {
   background-color: rgb(20, 19, 19);
   text-align: center;
   padding: 5px;
   box-sizing: border-box;
   border-radius: 30px;
-}
-div.ueberschrift {
-  text-align: center;
 }
 table {
   width: 500px;
@@ -41,6 +40,22 @@ div.detector {
 div.sensor {
 }
 div.system {
+}
+
+div.box {
+  background-color: rgb(20, 19, 19);
+  text-align: center;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 30px;
+}
+
+div.save {
+  background-color: rgb(20, 19, 19);
+  text-align: center;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 30px;
 }
 
 table.upload {

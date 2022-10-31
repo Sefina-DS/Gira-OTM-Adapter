@@ -1,41 +1,69 @@
 #include "SysHeaders.h"
 
 SENSOR sensor;
-Adafruit_BME280 bme;
-bool bme_run;
+Adafruit_BME280 bme280;
+Adafruit_BME680 bme680;
+bool bme280_run;
+bool bme680_run;
+
+float hum_score, gas_score;
+float gas_reference = 250000;
+float hum_reference = 40;
+int   getgasreference_count = 0;
+
+void bme_config()
+{
+    if ( sensor.bme == "BME - 680" && !bme680.begin()) 
+    {
+        while (1);
+        bme680.setHumidityOversampling(BME680_OS_2X);
+        bme680.setPressureOversampling(BME680_OS_4X);
+        bme680.setIIRFilterSize(BME680_FILTER_SIZE_3);
+        bme680.setGasHeater(320, 150); // 320*C for 150 ms
+    }
+}
 
 void bme_refresh()
 {
-    bme_run = bme.begin(0x76);
-    if (!bme_run)
+    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/Erweiterungen/BME-";
+    // BME - 280
+    if (sensor.bme == "BME - 280")
     {
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Störung");
-        Serial.println("BME-240 ist in Störung");
+        temp_topic += "280/";
+        bme280_run = bme280.begin(0x76);
+        if (!bme280_run)
+        {
+            mqtt_publish(temp_topic + "Status" , "Störung");
+            Serial.println("BME-280 ist in Störung");
+        }
+        else
+        {
+            mqtt_publish(temp_topic + "Status" , "Läuft");
+            if (sensor.bme_temperature)     mqtt_publish(temp_topic + "Temperatur" ,                String(bme280.readTemperature(), 1));
+            if (sensor.bme_pressure)        mqtt_publish(temp_topic + "Druck" ,                     String(bme280.readPressure() / 100.0F, 0));
+            if (sensor.bme_humidity)        mqtt_publish(temp_topic + "Feuchte" ,                   String(bme280.readHumidity(), 1));
+            if (sensor.bme_high)            mqtt_publish(temp_topic + "Meter über Meeresspiegel" ,  String(bme280.readAltitude(SEALEVELPRESSURE_HPA), 1));
+        }
     }
-    else
+    // BME - 680
+    if ( sensor.bme == "BME - 680")
     {
-        float temp_float;
-        char temp_msg[8];
-        client.publish((config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Status").c_str(), "Läuft");
-        if (sensor.bme280_temperature)
+        temp_topic += "680/";
+        bme680_run = bme680.begin();
+        if (!bme680_run)
         {
-            temp_float = bme.readTemperature();
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Temperatur", String(temp_float));
+            mqtt_publish(temp_topic + "Status" , "Störung");
+            Serial.println("BME-680 ist in Störung");
         }
-        if (sensor.bme280_pressure)
+        else
         {
-            temp_float = bme.readPressure() / 100.0F;
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Druck", String(temp_float));
-        }
-        if (sensor.bme280_humidity)
-        {
-            temp_float = bme.readHumidity();
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Feuchte", String(temp_float));
-        }
-        if (sensor.bme280_high)
-        {
-            temp_float = bme.readAltitude(SEALEVELPRESSURE_HPA);
-            mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_sensor + "Meter über Meeresspiegel", String(temp_float));
+            mqtt_publish(temp_topic + "Status" , "Läuft");
+            if (sensor.bme_temperature)     mqtt_publish(temp_topic + "Temperatur" ,                String(bme680.readTemperature(), 1));
+            if (sensor.bme_pressure)        mqtt_publish(temp_topic + "Druck" ,                     String(bme680.readPressure() / 100.0F, 0));
+            if (sensor.bme_humidity)        mqtt_publish(temp_topic + "Feuchte" ,                   String(bme680.readHumidity(), 1));
+            if (sensor.bme_high)            mqtt_publish(temp_topic + "Meter über Meeresspiegel" ,  String(bme680.readAltitude(SEALEVELPRESSURE_HPA), 1));
+            if (sensor.bme_gas_ohm)         mqtt_publish(temp_topic + "Gas in KOhm",                String(bme680.gas_resistance / 1000.0, 1));
+            if (sensor.bme_gas_score || sensor.bme_gas_text)    air_quality(temp_topic);
         }
     }
 }
@@ -62,14 +90,14 @@ void light_refresh()
     if (temp >= 200)
     {
         temp_light = analogRead(input_light);
-        mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_light + "Lichtzahl", String(temp_light));
+        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtzahl", String(temp_light));
         temp = temp_light - 4095;
         if (temp != 0)
         {
             temp = -temp;
         }
         temp = (temp * 100) / 4095;
-        mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_light + "Lichtwert", String(temp));
+        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtwert", String(temp));
     }
 }
 
@@ -80,216 +108,278 @@ void ubext_refresh()
     int faktor = 1026;
     float temp_roh = analogRead(input_ubext);
     float temp_ubext = ((temp_roh * 100000) / faktor) / ((100000 * R2) / (R1 + R2));
-    mqtt_publish(config.mqtt_topic_base + "/" + config.mqtt_topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
+    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
 }
 
-String web_server_sensor(const String &var)
+String webserver_call_sensor(const String &var)
 {
     String temp = "";
-    if (var == "nav-sen-bme")
+    if (var == "web_sensor_sensor")
     {
-        if (!sensor.bme280)
+
+        temp += F("<div class='sensor'><br/><div class='box'>");
+        temp += F("<h3>Senso Einstellungen</h3>");
+        temp += F("<form action='/get'>");
+        temp += F("<table>");
+        // BME280 Aktiv/Deaktiv
+        temp += F("<tr><td>BME Art :</td>");
+        temp += F("<td><select name='bme'><option value='");
+        temp += sensor.bme;
+        temp += F("' selected>");
+        temp += sensor.bme;
+        temp += F("</option>");
+        temp += F("<option value='keiner vorhanden'>keiner vorhanden</option>");
+        temp += F("<option value='BME - 280'>BME - 280</option>");
+        temp += F("<option value='BME - 680'>BME - 680</option>");
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table>");
+        // Verdeckte Einstellungen (BME 280 Aktiv)
+        temp += F("<table ");
+        if (sensor.bme == "keiner vorhanden")
         {
-            return "<br/><div class='bme280' style=' display : none;'>";
+            temp += F("style='display: none'>");
         }
         else
         {
-            return "<div class='bme280'>";
+            temp += F(">");
         }
-    }
-    if (var == "place_sensor_bme")
-    {
-        if (sensor.bme280)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_temperature")
-    {
-        if (sensor.bme280_temperature)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_humidity")
-    {
-        if (sensor.bme280_humidity)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_pressure")
-    {
-        if (sensor.bme280_pressure)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_bme_high")
-    {
-        if (sensor.bme280_high)
-        {
-            temp = "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert";
-        }
-        else
-        {
-            temp = "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-        }
-        return temp;
-    }
-    if (var == "place_sensor_light")
-    {
+            // Temperatur
+            temp += F("<tr><td>Temperatur :</td>");
+            temp += F("<td><select name='bme-temperature'><option value='");
+            if (sensor.bme_temperature)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Feuchtigkeit
+            temp += F("<tr><td>Feuchtigkeit :</td>");
+            temp += F("<td><select name='bme-humidity'><option value='");
+            if (sensor.bme_humidity)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Druck
+            temp += F("<tr><td>Druck :</td>");
+            temp += F("<td><select name='bme-pressure'><option value='");
+            if (sensor.bme_pressure)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            // Höhe
+            temp += F("<tr><td>Höhe :</td>");
+            temp += F("<td><select name='bme-high'><option value='");
+            if (sensor.bme_high)
+            {
+                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+            }
+            else
+            {
+                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            temp += F("</table>");
+            // Verdeckte Einstellungen (BME 680 Aktiv)
+            temp += F("<table ");
+            if (sensor.bme != "BME - 680")
+            {
+                temp += F("style='display: none'>");
+            }
+            else
+            {
+                temp += F(">");
+            }
+                // Gas Ohm
+                temp += F("<tr><td>Gas in KOhm :</td>");
+                temp += F("<td><select name='bme-gas-ohm'><option value='");
+                if (sensor.bme_gas_ohm)
+                {
+                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+                }
+                else
+                {
+                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+                }
+                temp += F("</select>");
+                temp += F("</td></tr>");
+                // Gas Score
+                temp += F("<tr><td>Raumklimabewertung im Score :</td>");
+                temp += F("<td><select name='bme-gas-score'><option value='");
+                if (sensor.bme_gas_score)
+                {
+                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+                }
+                else
+                {
+                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+                }
+                temp += F("</select>");
+                temp += F("</td></tr>");
+                // Gas Text
+                temp += F("<tr><td>Raumklimebewertung im Text :</td>");
+                temp += F("<td><select name='bme-gas-text'><option value='");
+                if (sensor.bme_gas_text)
+                {
+                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+                }
+                else
+                {
+                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+                }
+                temp += F("</select>");
+                temp += F("</td></tr>");
+                temp += F("</table><br/>");
+        // Light Aktiv/Deaktiv
+        temp += F("<table>");
+        temp += F("<tr><td>Lichtsensor :</td>");
+        temp += F("<td><select name='light'><option value='");
         if (sensor.light)
         {
-            temp = auswahl_aktiv;
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
         }
         else
         {
-            temp = auswahl_deaktiv;
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
         }
-        return temp;
-    }
-    if (var == "place_sensor_ubext")
-    {
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table><br/>");
+        // Spannung Aktiv/Deaktiv
+        temp += F("<table>");
+        temp += F("<tr><td>Versorgungsspannung :</td>");
+        temp += F("<td><select name='ubext'><option value='");
         if (sensor.ubext)
         {
-            temp = auswahl_aktiv;
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
         }
         else
         {
-            temp = auswahl_deaktiv;
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
         }
+        temp += F("</select>");
+        temp += F("</td></tr>");
+        temp += F("</table><br/>");
+        temp += F("<input type='submit' value='Submit' />");
+        temp += F("</form></div></div>");
         return temp;
     }
-
+    
     return String();
+    
 }
 
-void web_server_sensor_get(String name, String msg)
+void webserver_triger_sensor(String name, String msg)
 {
-    if (name == "bme")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280 = true;
-        }
-        else
-        {
-            sensor.bme280 = false;
-        }
-    }
-    if (name == "bme-temperature")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_temperature = true;
-        }
-        else
-        {
-            sensor.bme280_temperature = false;
-        }
-    }
-    if (name == "bme-humidity")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_humidity = true;
-        }
-        else
-        {
-            sensor.bme280_humidity = false;
-        }
-    }
-    if (name == "bme-temperature")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_pressure = true;
-        }
-        else
-        {
-            sensor.bme280_pressure = false;
-        }
-    }
-    if (name == "bme-high")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.bme280_high = true;
-        }
-        else
-        {
-            sensor.bme280_high = false;
-        }
-    }
-    if (name == "light")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.light = true;
-        }
-        else
-        {
-            sensor.light = false;
-        }
-    }
-    if (name == "ubext")
-    {
-        if (msg == "aktiviert")
-        {
-            sensor.ubext = true;
-        }
-        else
-        {
-            sensor.ubext = false;
-        }
-    }
+    if (name == "bme" && msg != "")     sensor.bme = msg;
+    if (name == "bme-temperature"   && msg == "aktiviert")      sensor.bme_temperature = true;
+    if (name == "bme-temperature"   && msg == "deaktiviert")    sensor.bme_temperature = false;
+    if (name == "bme-humidity"   && msg == "aktiviert")      sensor.bme_humidity = true;
+    if (name == "bme-humidity"   && msg == "deaktiviert")    sensor.bme_humidity = false;
+    if (name == "bme-pressure"   && msg == "aktiviert")      sensor.bme_pressure = true;
+    if (name == "bme-pressure"   && msg == "deaktiviert")    sensor.bme_pressure = false;
+    if (name == "bme-high"   && msg == "aktiviert")      sensor.bme_high = true;
+    if (name == "bme-high"   && msg == "deaktiviert")    sensor.bme_high = false;
+    if (name == "bme-gas-ohm"   && msg == "aktiviert")      sensor.bme_gas_ohm = true;
+    if (name == "bme-gas-ohm"   && msg == "deaktiviert")    sensor.bme_gas_ohm = false;
+    if (name == "bme-gas-score"   && msg == "aktiviert")      sensor.bme_gas_score = true;
+    if (name == "bme-gas-score"   && msg == "deaktiviert")    sensor.bme_gas_score = false;
+    if (name == "bme-gas-text"   && msg == "aktiviert")      sensor.bme_gas_text = true;
+    if (name == "bme-gas-text"   && msg == "deaktiviert")    sensor.bme_gas_text = false;
+    if (name == "light"   && msg == "aktiviert")      sensor.light = true;
+    if (name == "light"   && msg == "deaktiviert")    sensor.light = false;
+    if (name == "ubext"   && msg == "aktiviert")      sensor.ubext = true;
+    if (name == "ubext"   && msg == "deaktiviert")    sensor.ubext = false;
 }
 
 void load_conf_sensor(StaticJsonDocument<1024> doc)
 {
     Serial.println("... Sensor- Variablen ...");
     
-    sensor.bme280 = doc["bme_280"] | false;
-    sensor.bme280_temperature = doc["bme_280_temperature"] | false;
-    sensor.bme280_humidity = doc["bme_280_humidity"] | false;
-    sensor.bme280_pressure = doc["bme_280_pressure"] | false;
-    sensor.bme280_high = doc["bme_280_high"] | false;
-    sensor.light = doc["light"] | false;
-    sensor.ubext = doc["ubext"] | false;
+    sensor.bme                  = doc["bme"] | "keiner vorhanden";
+    sensor.bme_temperature      = doc["bme_temperature"] | false;
+    sensor.bme_humidity         = doc["bme_humidity"] | false;
+    sensor.bme_pressure         = doc["bme_pressure"] | false;
+    sensor.bme_high             = doc["bme_high"] | false;
+    sensor.bme_gas_ohm          = doc["bme_gas_ohm"] | false;
+    sensor.bme_gas_score        = doc["bme_gas_score"] | false;
+    sensor.bme_gas_text         = doc["bme_gas_text"] | false;
+    sensor.light                = doc["light"] | false;
+    sensor.ubext                = doc["ubext"] | false;
 }
 
 StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc)
 {
     Serial.println("... Sensor- Variablen ...");
     
-    doc["bme_280"] = sensor.bme280;
-    doc["bme_280_temperature"] = sensor.bme280_temperature;
-    doc["bme_280_humidity"] = sensor.bme280_humidity;
-    doc["bme_280_pressure"] = sensor.bme280_pressure;
-    doc["bme_280_high"] = sensor.bme280_high;
-    doc["light"] = sensor.light;
-    doc["ubext"] = sensor.ubext;
+    doc["bme"]              = sensor.bme;
+    doc["bme_temperature"]  = sensor.bme_temperature;
+    doc["bme_humidity"]     = sensor.bme_humidity;
+    doc["bme_pressure"]     = sensor.bme_pressure;
+    doc["bme_high"]         = sensor.bme_high;
+    doc["bme_gas_ohm"]      = sensor.bme_gas_ohm;
+    doc["bme_gas_score"]    = sensor.bme_gas_score;
+    doc["bme_gas_text"]     = sensor.bme_gas_text;
+    doc["light"]            = sensor.light;
+    doc["ubext"]            = sensor.ubext;
 
     return doc;
+}
+
+void air_quality(String topic) 
+{
+    float temp_humidity = bme680.readHumidity();
+    if (temp_humidity >= 38 && temp_humidity <= 42)     hum_score = 0.25*100; // Humidity +/-5% around optimum 
+    else
+    { //sub-optimal
+        if (temp_humidity < 38)                         hum_score = 0.25/hum_reference*temp_humidity*100;
+        else
+        {
+            hum_score = ((-0.25/(100-hum_reference)*temp_humidity)+0.416666)*100;
+        }
+    }
+    //Calculate gas contribution to IAQ index
+    float gas_lower_limit = 5000;   // Bad air quality limit
+    float gas_upper_limit = 50000;  // Good air quality limit 
+    if (gas_reference > gas_upper_limit)    gas_reference = gas_upper_limit; 
+    if (gas_reference < gas_lower_limit)    gas_reference = gas_lower_limit;
+    gas_score = (0.75/(gas_upper_limit-gas_lower_limit)*gas_reference -(gas_lower_limit*(0.75/(gas_upper_limit-gas_lower_limit))))*100;
+    float air_quality_score = hum_score + gas_score;
+    if ((getgasreference_count++)%10==0) 
+    {
+        int readings = 10;
+        for (int i = 1; i <= readings; i++)
+        {
+            gas_reference += bme680.readGas();
+        }
+        gas_reference = gas_reference / readings;
+    }
+    String air_text;
+    air_quality_score = (100 - air_quality_score) * 5;
+    if (air_quality_score >= 301)                               air_text = "Gefährlich";
+    if (air_quality_score >= 201 && air_quality_score <= 300 )  air_text = "sehr Ungesund";
+    if (air_quality_score >= 176 && air_quality_score <= 200 )  air_text = "Ungesund";
+    if (air_quality_score >= 151 && air_quality_score <= 175 )  air_text = "Ungesund für Sensiebelchen";
+    if (air_quality_score >=  51 && air_quality_score <= 150 )  air_text = "Angenehm";
+    if (air_quality_score >=  00 && air_quality_score <=  50 )  air_text = "Gut";
+    
+    if (sensor.bme_gas_score)         mqtt_publish(topic + "Gas in Score",      String(air_quality_score, 0));
+    if (sensor.bme_gas_score)         mqtt_publish(topic + "Gas in Text",       air_text);
 }
