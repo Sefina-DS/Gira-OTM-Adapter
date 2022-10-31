@@ -149,7 +149,7 @@ void filter(byte msg[10], int size)
             if (timer.alarm < millis())
             {
                 timer.alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
+                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true");
             }
             break;
         case 50: // 2
@@ -162,7 +162,7 @@ void filter(byte msg[10], int size)
             if (timer.alarm < millis())
             {
                 timer.alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
+                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true");
             }
             break;
         default:
@@ -180,8 +180,8 @@ void filter(byte msg[10], int size)
             for (int i = 0; i < detector.alarm_group_size + 1; i++)
             {
                 topic_temp = mqtt.topic_base + "/" + group_control + detector.alarm_group[i] + "/";
-                client.publish((topic_temp + "Alarm").c_str(), "false");
-                client.publish((topic_temp + "Testalarm").c_str(), "false");
+                mqtt_publish(topic_temp + "Alarm_Funk", "false");
+                mqtt_publish(topic_temp + "Testalarm_Funk", "false");
             }
             mqtt_link("Melder-Status/Taster Melder", "true");
             mqtt_link("Melder-Status/Alarm-Funk", "false");
@@ -219,7 +219,7 @@ void filter(byte msg[10], int size)
             if (timer.alarm < millis())
             {
                 timer.alarm = millis() + 300000;
-                client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
+                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true");
             }
             break;
         default:

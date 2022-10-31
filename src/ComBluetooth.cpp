@@ -50,18 +50,16 @@ void bluetooth_scan()
             String temp_name = bluetooth.mac_name[i];
             if ( gefunden == temp_adress)
             {
+                bluetooth.empfang[i] = empfang;
+                mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp_name, String(empfang));
                 Serial.print("Nummer ");
                 Serial.print(i);
                 Serial.print(" : ");
                 Serial.print(bluetooth.mac_adress[i]);
                 Serial.print(" | ");
-                Serial.println(gefunden);
-                bluetooth.empfang[i] = empfang;
-                Serial.print("publich an : ");
-                Serial.println(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp_name);
+                Serial.println(temp_name);
                 Serial.print("Empfang : ");
                 Serial.println(String(empfang));
-                mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_bluetooth + temp_name, String(empfang));
             }
         }
         
@@ -244,7 +242,7 @@ void bluetooth_mac_diagnose(String msg)
             if (msg[i] == 41)
             {
                 bluetooth.memory_file += ")";
-                bluetooth.temp_mac_gross = temp_name;
+                bluetooth.temp_mac_gross = temp_name + "_%_"+ bluetooth.temp_mac_gross;
                 temp_name = "";
                 bluetooth_mac();
             }
