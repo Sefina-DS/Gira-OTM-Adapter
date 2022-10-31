@@ -73,7 +73,7 @@ void spiffs_config_save_part_a()
     
     // Variablen werden gelesen
     
-    doc["seriel"] = config.seriel;
+    //doc["seriel"] = config.seriel;
 
     
 
@@ -141,7 +141,7 @@ void spiffs_config_load_part_a()
     load_conf_wifi(doc);
     load_conf_mqtt(doc);
     
-    config.seriel = doc["seriel"] | false;
+    //config.seriel = doc["seriel"] | false;
 
     
 

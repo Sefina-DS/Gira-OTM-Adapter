@@ -23,15 +23,13 @@
 
 // Datein
 
-#include "SysVars.h"
-
 #include "SpiffsManager.h"
 #include "ComWifi.h"
 #include "ComWebserver.h"
 #include "ComMqtt.h"
 #include "ComBluetooth.h"
 #include "ComSerial.h"
-#include "AdvancedFunctions.h"
+#include "SysFunctions.h"
 #include "PluginSensors.h"
 #include "PluginDetector.h"
 #include "PluginDetectorSerial.h"

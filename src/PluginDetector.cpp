@@ -164,14 +164,13 @@ void mqtt_detector_sub_read(String topic, String msg)
         
         if (comserial.com_status == 0)
         {
-            comserial.com_status = 1;
             if (msg_bool == true)
             {
-                serial_send("070020"); // Melder- Finden An
+                serial_send("070020", 1); // Melder- Finden An
             }
             else
             {
-                serial_send("070040"); // Melder- Finden Aus
+                serial_send("070040", 1); // Melder- Finden Aus
             }
         }
     }
@@ -182,14 +181,13 @@ void mqtt_detector_sub_read(String topic, String msg)
         if (topic == local_topic_detector +  "Testalarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Testalarm_Funk", "false");
         if (comserial.com_status == 0)
         {
-            comserial.com_status = 1;
             if (msg_bool == true)
             {
-                serial_send("030080"); // Test- Alarm
+                serial_send("030080", 1); // Test- Alarm
             }
             else
             {
-                serial_send("030200"); // Reset Funk-Alarm + Test-Alarm
+                serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
             }
         }
     }
@@ -200,22 +198,28 @@ void mqtt_detector_sub_read(String topic, String msg)
         if (topic == local_topic_detector +  "Reset_Test|Funk_Alarme" && msg == "")                          mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
         if (comserial.com_status == 0)
         {
-            comserial.com_status = 1;
             if (msg_bool == true)
             {
-                serial_send("030000"); // Test- Alarm- Reset
+                serial_send("030000", 1); // Test- Alarm- Reset
                 mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
             }
+        }
+        else
+        {
+            mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
         }
     }
 
     //      SERIELE TESTNACHRICHT
     if (topic == local_topic_detector + "Seriele_Nachricht")
     {
-        if (comserial.com_status == 0)
+        if (comserial.com_status == 0 && msg != "" )
         {
-            comserial.com_status = 1;
-            serial_send(msg); // Testnachricht (Als String)
+            serial_send(msg, 1); // Testnachricht (Als String)
+            mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
+        }
+        else
+        {
             mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
         }
     }
@@ -226,10 +230,9 @@ void mqtt_detector_sub_read(String topic, String msg)
         if (topic == local_topic_detector +  "Alarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Alarm_Funk", "false");
         if (comserial.com_status == 0)
         {
-            comserial.com_status = 1;
             if (msg_bool == true)
             {
-                serial_send("030210"); // Alarm Funk
+                serial_send("030210", 1); // Alarm Funk
             }
         }
     }
@@ -243,18 +246,17 @@ void mqtt_detector_sub_read(String topic, String msg)
             if (topic == local_topic_group + detector.alarm_group[i] + "/Alarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Alarm_Funk", "false");
             if (comserial.com_status == 0)
             {
-                comserial.com_status = 1;
                 if (msg_bool == true)
                 {
                     if (comserial.timer_alarm < millis())
                     {
                         comserial.timer_alarm = millis() + 300000;
-                        serial_send("030210"); // Alarm Funk
+                        serial_send("030210", 1); // Alarm Funk
                     }
                 }
                 else
                 {
-                    serial_send("030200"); // Reset Funk-Alarm + Test-Alarm
+                    serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
                 }
             }
         }
@@ -264,14 +266,13 @@ void mqtt_detector_sub_read(String topic, String msg)
             if (topic == local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk", "false");
             if (comserial.com_status == 0)
             {
-                comserial.com_status = 1;
                 if (msg_bool == true)
                 {
-                    serial_send("030080"); // Test- Alarm
+                    serial_send("030080", 1); // Test- Alarm
                 }
                 else
                 {
-                    serial_send("030200"); // Reset Funk-Alarm + Test-Alarm
+                    serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
                 }
             }
         }

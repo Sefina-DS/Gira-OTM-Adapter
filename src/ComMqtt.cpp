@@ -2,8 +2,6 @@
 
 MQTT mqtt;
 
-int mqtt_counter = 0;
-
 ///         MQTT Nachrichten Empfangen
 void mqtt_read(char *topic, byte *message, unsigned int length)
 {
@@ -63,13 +61,13 @@ void mqtt_connect()
     ///         Connect mit LastWill Message
     if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
     {
-      mqtt_counter = 0;
+      mqtt.false_number = 0;
       ///         Online Status setzen
       // timer_bluetooth = millis();
       mqtt_publish(temp_topic + "Online", "true");
-      mqtt_publish(temp_topic + "ESP- ID", wifi.esp_name);
-      mqtt_publish(temp_topic + "Mac Adresse", WiFi.macAddress());
-      mqtt_publish(temp_topic + "IP Adresse", WiFi.localIP().toString());
+      mqtt_publish(temp_topic + "ESP-ID", wifi.esp_name);
+      mqtt_publish(temp_topic + "Mac-Adresse", WiFi.macAddress());
+      mqtt_publish(temp_topic + "IP-Adresse", WiFi.localIP().toString());
 
       Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
       Serial.println("");
@@ -84,9 +82,10 @@ void mqtt_connect()
     }
     else
     {
-      mqtt_counter ++;
-      Serial.println(" / nicht erfolgreich / neuer Versuch in 5 Sekunden");
-      if (mqtt_counter == 12)
+      mqtt.false_number ++;
+      Serial.print(" / nicht erfolgreich / neuer Versuch in 5 Sekunden / False-Counter : ");
+      Serial.println(mqtt.false_number);
+      if (mqtt.false_number == 12)
       {
         ESP.restart();
       }

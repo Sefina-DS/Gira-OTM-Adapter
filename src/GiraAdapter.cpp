@@ -1,13 +1,8 @@
 #include "SysHeaders.h"
 
-Config config;
-
 AsyncWebServer *server;
 WiFiClient espClient;
 PubSubClient client(espClient);
-int seri_status = 0;
-unsigned long timer_time = 0;
-unsigned long timer_alarm = 0;
 
 void setup()
 {
@@ -53,9 +48,9 @@ void setup()
 
   wlan_config();
 
-  config.seriel = true;
+  comserial.aktiv = true;
 
-  if (config.seriel == true)
+  if (comserial.aktiv == true)
   {
     digitalWrite(output_comport_activ, LOW);
     Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
@@ -76,18 +71,18 @@ void loop()
   serial_status();
 
   // Rücksetzen Alarmtimer
-  if (millis() >= timer_alarm && timer_alarm != 0) timer_alarm = 0;
+  if (millis() >= timer.alarm && timer.alarm != 0) timer.alarm = 0;
   // 5 Sekunden intervall
-  if (millis() >= timer_time)
+  if (millis() >= timer.funktion)
   {
-    timer_time = millis() + 5000;
+    timer.funktion = millis() + 5000;
     timer_funktion();
   }
   // MQTT Funktion
   if (mqtt.aktiv) client.loop();
   // Seriele Funktionen
   serial_read();
-  if (seri_status > 0) serial_send("");
+  if (comserial.com_status > 0) serial_send("", comserial.com_status);
   // bluetooth !
   if (bluetooth.konfiguriert &&
       bluetooth.timer < millis())

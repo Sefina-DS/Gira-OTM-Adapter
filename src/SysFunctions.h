@@ -13,30 +13,6 @@
 #define output_led_detector 27
 #define output_comport_activ 23
 
-// MQTT Definitions
 
 
-// Vars
-
-struct Config
-{
-
-
-    boolean seriel;
-
-
-};
-extern Config config;
-
-
-extern int mqtt_counter;
-
-
-extern int seri_status;
-extern String ssize;
-extern String seri_message_receive;
-
-
-extern unsigned long timer_time;
-extern unsigned long timer_alarm;
-
+void led_flash_timer(int timer_on,int timer_off, int number);

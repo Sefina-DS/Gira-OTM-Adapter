@@ -146,9 +146,9 @@ void filter(byte msg[10], int size)
         case 49: // 1
             mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "true");
             mqtt_link("Melder-Status/Alarm Thermisch", "true");
-            if (timer_alarm < millis())
+            if (timer.alarm < millis())
             {
-                timer_alarm = millis() + 300000;
+                timer.alarm = millis() + 300000;
                 client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;
@@ -159,9 +159,9 @@ void filter(byte msg[10], int size)
         case 51: // 3
             mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "false");
             mqtt_link("Melder-Status/Alarm Thermisch", "true");
-            if (timer_alarm < millis())
+            if (timer.alarm < millis())
             {
-                timer_alarm = millis() + 300000;
+                timer.alarm = millis() + 300000;
                 client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;
@@ -175,7 +175,7 @@ void filter(byte msg[10], int size)
             mqtt_link("Melder-Status/Taster Melder", "false");
             break;
         case 56: // 8
-            serial_send("030200");
+            if (comserial.com_status > 0) serial_send("030200", 1);
             topic_temp = "";
             for (int i = 0; i < detector.alarm_group_size + 1; i++)
             {
@@ -216,9 +216,9 @@ void filter(byte msg[10], int size)
             break;
         case 52: // 4
             mqtt_link("Melder-Status/Alarm Optisch", "true");
-            if (timer_alarm < millis())
+            if (timer.alarm < millis())
             {
-                timer_alarm = millis() + 300000;
+                timer.alarm = millis() + 300000;
                 client.publish((mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm").c_str(), "true");
             }
             break;

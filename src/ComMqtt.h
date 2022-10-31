@@ -7,6 +7,7 @@ struct MQTT
     String port;
     String topic_base;
     String topic_define;
+    int false_number = 0;
     
 };
 extern MQTT mqtt;

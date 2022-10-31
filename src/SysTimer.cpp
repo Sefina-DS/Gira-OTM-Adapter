@@ -1,8 +1,11 @@
 #include "SysHeaders.h"
 
+TIMER timer;
+
 void timer_funktion()
 {
     String msg;
+    String temp_topic;
     int temp = 0;
     static int nr = 0;
     if (nr == 120)
@@ -27,22 +30,9 @@ void timer_funktion()
         {
             wlan_connect();
         }
-        if (WiFi.isConnected() &&
-            client.connected())
+        if (sensor.bme != "keiner vorhanden")
         {
-            if (seri_run == true)
-            {
-                msg = "true";
-            }
-            else
-            {
-                msg = "false";
-            }
-            mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + detector_status + "Komunikation", String(msg));
-            if (sensor.bme != "keiner vorhanden")
-            {
-                bme_refresh();
-            }
+            bme_refresh();
         }
     }
     if (nr % 2 == 0)
@@ -63,42 +53,42 @@ void timer_funktion()
     case 52:
     case 82:
     case 112:
-        seri_status = 1;
-        serial_send("09");
+        //comserial.com_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("09", 1);
         temp = ((millis() / 1000) / 60) / 60;
-        
-        //mqtt_publish_int(mqtt.topic_base + "/" + mqtt.topic_define + "/" + "esp_status" + "/" + "Betriebsstunden", temp);
+        temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status/";
+        mqtt_publish( temp_topic + "Betriebsstunden", String(temp));
 
         break;
     // Statusmeldungen
     case 13:
-        seri_status = 1;
-        serial_send("02");
+        //comserial.com_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("02", 1);
         break;
     // Serienummer 25
     case 25:
-        seri_status = 1;
-        serial_send("04");
+        //seri_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("04", 1);
         break;
     // Batterie + 2x Temperaturfühler 45
     case 45:
-        seri_status = 1;
-        serial_send("0C");
+        //seri_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("0C", 1);
         break;
     // Rauchkammer + Rauchalarme + Verschmutzung 65
     case 65:
-        seri_status = 1;
-        serial_send("0B");
+        //seri_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("0B", 1);
         break;
     // Alarme - 1 85
     case 85:
-        seri_status = 1;
-        serial_send("0D");
+        //seri_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("0D", 1);
         break;
     // Alarme - 2 105
     case 105:
-        seri_status = 1;
-        serial_send("0E");
+        //seri_status = 1;
+        if ( comserial.com_status == 0 ) serial_send("0E", 1);
         break;
     // Abbruch
     default:

@@ -2,12 +2,10 @@
 
 COMSERIAL comserial;
 
-boolean seri_run;
-String seri_message_receive = "";
-
-void serial_send(String msg_funktion = "")
+void serial_send(String msg_funktion = "", int status = 1)
 {
-    if (!config.seriel)
+    if ( comserial.com_status != status ) comserial.com_status = status;
+    if (!comserial.gestartet)
     {
         return;
     }
@@ -21,11 +19,11 @@ void serial_send(String msg_funktion = "")
     int number = 0;
     byte msg[20];
     int length = msg_speicher.length();
-    if (seri_status % 2 != 0)
+    if (comserial.com_status % 2 != 0) // muss ungerade sein !
     {
-        if (seri_status < 7)
+        if (comserial.com_status < 7)
         {
-            seri_status++;
+            comserial.com_status++;
             //      String -> Byte || Buchstaben in decimal und Addieren
             for (byte n = 0; n < msg_speicher.length(); n++)
             {
@@ -72,7 +70,7 @@ void serial_send(String msg_funktion = "")
         else
         {
             Serial.println("Senden- Serial abgebrochen");
-            seri_status = 0;
+            comserial.com_status = 0;
             msg_speicher = "";
         }
     }
@@ -82,6 +80,7 @@ void serial_read()
 {
     if (Serial2.available() > 0)
     {
+        String temp_receive = "";
         int deci = 0;
         char hex[8] = {0};
         int number = 0;
@@ -92,7 +91,6 @@ void serial_read()
         char letter;
 
         Serial.println("Nachricht wird Empfangen !");
-        seri_message_receive = "";
         int rlen = Serial2.readBytes(buff, size);
         for (int i = 0; i < rlen; i++)
         {
@@ -108,7 +106,7 @@ void serial_read()
         if (buff[0] == 0x06)
         {
             Serial.println("Senden- Serial erfolgreich");
-            seri_status = 0;
+            comserial.com_status = 0;
             if (buff[2] != 0x02)
             {
                 return;
@@ -117,7 +115,7 @@ void serial_read()
         if (buff[0] == 0x15)
         {
             Serial.println("Senden- Serial nicht erfolgreich");
-            seri_status++;
+            comserial.com_status++;
             if (buff[2] != 0x02)
             {
                 return;
@@ -147,11 +145,11 @@ void serial_read()
             for (int i = begin; i < end; i++)
             {
                 letter = buff[i];
-                seri_message_receive += letter;
+                temp_receive += letter;
                 shex[ssize] = letter;
                 ssize++;
             }
-            Serial.println("Nachricht wurde erfolgreich empfangen : " + seri_message_receive);
+            Serial.println("Nachricht wurde erfolgreich empfangen : " + temp_receive);
             filter(shex, ssize);
         }
         else
@@ -161,9 +159,9 @@ void serial_read()
             for (int i = begin; i < end + 2; i++)
             {
                 letter = buff[i];
-                seri_message_receive += letter;
+                temp_receive += letter;
             }
-            Serial.println("Nachricht wurde abgelehnt : " + seri_message_receive);
+            Serial.println("Nachricht wurde abgelehnt : " + temp_receive);
         }
     }
 }
@@ -171,7 +169,7 @@ void serial_read()
 void serial_status()
 {
     // Output aktivieren/deaktivieren
-    if (config.seriel == true)
+    if (comserial.aktiv == true)
     {
         digitalWrite(output_comport_activ, LOW);
     }
@@ -183,10 +181,10 @@ void serial_status()
     // abfragen Seriele komunikation + Variable anpassen
     if (digitalRead(input_comport_activ) == 0)
     {
-        seri_run = true;
+        comserial.gestartet = true;
     }
     else
     {
-        seri_run = false;
+        comserial.gestartet = false;
     }
 }
