@@ -9,11 +9,13 @@ struct BLUETOOTH
     boolean konfiguriert = false;
     unsigned long timer = 0;
     int empfang[20];
-    char mac_adress[20][20] = { "", };
-    char mac_name[20][60] = { "", };
+    char mac_adress_klein[20][20] = { "", };
+    char mac_adress_gross[20][20] = { "", };
+    char mac_name[20][40] = { "", };
     int mac_size = 0;
     String temp_mac_klein;
     String temp_mac_gross;
+    String temp_mac_name;
     int temp_mac_a;
     int temp_mac_b;
     String memory_file;
