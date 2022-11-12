@@ -12,7 +12,7 @@ struct DETECTOR
     int alarm_group[99];
     int alarm_group_size;
     String location;
-    
+    unsigned long timer = 0;
 };
 extern DETECTOR detector;
 

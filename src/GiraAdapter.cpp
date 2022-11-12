@@ -20,74 +20,83 @@ void setup()
   led_flash_timer(5000, 0, 1);
 
   spiffs_starten();
-
   spiffs_scan();
-  spiffs_config_read_part_a();
-  spiffs_config_read_part_b();
+  spiffs_config_read();
 
   if (digitalRead(input_reset) == 0)
   {
     Serial.println("Config- Datein werden gelöscht : ");
-    Serial.print(safefilea);
+    Serial.print(safefile);
     Serial.println("...");
-    SPIFFS.remove(safefilea);
-    Serial.print(safefileb);
-    Serial.println("...");
-    SPIFFS.remove(safefileb);
+    SPIFFS.remove(safefile);
     Serial.println("löschen erfolgreich ... !");
   }
   
-
-  server = new AsyncWebServer(80);
-  webserver_art();
-
   Serial.println();
   Serial.print(wifi.esp_name);
   Serial.println(" wird gestartet");
   Serial.println();
 
+  webserver_art();
   wlan_config();
+  version_check();
 
-  comserial.aktiv = true;
+  if ( mqtt.aktiv )     { mqtt_config(); }
 
+
+  //comserial.aktiv = true;
+
+  /*
   if (comserial.aktiv == true)
   {
     digitalWrite(output_comport_activ, LOW);
     Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
   }
-  if (mqtt.aktiv)
-  {
-    mqtt_config();
-  }
-  if (bluetooth.aktiv)
-  {
-    bluetooth_config();
-  }
+  if ( mqtt.aktiv ) { mqtt_config(); }
+
   bme_config();
+
+  */
+  if ( webserver.notbetrieb && WiFi.isConnected() == true )
+  {
+    Serial.print("config.html und config.css wird runtergeladen");
+    update_webpage();
+    delay(1000);
+    ESP.restart();
+  }
 }
 
 void loop()
 {
+  if ( !WiFi.isConnected() && !AP_Mode )                              wlan_connect(); 
+  if ( WiFi.isConnected() && mqtt.aktiv && !client.connected() )      mqtt_connect(); 
+  if ( client.connected() && mqtt.aktiv )                             client.loop();
+  
+  /*
   serial_status();
+  if ( client.connected() && detectordiag.timer <= millis() && comserial.gestartet == true ) detector_serial_timer(); 
+  if ( client.connected() && mqtt.timer <= millis() ) mqtt_esp_status();
+  if ( system_funktion.timer <= millis() ) system_timer();
 
   // Rücksetzen Alarmtimer
-  if (millis() >= timer.alarm && timer.alarm != 0) timer.alarm = 0;
-  // 5 Sekunden intervall
-  if (millis() >= timer.funktion)
-  {
-    timer.funktion = millis() + 5000;
-    timer_funktion();
-  }
+  if (millis() >= detector.timer && detector.timer != 0) detector.timer = 0;
+  
   // MQTT Funktion
   if (mqtt.aktiv) client.loop();
   // Seriele Funktionen
   serial_read();
   if (comserial.com_status > 0) serial_send("", comserial.com_status);
-  // bluetooth !
-  if (bluetooth.konfiguriert &&
-      bluetooth.timer < millis())
+  // 30 Sekunden intervall für Erweiterungen
+  if (millis() >= sensor.timer)
   {
-    bluetooth.timer = millis() + 5000;
-    bluetooth_scan();
+    sensor.timer = millis() + 30000;
+    bme_refresh();
   }
+  */
+
+ 
+
+
+
+
 }

@@ -91,6 +91,19 @@ String webserver_call_detector(const String &var)
         temp += F("<h3>Rauchmelder Einstellungen</h3>");
         temp += F("<form action='/get'>");
         temp += F("<table>");
+        // Komunikation (Serial)
+        temp += F("<tr><td>Komunikation :</td>");
+        temp += F("<td><select name='detector_komunikation'><option value='");
+        if (comserial.aktiv)
+        {
+            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
+        }
+        else
+        {
+            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
+        }
+        temp += F("</select>");
+        temp += F("</td></tr>");
         // Einbauort
         temp += F("<tr><td>Einbauort :</td>");
         temp += F("<td><input class='setting' type='text' name='detector_location' placeholder='");
@@ -118,6 +131,8 @@ String webserver_call_detector(const String &var)
 
 void webserver_triger_detector(String name, String msg)
 {
+    if (name == "detector_komunikation"   && msg == "aktiviert")      comserial.aktiv = true;
+    if (name == "detector_komunikation"   && msg == "deaktiviert")    comserial.aktiv = false;
     if (name == "detector_location" && msg != "")       detector.location = msg;
     if (name == "detector_group" && msg != "")          detector.group = msg.toInt();
     if (name == "detector_alarm_group" && msg != "")    alarm_group_diagnose(msg);
@@ -129,7 +144,7 @@ void mqtt_detector_sub_register()
     String local_topic_group = mqtt.topic_base + "/-Gruppen-Steuerung-/";
 
     client.subscribe((local_topic_detector + "Seriele_Nachricht").c_str());
-    mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
+    //mqtt_publish(local_topic_detector + "Seriele_Nachricht", "", "mqtt_detector_sub_register");
   
     client.subscribe((local_topic_detector + "Melder_Finden").c_str());
     client.subscribe((local_topic_detector + "Reset_Test|Funk_Alarme").c_str());
@@ -159,8 +174,8 @@ void mqtt_detector_sub_read(String topic, String msg)
     if (topic == local_topic_detector +  "Melder_Finden" ||
         topic == local_topic_group + detector.group + "/" + "Melder_Finden")
     {
-        if (topic == local_topic_detector +  "Melder_Finden" && msg == "")                          mqtt_publish(local_topic_detector + "Melder_Finden", "false");
-        if (topic == local_topic_group + detector.group + "/" + "Melder_Finden" && msg == "")       mqtt_publish(local_topic_group + detector.group + "/" + "Melder_Finden", "false");
+        if (topic == local_topic_detector +  "Melder_Finden" && msg == "")                          mqtt_publish(local_topic_detector + "Melder_Finden", "false", "mqtt_detector_sub_read");
+        if (topic == local_topic_group + detector.group + "/" + "Melder_Finden" && msg == "")       mqtt_publish(local_topic_group + detector.group + "/" + "Melder_Finden", "false", "mqtt_detector_sub_read");
         
         if (comserial.com_status == 0)
         {
@@ -178,7 +193,7 @@ void mqtt_detector_sub_read(String topic, String msg)
     //      TESTALARM ÜBER ESP
     if (topic == local_topic_detector + "Testalarm_Funk")
     {
-        if (topic == local_topic_detector +  "Testalarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Testalarm_Funk", "false");
+        if (topic == local_topic_detector +  "Testalarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Testalarm_Funk", "false", "mqtt_detector_sub_read");
         if (comserial.com_status == 0)
         {
             if (msg_bool == true)
@@ -195,18 +210,18 @@ void mqtt_detector_sub_read(String topic, String msg)
     //      RESET TEST / UND FUNK _ ALARME
     if (topic == local_topic_detector + "Reset_Test|Funk_Alarme")
     {
-        if (topic == local_topic_detector +  "Reset_Test|Funk_Alarme" && msg == "")                          mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
+        if (topic == local_topic_detector +  "Reset_Test|Funk_Alarme" && msg == "")                          mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false", "mqtt_detector_sub_read");
         if (comserial.com_status == 0)
         {
             if (msg_bool == true)
             {
                 serial_send("030000", 1); // Test- Alarm- Reset
-                mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
+                mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false", "mqtt_detector_sub_read");
             }
         }
         else
         {
-            mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false");
+            mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false", "mqtt_detector_sub_read");
         }
     }
 
@@ -216,18 +231,18 @@ void mqtt_detector_sub_read(String topic, String msg)
         if (comserial.com_status == 0 && msg != "" )
         {
             serial_send(msg, 1); // Testnachricht (Als String)
-            mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
+            //mqtt_publish(local_topic_detector + "Seriele_Nachricht", "", "mqtt_detector_sub_read");
         }
         else
         {
-            mqtt_publish(local_topic_detector + "Seriele_Nachricht", "");
+            //mqtt_publish(local_topic_detector + "Seriele_Nachricht", "", "mqtt_detector_sub_read");
         }
     }
 
     //      FUNK- ALARM
     if (topic == local_topic_detector + "Alarm_Funk")
     {
-        if (topic == local_topic_detector +  "Alarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Alarm_Funk", "false");
+        if (topic == local_topic_detector +  "Alarm_Funk" && msg == "")                          mqtt_publish(local_topic_detector + "Alarm_Funk", "false", "mqtt_detector_sub_read");
         if (comserial.com_status == 0)
         {
             if (msg_bool == true)
@@ -243,7 +258,7 @@ void mqtt_detector_sub_read(String topic, String msg)
         // Feueralarm
         if (topic == local_topic_group + detector.alarm_group[i] + "/Alarm_Funk")
         {
-            if (topic == local_topic_group + detector.alarm_group[i] + "/Alarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Alarm_Funk", "false");
+            if (topic == local_topic_group + detector.alarm_group[i] + "/Alarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Alarm_Funk", "false", "mqtt_detector_sub_read");
             if (comserial.com_status == 0)
             {
                 if (msg_bool == true)
@@ -263,7 +278,7 @@ void mqtt_detector_sub_read(String topic, String msg)
         // Testalarm
         if (topic == local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk")
         {
-            if (topic == local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk", "false");
+            if (topic == local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk" && msg == "")  mqtt_publish(local_topic_group + detector.alarm_group[i] + "/Testalarm_Funk", "false", "mqtt_detector_sub_read");
             if (comserial.com_status == 0)
             {
                 if (msg_bool == true)

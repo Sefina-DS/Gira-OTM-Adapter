@@ -4,12 +4,15 @@ struct WEBSERVER
 {
     String navigation;
     String wifi_ssid;
+    boolean notbetrieb = false;
+    unsigned long timer = 0;
 };
 extern WEBSERVER webserver;
 
 extern AsyncWebServer *server;
 extern const char *PARAM_MESSAGE;
 extern const char notbetrieb_html[] PROGMEM;
+extern String processor(const String& var);
 
 
 void webserver_art();

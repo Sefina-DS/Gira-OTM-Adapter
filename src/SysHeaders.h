@@ -17,9 +17,12 @@
 //#include <AsyncTCP.h>
 //#include <Update.h>
 
-#include <BLEDevice.h>
-#include <BLEScan.h>
-#include <BLEAddress.h>
+//#include <BLEDevice.h>
+//#include <BLEScan.h>
+//#include <BLEAddress.h>
+
+#include <HTTPClient.h>
+#include <ESP32httpUpdate.h>
 
 // Datein
 
@@ -27,10 +30,9 @@
 #include "ComWifi.h"
 #include "ComWebserver.h"
 #include "ComMqtt.h"
-#include "ComBluetooth.h"
+//#include "ComBluetooth.h"
 #include "ComSerial.h"
 #include "SysFunctions.h"
 #include "PluginSensors.h"
 #include "PluginDetector.h"
 #include "PluginDetectorSerial.h"
-#include "SysTimer.h"

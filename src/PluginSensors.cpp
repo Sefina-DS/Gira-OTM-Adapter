@@ -25,6 +25,7 @@ void bme_config()
 
 void bme_refresh()
 {
+    StaticJsonDocument<1024> temp_json;
     String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/Erweiterungen/BME-";
     // BME - 280
     if (sensor.bme == "BME - 280")
@@ -33,16 +34,18 @@ void bme_refresh()
         bme280_run = bme280.begin(0x76);
         if (!bme280_run)
         {
-            mqtt_publish(temp_topic + "Status" , "Störung");
+            temp_json["BME-Status"]              = "Störung";
+            light_refresh(temp_json);
             Serial.println("BME-280 ist in Störung");
         }
         else
         {
-            mqtt_publish(temp_topic + "Status" , "Läuft");
-            if (sensor.bme_temperature)     mqtt_publish(temp_topic + "Temperatur" ,                String(bme280.readTemperature(), 1));
-            if (sensor.bme_pressure)        mqtt_publish(temp_topic + "Druck" ,                     String(bme280.readPressure() / 100.0F, 0));
-            if (sensor.bme_humidity)        mqtt_publish(temp_topic + "Feuchte" ,                   String(bme280.readHumidity(), 1));
-            if (sensor.bme_high)            mqtt_publish(temp_topic + "Meter über Meeresspiegel" ,  String(bme280.readAltitude(SEALEVELPRESSURE_HPA), 1));
+            temp_json["BME-Status"]              = "Läuft";
+            if (sensor.bme_temperature)     temp_json["Temperatur"]     =   String(bme280.readTemperature(), 1);
+            if (sensor.bme_pressure)        temp_json["Druck"]          =   String(bme280.readPressure() / 100.0F, 0);
+            if (sensor.bme_humidity)        temp_json["Feuchte"]        =   String(bme280.readHumidity(), 1);
+            if (sensor.bme_high)            temp_json["Höhe"]           =   String(bme280.readAltitude(SEALEVELPRESSURE_HPA), 1);
+            light_refresh(temp_json);
         }
     }
     // BME - 680
@@ -52,63 +55,74 @@ void bme_refresh()
         bme680_run = bme680.begin();
         if (!bme680_run)
         {
-            mqtt_publish(temp_topic + "Status" , "Störung");
             Serial.println("BME-680 ist in Störung");
+            temp_json["BME-Status"]              = "Störung";
+            light_refresh(temp_json);
         }
         else
         {
-            mqtt_publish(temp_topic + "Status" , "Läuft");
-            if (sensor.bme_temperature)     mqtt_publish(temp_topic + "Temperatur" ,                String(bme680.readTemperature(), 1));
-            if (sensor.bme_pressure)        mqtt_publish(temp_topic + "Druck" ,                     String(bme680.readPressure() / 100.0F, 0));
-            if (sensor.bme_humidity)        mqtt_publish(temp_topic + "Feuchte" ,                   String(bme680.readHumidity(), 1));
-            if (sensor.bme_high)            mqtt_publish(temp_topic + "Meter über Meeresspiegel" ,  String(bme680.readAltitude(SEALEVELPRESSURE_HPA), 1));
-            if (sensor.bme_gas_ohm)         mqtt_publish(temp_topic + "Gas in KOhm",                String(bme680.gas_resistance / 1000.0, 1));
-            if (sensor.bme_gas_score || sensor.bme_gas_text)    air_quality(temp_topic);
+            temp_json["BME-Status"]              = "Läuft";
+            if (sensor.bme_temperature)     temp_json["Temperatur"]     =   String(bme680.readTemperature(), 1);
+            if (sensor.bme_pressure)        temp_json["Druck"]          =   String(bme680.readPressure() / 100.0F, 0);
+            if (sensor.bme_humidity)        temp_json["Feuchte"]        =   String(bme680.readHumidity(), 1);
+            if (sensor.bme_high)            temp_json["Höhe"]           =   String(bme680.readAltitude(SEALEVELPRESSURE_HPA), 1);
+            if (sensor.bme_gas_ohm)         temp_json["Gas_KOhm"]       =   String(bme680.gas_resistance / 1000.0, 1);
+            if (sensor.bme_gas_score || sensor.bme_gas_text)    air_quality(temp_json);
+            if (!sensor.bme_gas_score && !sensor.bme_gas_text)  light_refresh(temp_json);
+            //sensor_mqtt_send(temp_json);
         }
     }
+    if ( sensor.bme == "keiner vorhanden") light_refresh(temp_json);
 }
 
-void light_refresh()
+void light_refresh(StaticJsonDocument<1024> temp_json)
 {
-    String topic;
-    String msg;
-    int temp;
-    static int temp_light = 0;
-    temp = analogRead(input_light);
-    if (temp < temp_light)
+    if (sensor.light)
     {
-        temp = temp_light - temp;
-    }
-    else
-    {
-        temp = temp - temp_light;
-    }
-    if (temp < 0)
-    {
-        temp = -temp;
-    }
-    if (temp >= 200)
-    {
+        String topic;
+        int temp;
+        static int temp_light = 0;
+        temp = analogRead(input_light);
+        if (temp < temp_light)
+        {
+            temp = temp_light - temp;
+        }
+        else
+        {
+            temp = temp - temp_light;
+        }
+        if (temp < 0)
+        {
+            temp = -temp;
+        }
         temp_light = analogRead(input_light);
-        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtzahl", String(temp_light));
+        temp_json["Lichtzahl"]  =   String(temp_light);
         temp = temp_light - 4095;
         if (temp != 0)
         {
             temp = -temp;
         }
         temp = (temp * 100) / 4095;
-        mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_light + "Lichtwert", String(temp));
+        temp_json["Lichtwert"]  =   String(temp);
     }
+
+    ubext_refresh(temp_json);
 }
 
-void ubext_refresh()
+void ubext_refresh(StaticJsonDocument<1024> temp_json)
 {
-    int R1 = 10490;
-    int R2 = 2140;
-    int faktor = 1026;
-    float temp_roh = analogRead(input_ubext);
-    float temp_ubext = ((temp_roh * 100000) / faktor) / ((100000 * R2) / (R1 + R2));
-    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + extension + ext_ubext + "Spannungsversorgung Extern", String(temp_ubext));
+    if (sensor.ubext)
+    {
+        int R1 = 10490;
+        int R2 = 2140;
+        int faktor = 1026;
+        float temp_roh = analogRead(input_ubext);
+        float temp_ubext = ((temp_roh * 100000) / faktor) / ((100000 * R2) / (R1 + R2));
+        temp_json["UB-Ext"]  =   String(temp_ubext);
+    }
+
+    sensor_mqtt_send(temp_json);
+
 }
 
 String webserver_call_sensor(const String &var)
@@ -343,7 +357,7 @@ StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc)
     return doc;
 }
 
-void air_quality(String topic) 
+void air_quality(StaticJsonDocument<1024> temp_json) 
 {
     float temp_humidity = bme680.readHumidity();
     if (temp_humidity >= 38 && temp_humidity <= 42)     hum_score = 0.25*100; // Humidity +/-5% around optimum 
@@ -380,6 +394,15 @@ void air_quality(String topic)
     if (air_quality_score >=  51 && air_quality_score <= 150 )  air_text = "Angenehm";
     if (air_quality_score >=  00 && air_quality_score <=  50 )  air_text = "Gut";
     
-    if (sensor.bme_gas_score)         mqtt_publish(topic + "Gas in Score",      String(air_quality_score, 0));
-    if (sensor.bme_gas_score)         mqtt_publish(topic + "Gas in Text",       air_text);
+    if (sensor.bme_gas_score)         temp_json["Gas in Score"] =   String(air_quality_score, 0);
+    if (sensor.bme_gas_score)         temp_json["Gas in Text"]  =   air_text;
+
+    light_refresh(temp_json);
+}
+
+void sensor_mqtt_send(StaticJsonDocument<1024> temp_json)
+{
+    String temp_string;
+    serializeJson(temp_json, temp_string);
+    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + "Extension" + "/" + "Sensoren", temp_string, "sensor_mqtt_send");
 }

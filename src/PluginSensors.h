@@ -19,18 +19,21 @@ struct SENSOR
     boolean bme_gas_text;
     boolean light;
     boolean ubext;
+    unsigned long timer = 0;
     
 };
 extern SENSOR sensor;
 
 void bme_config();
 void bme_refresh();
-void air_quality(String topic);
-void light_refresh();
-void ubext_refresh();
+void air_quality(StaticJsonDocument<1024> temp_json);
+void light_refresh(StaticJsonDocument<1024> temp_json);
+void ubext_refresh(StaticJsonDocument<1024> temp_json);
 
 String webserver_call_sensor(const String &var);
 void webserver_triger_sensor(String name, String msg);
 
 void load_conf_sensor(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc);
+
+void sensor_mqtt_send(StaticJsonDocument<1024> temp_json);

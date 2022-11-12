@@ -1,5 +1,14 @@
 #pragma once
 
+struct SYSTEM_FUNKTION
+{
+    unsigned long timer = 0;
+    String version_old = "20240207";
+    String version_new ;
+    boolean new_version ;
+};
+extern SYSTEM_FUNKTION system_funktion;
+
 //      Inputs
 #define RXD2 17
 #define TXD2 16
@@ -14,5 +23,9 @@
 #define output_comport_activ 23
 
 
-
+void system_timer();
+void version_check();
+void firmwareupdate_http();
+void update_webpage();
 void led_flash_timer(int timer_on,int timer_off, int number);
+void speicher_diagnose();

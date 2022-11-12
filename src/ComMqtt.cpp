@@ -37,6 +37,7 @@ void mqtt_config()
   Serial.println(mqtt.port);
   client.setServer(mqtt.ip.c_str(), mqtt.port.toInt());
   client.setCallback(mqtt_read);
+  mqtt_connect();
 }
 
 ///         MQTT verbinden
@@ -57,18 +58,20 @@ void mqtt_connect()
     // timer_bluetooth = 0;
     led_flash_timer(250, 150, 3);
     Serial.print("MQTT verbinden");
-    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status/";
+    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP/";
     ///         Connect mit LastWill Message
     if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
     {
       mqtt.false_number = 0;
+      mqtt.reconnect_counter ++;
       ///         Online Status setzen
       // timer_bluetooth = millis();
-      mqtt_publish(temp_topic + "Online", "true");
-      mqtt_publish(temp_topic + "ESP-ID", wifi.esp_name);
-      mqtt_publish(temp_topic + "Mac-Adresse", WiFi.macAddress());
-      mqtt_publish(temp_topic + "IP-Adresse", WiFi.localIP().toString());
-
+      mqtt_publish(temp_topic + "Online", "true", "mqtt_connect");
+      mqtt_publish(temp_topic + "Firmwareupdate", "false", "mqtt_connect");
+      
+      mqtt_esp_status();
+      
+      
       Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
       Serial.println("");
       
@@ -93,14 +96,31 @@ void mqtt_connect()
   }
 }
 
-void mqtt_publish(String topic, String msg)
+void mqtt_publish(String topic, String msg, String funktion)
 {
+  if (!client.connected()) return;
   int topic_size = topic.length();
   int msg_size = msg.length();
-  char temp_topic[topic_size];
+  /*char temp_topic[topic_size];
   char temp_msg[msg_size];
   topic.toCharArray(temp_topic, topic_size + 1);
-  msg.toCharArray(temp_msg, msg_size + 1);
+  msg.toCharArray(temp_msg, msg_size + 1);*/
+
+  const char* temp_topic =  topic.c_str();
+  const char* temp_msg =  msg.c_str();
+  
+  Serial.print("MQTT Send - Funktion : ");
+  Serial.print(funktion);
+  Serial.print(" || Topic (");
+  Serial.print(topic_size);
+  Serial.print(") : ");
+  Serial.print(temp_topic);
+  Serial.print(" / ");
+  Serial.print(topic);
+  Serial.print(" || Msg (");
+  Serial.print(msg_size);
+  Serial.print(") : ");
+  Serial.println(temp_msg);
 
   client.publish(temp_topic, temp_msg);
 }
@@ -208,22 +228,49 @@ StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
 
 void mqtt_mqtt_sub_register()
 {
-  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
+  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
   client.subscribe((temp + "Neustart-ESP").c_str());
+  client.subscribe((temp + "Firmwareupdate").c_str());
 
 }
 
 void mqtt_mqtt_sub_read(String topic, String msg)
 {
   String temp;
-  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP_Status" + "/";
+  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
   
-  if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false");
+  if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
   if ( topic == temp + "Neustart-ESP" && msg == "true" )
   {
-    mqtt_publish(temp + "Neustart-ESP", "false");
+    mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
     delay(3000);
     ESP.restart();
   }
+  if ( topic == temp + "Firmwareupdate" && msg == "")   mqtt_publish(temp + "Firmwareupdate", "false", "mqtt_mqtt_sub_read");
+  if ( topic == temp + "Firmwareupdate" && msg == "true" )
+  {
+    delay(1000);
+    firmwareupdate_http();
+  }
 
+}
+
+void mqtt_esp_status()
+{
+  StaticJsonDocument<1024> temp_json;
+  String temp_string;
+  
+  temp_json["ESP-ID"]              = wifi.esp_name;
+  temp_json["Version-Alt"]         = system_funktion.version_old;
+  temp_json["updatebar"]           = system_funktion.new_version;
+  temp_json["ESP-ID"]              = wifi.esp_name;
+  temp_json["Mac-Adresse"]         = WiFi.macAddress();
+  temp_json["IP-Adresse"]          = WiFi.localIP().toString();
+  temp_json["Reconnect"]           = String(mqtt.reconnect_counter);
+  temp_json["Betriebsstunden"]     = String(((millis() / 1000) / 60) / 60);
+
+  serializeJson(temp_json, temp_string);
+  mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP" + "/" + "Status", temp_string, "mqtt_esp_status");
+
+  mqtt.timer = millis() + 300000 ;
 }

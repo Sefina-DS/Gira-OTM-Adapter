@@ -169,30 +169,28 @@ String webserver_call_wifi(const String &var)
             temp += F("Bitte eintragen !'");
         }
         temp += F("'></td></tr>");
-        // IP - Typ
-        temp += F("<tr><td>IP- Adressen Typ :</td>");
-        temp += F("<td><select name='wifi_dhcp'><option value='");
-        if (wifi.dhcp)
+        if (!webserver.notbetrieb)
         {
-            temp += F("dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch");
-        }
-        else
-        {
-            temp += F("statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch");
-        }
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        temp += F("</table>");
-        // Verdeckte Einstellungen (Statische IP Config)
-        temp += F("<table ");
-        if (wifi.dhcp)
-        {
-            temp += F("style='display: none'>");
-        }
-        else
-        {
-            temp += F(">");
-        }
+            // IP - Typ
+            temp += F("<tr><td>IP- Adressen Typ :</td>");
+            temp += F("<td><select name='wifi_dhcp'><option value='");
+            if (wifi.dhcp)
+            {
+                temp += F("dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch");
+            } else {
+                temp += F("statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch");
+            }
+            temp += F("</select>");
+            temp += F("</td></tr>");
+            temp += F("</table>");
+            // Verdeckte Einstellungen (Statische IP Config)
+            temp += F("<table ");
+            if (wifi.dhcp)
+            {
+                temp += F("style='display: none'>");
+            } else {
+                temp += F(">");
+            }
             // IP - Adresse
             temp += F("<tr><td>IP Adresse :</td>");
             temp += F("<td><input class='setting' type='text' name='wifi_ip' placeholder='");
@@ -213,6 +211,7 @@ String webserver_call_wifi(const String &var)
             temp += F("<td><input class='setting' type='text' name='wifi_dns' placeholder='");
             temp +=     wifi.dns;
             temp += F("'></td></tr>");
+        }
         temp += F("</table><br/>");
         temp += F("<input type='submit' value='Submit' />");
         temp += F("</form></div></div>");
@@ -224,66 +223,31 @@ String webserver_call_wifi(const String &var)
 
 void webserver_triger_wifi(String name, String msg)
 {
-    if (name == "esp_name")
+    if (msg != "")
     {
-        if (msg != "")
-        {
-            wifi.esp_name = msg;
-        }
+        if (name == "esp_name")     { wifi.esp_name = msg; }
+        if (name == "wifi_ssid")    { wifi.ssid = msg; }
+        if (name == "wifi_pw")      { wifi.pw = msg; }
+        if (name == "wifi_ip")      { wifi.ip = msg; }
+        if (name == "wifi_gw")      { wifi.gw = msg; }
+        if (name == "wifi_subnet")  { wifi.subnet = msg; }
+        if (name == "wifi_dns")     { wifi.dns = msg; }
     }
-    if (name == "wifi_ssid")
-    {
-        if (msg != "")
-        {
-            wifi.ssid = msg;
-        }
-    }
-    if (name == "wifi_pw")
-    {
-        if (msg != "")
-        {
-            wifi.pw = msg;
-        }
-    }
+    
     if (name == "wifi_dhcp")
     {
-        if (msg == "dynamisch")
-        {
-            wifi.dhcp = true;
-        }
-        else
-        {
-            wifi.dhcp = false;
-        }
+        if (msg == "dynamisch") { wifi.dhcp = true; } else { wifi.dhcp = false; }
     }
-    if (name == "wifi_ip")
+    
+    if (    webserver.notbetrieb &&
+            wifi.ssid != "" &&
+            wifi.pw != "" )
     {
-        if (msg != "")
-        {
-            wifi.ip = msg;
-        }
+        spiffs_config_save();
+        delay(1000);
+        ESP.restart();
     }
-    if (name == "wifi_gw")
-    {
-        if (msg != "")
-        {
-            wifi.gw = msg;
-        }
-    }
-    if (name == "wifi_subnet")
-    {
-        if (msg != "")
-        {
-            wifi.subnet = msg;
-        }
-    }
-    if (name == "wifi_dns")
-    {
-        if (msg != "")
-        {
-            wifi.dns = msg;
-        }
-    }
+
 }
 
 void load_conf_wifi(StaticJsonDocument<1024> doc)

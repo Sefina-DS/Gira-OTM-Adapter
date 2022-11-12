@@ -2,6 +2,24 @@
 
 COMSERIAL comserial;
 
+void load_conf_serial(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Serial- Variablen ...");
+
+    String temp;
+    
+    comserial.aktiv                = doc["serial"] | true;
+}
+
+StaticJsonDocument<1024> safe_conf_serial(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Serial- Variablen ...");
+    
+    doc["serial"]                   = comserial.aktiv;
+
+    return doc;
+}
+
 void serial_send(String msg_funktion = "", int status = 1)
 {
     if ( comserial.com_status != status ) comserial.com_status = status;

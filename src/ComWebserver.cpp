@@ -4,6 +4,7 @@ WEBSERVER webserver;
 
 void webserver_art()
 {
+  server = new AsyncWebServer(80);
   if (SPIFFS.exists("/config.html"))
   {
     Serial.println("config.html ist vorhanden = Normalbetrieb");
@@ -12,6 +13,7 @@ void webserver_art()
   else
   {
     Serial.println("config.html ist nicht vorhanden = Notbetrieb");
+    webserver.notbetrieb=true;
     webserver_notbetrieb();
   }
 }
@@ -25,12 +27,14 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 </head>
 <body>
 <center>
-<table>
-<tr><th><h1>! Notbetrieb !</h1><br>! File upload !</th></tr>
-<tr><td align=center height=50>nur zum upload der config.html + config.css nutzen !</td></tr>
+<h1>! Notbetrieb !</h1>
+%web_network_ip%
+<br>
+<h3>Datein Upload</h3>
 <tr><td align=center height=50>Free Storage: %FREESPIFFS% | Used Storage: %USEDSPIFFS% | Total Storage: %TOTALSPIFFS%</td></tr>
 <tr><td align=center height=25><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td></tr>
 <tr><td align=center height=25><input type="submit" name="upload" value="Upload" title="Upload File"></form></td></tr>
+<br>
 <tr><td align=center height=50>Auf dem ESP vorhandene Daten :</td></tr>
 <tr><td align=center>%FILELIST%</td></tr>
 </table>
@@ -157,8 +161,6 @@ String webserver_call(const String &var)
   // Sensor
   temp = webserver_call_sensor(var);
   if (temp != "") { return temp; }
-  temp = webserver_call_bluetooth(var);
-  if (temp != "") { return temp; }
 
   // System
   temp = webserver_call_spiffs(var);
@@ -193,12 +195,10 @@ String webserver_call(const String &var)
 
 void webserver_triger(String name, String msg)
 {
-    webserver_triger_spiffs(name, msg);
     webserver_triger_wifi(name, msg);
     webserver_triger_mqtt(name, msg);
     webserver_triger_detector(name, msg);
     webserver_triger_sensor(name, msg);
-    webserver_triger_bluetooth(name, msg);
 
     if (name == "navigation")
     {
@@ -208,8 +208,7 @@ void webserver_triger(String name, String msg)
     {
         if (msg == "geänderte Config übertragen und Modul neustarten !")
         {
-            spiffs_config_save_part_a();
-            spiffs_config_save_part_b();
+            spiffs_config_save();
             Serial.println("ESP wird in 6 Sekunden neugestartet !");
             delay(6000);
             ESP.restart();
@@ -219,8 +218,7 @@ void webserver_triger(String name, String msg)
     {
         if (msg == "Werkseinstellungen laden !")
         {
-            SPIFFS.remove(safefilea);
-            SPIFFS.remove(safefileb);
+            SPIFFS.remove(safefile);
             Serial.println("Savefile wurde gelöscht !");
             Serial.println();
             Serial.println("ESP wird in 6 Sekunden neugestartet !");

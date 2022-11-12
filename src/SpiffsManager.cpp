@@ -7,8 +7,7 @@ void spiffs_starten()
     if (SPIFFS.begin())
     {
         Serial.println(F("SPIFFS wurde erfolgreich gemountet ..."));
-        spiffs_config_load_part_a();
-        spiffs_config_load_part_b();
+        spiffs_config_load();
     }
     else
     {
@@ -51,13 +50,13 @@ void spiffs_scan()
     Serial.println("");
 }
 
-void spiffs_config_save_part_a()
+void spiffs_config_save()
 {
-    SPIFFS.remove(safefilea);
-    File fileTemp = SPIFFS.open(safefilea, FILE_WRITE);
+    SPIFFS.remove(safefile);
+    File fileTemp = SPIFFS.open(safefile, FILE_WRITE);
     if (!fileTemp)
     {
-        Serial.println("config_a.json konnte nicht erstellt werden !");
+        Serial.println("config.json konnte nicht erstellt werden !");
         return;
     }
     StaticJsonDocument<1024> doc;
@@ -70,6 +69,7 @@ void spiffs_config_save_part_a()
     doc = safe_conf_mqtt(doc);
     doc = safe_conf_sensor(doc);
     doc = safe_conf_detector(doc);
+    doc = safe_conf_serial(doc);
     
     // Variablen werden gelesen
     
@@ -79,52 +79,21 @@ void spiffs_config_save_part_a()
 
     if (serializeJson(doc, fileTemp) == 0)
     {
-        Serial.println("Speichern der config_a.json Fehlgeschlagen !");
+        Serial.println("Speichern der config.json Fehlgeschlagen !");
     }
     else
     {
-        Serial.println("Speichern der config_a.json Erfolgreich !");
+        Serial.println("Speichern der config.json Erfolgreich !");
     }
     Serial.println();
     fileTemp.close();
 }
-void spiffs_config_save_part_b()
+
+void spiffs_config_load()
 {
-    SPIFFS.remove(safefileb);
-    File fileTemp = SPIFFS.open(safefileb, FILE_WRITE);
-    if (!fileTemp)
-    {
-        Serial.println("config_b.json konnte nicht erstellt werden !");
-        return;
-    }
-    StaticJsonDocument<1024> doc;
-    String msg_temp = "";
+    Serial.println("Config - wird in Variablen geschrieben ...");
     
-
-    // Funktionen - SAFE
-
-    doc = safe_conf_bluetooth(doc);
-
-    
-
-    if (serializeJson(doc, fileTemp) == 0)
-    {
-        Serial.println("Speichern der config_b.json Fehlgeschlagen !");
-    }
-    else
-    {
-        Serial.println("Speichern der config_b.json Erfolgreich !");
-    }
-    Serial.println();
-    fileTemp.close();
-    SPIFFS.remove(safefile_alt);
-}
-
-void spiffs_config_load_part_a()
-{
-    Serial.println("Config A - wird in Variablen geschrieben ...");
-    
-    File fileTemp = SPIFFS.open(safefilea);
+    File fileTemp = SPIFFS.open(safefile);
 
     StaticJsonDocument<4096> doc;
     DeserializationError error = deserializeJson(doc, fileTemp);
@@ -132,7 +101,7 @@ void spiffs_config_load_part_a()
     String msg_temp = "";
 
     if (error)
-        Serial.println("Config A - Lesefehler || Standart wird genutzt !");
+        Serial.println("Config - Lesefehler || Standart wird genutzt !");
 
     // Funktionen - LOAD
     
@@ -140,56 +109,15 @@ void spiffs_config_load_part_a()
     load_conf_detector(doc);
     load_conf_wifi(doc);
     load_conf_mqtt(doc);
+    load_conf_serial(doc);
     
-    //config.seriel = doc["seriel"] | false;
-
-    
-
-    fileTemp.close();
-}
-void spiffs_config_load_part_b()
-{
-    Serial.println("Config B - wird in Variablen geschrieben ...");
-    
-    File fileTemp = SPIFFS.open(safefileb);
-
-    StaticJsonDocument<1024> doc;
-    DeserializationError error = deserializeJson(doc, fileTemp);
-
-    String msg_temp = "";
-
-    if (error)
-        Serial.println("Config B- Lesefehler || Standart wird genutzt !");
-
-    // Funktionen - LOAD
-    
-    load_conf_bluetooth(doc);
-
-    
-
     fileTemp.close();
 }
 
-void spiffs_config_read_part_a()
+void spiffs_config_read()
 { // lesen der config.json
-    Serial.println("Anzeige der config A - Datei !");
-    File fileTemp = SPIFFS.open(safefilea);
-    if (!fileTemp)
-    {
-        Serial.println("die config.json konnte nicht gelesen werden");
-        return;
-    }
-    while (fileTemp.available())
-    {
-        Serial.print((char)fileTemp.read());
-    }
-    Serial.println();
-    fileTemp.close();
-}
-void spiffs_config_read_part_b()
-{ // lesen der config.json
-    Serial.println("Anzeige der config B - Datei !");
-    File fileTemp = SPIFFS.open(safefileb);
+    Serial.println("Anzeige der config - Datei !");
+    File fileTemp = SPIFFS.open(safefile);
     if (!fileTemp)
     {
         Serial.println("die config.json konnte nicht gelesen werden");
@@ -224,9 +152,4 @@ String webserver_call_spiffs(const String &var)
     }
   
     return String();
-}
-
-void webserver_triger_spiffs(String name, String msg)
-{
-
 }
