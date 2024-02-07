@@ -18,7 +18,7 @@ void version_check()
     {
         Serial.println("Version- Update wird geprüfft ... ");
         HTTPClient http;
-        http.begin("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/main/firmware/version.txt");
+        http.begin( firmware_path() + "firmware/version.txt" );
         int httpCode = http.GET();
         if(httpCode > 0) 
         {
@@ -40,6 +40,7 @@ void version_check()
         Serial.print(system_funktion.version_old);
         Serial.print(" // neue Version : ");
         Serial.print(system_funktion.version_new);
+        Serial.println();
         if ( system_funktion.new_version )
         {
             Serial.println("Eine neue Version steht zum download bereit.");
@@ -58,7 +59,7 @@ void update_webpage()
         if (file_html) 
         {
             HTTPClient http;
-            http.begin("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/main/data/config.html");
+            http.begin( firmware_path() + "data/config.html" );
             int httpCode = http.GET();
             if(httpCode > 0) 
             {
@@ -75,7 +76,7 @@ void update_webpage()
         if (file_css) 
         {
             HTTPClient http;
-            http.begin("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/main/data/config.css");
+            http.begin( firmware_path() + "data/config.css" );
             int httpCode = http.GET();
             if(httpCode > 0) 
             {
@@ -96,8 +97,9 @@ void firmwareupdate_http()
     if (WiFi.isConnected() &&
         system_funktion.new_version )
     {
+        Serial.println(firmware_path());
         update_webpage();
-        t_httpUpdate_return ret = ESPhttpUpdate.update("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/main/firmware/firmware.bin");
+        t_httpUpdate_return ret = ESPhttpUpdate.update( firmware_path() + "firmware/firmware.bin" );
         switch(ret) {
             case HTTP_UPDATE_FAILED:
                 Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
@@ -141,4 +143,39 @@ void speicher_diagnose()
 
     serializeJson(temp_json, temp_string);
     mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/-Speicher-Status-", temp_string, "mqtt_esp_status");
+}
+
+void load_conf_sys(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Sys- Variablen ...");
+    
+    system_funktion.fw_art = doc["fw"] | "main";
+}
+
+StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
+{
+    Serial.println("... Sys- Variablen ...");
+    
+    doc["fw"] = system_funktion.fw_art;
+
+    return doc;
+}
+
+/*String firmware_path ()
+{
+    String temp ;
+    temp += "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" ;
+    temp += system_funktion.fw_art ;
+    temp += "/" ;
+
+    return temp;
+}*/
+
+const String& firmware_path() {
+    static String temp;
+    temp = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/";
+    temp += system_funktion.fw_art;
+    temp += "/";
+    Serial.println(temp);
+    return temp;
 }

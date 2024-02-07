@@ -65,6 +65,7 @@ void spiffs_config_save()
 
     // Funktionen - SAFE
 
+    doc = safe_conf_sys(doc);
     doc = safe_conf_wifi(doc);
     doc = safe_conf_mqtt(doc);
     doc = safe_conf_sensor(doc);
@@ -105,6 +106,7 @@ void spiffs_config_load()
 
     // Funktionen - LOAD
     
+    load_conf_sys(doc);
     load_conf_sensor(doc);
     load_conf_detector(doc);
     load_conf_wifi(doc);
