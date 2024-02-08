@@ -36,7 +36,9 @@ void bme_refresh()
         {
             temp_json["BME-Status"]              = "Störung";
             light_refresh(temp_json);
-            Serial.println("BME-280 ist in Störung");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("BME-280 ist in Störung");
+            #endif
         }
         else
         {
@@ -55,7 +57,9 @@ void bme_refresh()
         bme680_run = bme680.begin();
         if (!bme680_run)
         {
-            Serial.println("BME-680 ist in Störung");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("BME-680 ist in Störung");
+            #endif
             temp_json["BME-Status"]              = "Störung";
             light_refresh(temp_json);
         }
@@ -325,8 +329,9 @@ void webserver_triger_sensor(String name, String msg)
 
 void load_conf_sensor(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Sensor- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Sensor- Variablen ...");
+    #endif
     sensor.bme                  = doc["bme"] | "keiner vorhanden";
     sensor.bme_temperature      = doc["bme_temperature"] | false;
     sensor.bme_humidity         = doc["bme_humidity"] | false;
@@ -341,8 +346,9 @@ void load_conf_sensor(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Sensor- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Sensor- Variablen ...");
+    #endif
     doc["bme"]              = sensor.bme;
     doc["bme_temperature"]  = sensor.bme_temperature;
     doc["bme_humidity"]     = sensor.bme_humidity;

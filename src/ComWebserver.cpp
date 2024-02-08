@@ -7,12 +7,16 @@ void webserver_art()
   server = new AsyncWebServer(80);
   if (SPIFFS.exists("/config.html"))
   {
-    Serial.println("config.html ist vorhanden = Normalbetrieb");
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("config.html ist vorhanden = Normalbetrieb");
+    #endif
     webserver_normalbetrieb();
   }
   else
   {
-    Serial.println("config.html ist nicht vorhanden = Notbetrieb");
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("config.html ist nicht vorhanden = Notbetrieb");
+    #endif
     webserver.notbetrieb=true;
     webserver_notbetrieb();
   }
@@ -45,31 +49,35 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
-  String logmessage = "Client:" + request->client()->remoteIP().toString() + " " + request->url();
-  Serial.println(logmessage);
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
+  #endif
 
   if (!index)
   {
-    logmessage = "Upload Start: " + String(filename);
     // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open("/" + filename, "w");
-    Serial.println(logmessage);
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("Upload Start: " + String(filename));
+    #endif
   }
 
   if (len)
   {
     // stream the incoming chunk to the opened file
     request->_tempFile.write(data, len);
-    logmessage = "Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len);
-    Serial.println(logmessage);
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len));
+    #endif
   }
 
   if (final)
   {
-    logmessage = "Upload Complete: " + String(filename) + ",size: " + String(index + len);
     // close the file handle as the upload is now done
     request->_tempFile.close();
-    Serial.println(logmessage);
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("Upload Complete: " + String(filename) + ",size: " + String(index + len));
+    #endif
     request->redirect("/");
   }
 }
@@ -89,7 +97,9 @@ String humanReadableSize(const size_t bytes)
 String listFiles(bool ishtml)
 {
   String returnText = "";
-  Serial.println("Listing files stored on SPIFFS");
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.println("Listing files stored on SPIFFS");
+  #endif
   File root = SPIFFS.open("/");
   File foundfile = root.openNextFile();
   if (ishtml)
@@ -121,8 +131,9 @@ void webserver_notbetrieb()
 {
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
              {
-    String logmessage = "Client:" + request->client()->remoteIP().toString() + + " " + request->url();
-    Serial.println(logmessage);
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("Client:" + request->client()->remoteIP().toString() + + " " + request->url());
+    #endif
     request->send_P(200, "text/html", notbetrieb_html, webserver_call); });
 
   webserver_config();
@@ -142,20 +153,16 @@ void webserver_normalbetrieb()
 
 String webserver_call(const String &var)
 {
-  Serial.print("Web-Server call mit : ");
-  Serial.println(var);
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.print("Web-Server call mit : ");
+    Serial.println(var);
+  #endif
   String temp = "";
   // Überschrift
   if (var == "header_esp_name" ) return wifi.esp_name;
   if (var == "header_detector_location" ) return detector.location;
-  /*
-  //  Web - Requests
-  if          ( String temp = web_request_wifi(var); temp != "")       { return temp;
-  } else if   ( String temp = webserver_call_mqtt(var); temp != "")    { return temp;
-  }*/
   
   // Netzwerk
-  
   temp = web_request_wifi(var);         if (temp != "") return temp; 
   temp = webserver_call_mqtt(var);      if (temp != "") return temp;
   
@@ -167,7 +174,7 @@ String webserver_call(const String &var)
 
   // System
   temp = web_request_sys(var);          if (temp != "") return temp;
-  temp = webserver_call_spiffs(var);    if (temp != "") return temp;
+  temp = web_request_spiff(var);        if (temp != "") return temp;
   
   
   if (var == "navigation-network" &&
@@ -191,48 +198,41 @@ String webserver_call(const String &var)
     return "display: none;";
   }
  
-
-
   return String();
 }
 
 void webserver_triger(String name, String msg)
 {
-    Serial.println("globaler trigger");
-    web_response_sys(name,msg);
-    webserver_triger_wifi(name, msg);
-    webserver_triger_mqtt(name, msg);
-    webserver_triger_detector(name, msg);
-    webserver_triger_sensor(name, msg);
+  web_response_sys(name,msg);
+  webserver_triger_wifi(name, msg);
+  webserver_triger_mqtt(name, msg);
+  webserver_triger_detector(name, msg);
+  webserver_triger_sensor(name, msg);
 
-    if (name == "navigation")
-    {
-        webserver.navigation = msg;
+  if (name == "navigation")                                       webserver.navigation = msg;
+  if (name == "config_save" && msg == "Änderungen übernehmen")    spiffs_config_save();
+  if (name == "config_save_restart") {
+    if (msg == "geänderte Config übertragen und Modul neustarten !") {
+      spiffs_config_save();
+      #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("ESP wird in 6 Sekunden neugestartet !");
+      #endif
+      delay(6000);
+      ESP.restart();
     }
-    if (name == "config_save" && msg == "Änderungen übernehmen")    spiffs_config_save();
-    
-    if (name == "config_save_restart")
-    {
-        if (msg == "geänderte Config übertragen und Modul neustarten !")
-        {
-            spiffs_config_save();
-            Serial.println("ESP wird in 6 Sekunden neugestartet !");
-            delay(6000);
-            ESP.restart();
-        }
+  }
+  if (name == "reset_config") {
+    if (msg == "Werkseinstellungen laden !") {
+      SPIFFS.remove(safefile);
+      #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("Savefile wurde gelöscht !");
+        Serial.println();
+        Serial.println("ESP wird in 6 Sekunden neugestartet !");
+      #endif
+      delay(6000);
+      ESP.restart();
     }
-    if (name == "reset_config")
-    {
-        if (msg == "Werkseinstellungen laden !")
-        {
-            SPIFFS.remove(safefile);
-            Serial.println("Savefile wurde gelöscht !");
-            Serial.println();
-            Serial.println("ESP wird in 6 Sekunden neugestartet !");
-            delay(6000);
-            ESP.restart();
-        }
-    }
+  }
 }
 
 void webserver_config()
@@ -262,30 +262,38 @@ void webserver_config()
                     art = "File";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+                    #ifdef DEBUG_SERIAL_OUTPUT
+                      Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+                    #endif
                 }
                 else if (p->isPost())
                 {
                     art = "Post";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+                    #ifdef DEBUG_SERIAL_OUTPUT
+                      Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+                    #endif
                 }
                 else
                 {
                     art = "Get";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+                    #ifdef DEBUG_SERIAL_OUTPUT
+                      Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+                    #endif
                 }
                 webserver_triger(id,msg);
 
-                Serial.print("MSG : ");
-                Serial.print(art);
-                Serial.print(" | ");
-                Serial.print(id);
-                Serial.print(" | ");
-                Serial.println(msg);
+                #ifdef DEBUG_SERIAL_OUTPUT
+                  Serial.print("MSG : ");
+                  Serial.print(art);
+                  Serial.print(" | ");
+                  Serial.print(id);
+                  Serial.print(" | ");
+                  Serial.println(msg);
+                #endif
             }
             request->send(SPIFFS, "/config.html", String(), false, webserver_call); });
 }

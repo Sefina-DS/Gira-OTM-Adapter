@@ -6,8 +6,10 @@ PubSubClient client(espClient);
 
 void setup()
 {
-  Serial.begin(115200);
-  Serial.println();
+  #ifdef DEBUG_SERIAL_OUTPUT  
+    Serial.begin(115200);
+    Serial.println("Serial, Debug gestartet ...");
+  #endif
 
   pinMode(output_led_esp, OUTPUT);
   pinMode(output_led_detector, OUTPUT);
@@ -25,17 +27,20 @@ void setup()
 
   if (digitalRead(input_reset) == 0)
   {
-    Serial.println("Config- Datein werden gelöscht : ");
-    Serial.print(safefile);
-    Serial.println("...");
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("Config- Datein werden gelöscht : ");
+      Serial.print(safefile);
+      Serial.println("...");
+    #endif
     SPIFFS.remove(safefile);
-    Serial.println("löschen erfolgreich ... !");
   }
   
-  Serial.println();
-  Serial.print(wifi.esp_name);
-  Serial.println(" wird gestartet");
-  Serial.println();
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.println();
+    Serial.print(wifi.esp_name);
+    Serial.println(" wird gestartet");
+    Serial.println();
+  #endif
 
   webserver_art();
   wlan_config();
@@ -59,7 +64,9 @@ void setup()
   */
   if ( webserver.notbetrieb && WiFi.isConnected() == true )
   {
-    Serial.print("config.html und config.css wird runtergeladen");
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.print("config.html und config.css wird runtergeladen");
+    #endif
     update_webpage();
     delay(1000);
     ESP.restart();

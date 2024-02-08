@@ -3,32 +3,44 @@
 // Spiffs Starten
 void spiffs_starten()
 {
-    Serial.println(F("Starten von dem Filesystem... "));
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println(F("Starten von dem Filesystem... "));
+    #endif
     if (SPIFFS.begin())
     {
-        Serial.println(F("SPIFFS wurde erfolgreich gemountet ..."));
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println(F("SPIFFS wurde erfolgreich gemountet ..."));
+        #endif
         spiffs_config_load();
     }
     else
     {
-        Serial.println(F("Fehler beim Mounten von SPIFFS !"));
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println(F("Fehler beim Mounten von SPIFFS !"));
+        #endif
         spiffs_format();
     }
 }
 // Spiffs Formatieren
 void spiffs_format()
 {
-    Serial.println("");
-    Serial.println(F("Formatieren wird durchgeführt... "));
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("");
+        Serial.println(F("Formatieren wird durchgeführt... "));
+    #endif
     bool formatted = SPIFFS.format();
     if (formatted)
     {
-        Serial.println("\n\nSuccess formatting");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("\n\nSuccess formatting");
+        #endif
         spiffs_starten();
     }
     else
     {
-        Serial.println("\n\nError formatting");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("\n\nError formatting");
+        #endif
         spiffs_format();
     }
 }
@@ -37,17 +49,21 @@ void spiffs_scan()
 {
     File root = SPIFFS.open("/");
     File file = root.openNextFile();
-    Serial.println("Spiffs wird nach Datein durchsucht :");
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("Spiffs wird nach Datein durchsucht :");
+    #endif
 
     while (file)
     {
-
-        Serial.print("FILE: ");
-        Serial.println(file.name());
-
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.print("FILE: ");
+            Serial.println(file.name());
+        #endif
         file = root.openNextFile();
     }
-    Serial.println("");
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("");
+    #endif
 }
 
 void spiffs_config_save()
@@ -56,7 +72,9 @@ void spiffs_config_save()
     File fileTemp = SPIFFS.open(safefile, FILE_WRITE);
     if (!fileTemp)
     {
-        Serial.println("config.json konnte nicht erstellt werden !");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("config.json konnte nicht erstellt werden !");
+        #endif
         return;
     }
     StaticJsonDocument<1024> doc;
@@ -76,24 +94,22 @@ void spiffs_config_save()
     
     //doc["seriel"] = config.seriel;
 
-    
-
-    if (serializeJson(doc, fileTemp) == 0)
-    {
-        Serial.println("Speichern der config.json Fehlgeschlagen !");
-    }
-    else
-    {
-        Serial.println("Speichern der config.json Erfolgreich !");
-    }
-    Serial.println();
+    #ifdef DEBUG_SERIAL_OUTPUT
+        if (serializeJson(doc, fileTemp) == 0) {
+            Serial.println("Speichern der config.json Fehlgeschlagen !");
+        } else {
+            Serial.println("Speichern der config.json Erfolgreich !");
+        }
+        Serial.println();
+    #endif
     fileTemp.close();
 }
 
 void spiffs_config_load()
 {
-    Serial.println("Config - wird in Variablen geschrieben ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("Config - wird in Variablen geschrieben ...");
+    #endif
     File fileTemp = SPIFFS.open(safefile);
 
     StaticJsonDocument<4096> doc;
@@ -101,9 +117,9 @@ void spiffs_config_load()
 
     String msg_temp = "";
 
-    if (error)
-        Serial.println("Config - Lesefehler || Standart wird genutzt !");
-
+    #ifdef DEBUG_SERIAL_OUTPUT
+        if (error)  Serial.println("Config - Lesefehler || Standart wird genutzt !");
+    #endif
     // Funktionen - LOAD
     
     load_conf_sys(doc);
@@ -118,40 +134,32 @@ void spiffs_config_load()
 
 void spiffs_config_read()
 { // lesen der config.json
-    Serial.println("Anzeige der config - Datei !");
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("Anzeige der config - Datei !");
+    #endif
     File fileTemp = SPIFFS.open(safefile);
-    if (!fileTemp)
-    {
-        Serial.println("die config.json konnte nicht gelesen werden");
+    if (!fileTemp) {
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("die config.json konnte nicht gelesen werden");
+        #endif
         return;
     }
-    while (fileTemp.available())
-    {
-        Serial.print((char)fileTemp.read());
-    }
-    Serial.println();
+    #ifdef DEBUG_SERIAL_OUTPUT
+        while (fileTemp.available()) {
+            Serial.print((char)fileTemp.read());
+        }
+        Serial.println();
+    #endif
     fileTemp.close();
 }
 
-String webserver_call_spiffs(const String &var)
+String web_request_spiff(const String &var)
 {
     String temp = "";
-    if (var == "FILELIST")
-    {
-        return listFiles(true);
+    if          (var == "FILELIST")     { return listFiles(true);
+    } else if   (var == "FREESPIFFS")   { return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes())); 
+    } else if   (var == "USEDSPIFFS")   { return humanReadableSize(SPIFFS.usedBytes());
+    } else if   (var == "TOTALSPIFFS")  { return humanReadableSize(SPIFFS.totalBytes());
     }
-    if (var == "FREESPIFFS")
-    {
-        return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes()));
-    }
-    if (var == "USEDSPIFFS")
-    {
-        return humanReadableSize(SPIFFS.usedBytes());
-    }
-    if (var == "TOTALSPIFFS")
-    {
-        return humanReadableSize(SPIFFS.totalBytes());
-    }
-  
     return String();
 }

@@ -16,7 +16,9 @@ void version_check()
 {
     if (WiFi.isConnected() == true )
     {
-        Serial.println("Version- Update wird geprüfft ... ");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("Version- Update wird geprüfft ... ");
+        #endif
         HTTPClient http;
         http.begin( firmware_path() + "firmware/version.txt" );
         int httpCode = http.GET();
@@ -36,17 +38,18 @@ void version_check()
         } else {
             system_funktion.new_version = false;
         }
-        Serial.print("alte Version : ");
-        Serial.print(system_funktion.version_old);
-        Serial.print(" // neue Version : ");
-        Serial.print(system_funktion.version_new);
-        Serial.println();
-        if ( system_funktion.new_version )
-        {
-            Serial.println("Eine neue Version steht zum download bereit.");
-        } else {
-            Serial.println("Kein Update vorhanden.");
-        }
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.print("alte Version : ");
+            Serial.print(system_funktion.version_old);
+            Serial.print(" // neue Version : ");
+            Serial.print(system_funktion.version_new);
+            Serial.println();
+            if ( system_funktion.new_version ) {
+                Serial.println("Eine neue Version steht zum download bereit.");
+            } else {
+                Serial.println("Kein Update vorhanden.");
+            }
+        #endif
     }
 }
 
@@ -97,18 +100,26 @@ void firmwareupdate_http()
     if (WiFi.isConnected() &&
         system_funktion.new_version )
     {
-        Serial.println(firmware_path());
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println(firmware_path());
+        #endif
         update_webpage();
         t_httpUpdate_return ret = ESPhttpUpdate.update( firmware_path() + "firmware/firmware.bin" );
         switch(ret) {
             case HTTP_UPDATE_FAILED:
-                Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                #ifdef DEBUG_SERIAL_OUTPUT
+                    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                #endif
                 break;
             case HTTP_UPDATE_NO_UPDATES:
-                Serial.println("HTTP_UPDATE_NO_UPDATES");
+                #ifdef DEBUG_SERIAL_OUTPUT
+                    Serial.println("HTTP_UPDATE_NO_UPDATES");
+                #endif 
                 break;
             case HTTP_UPDATE_OK:
-                Serial.println("HTTP_UPDATE_OK");
+                #ifdef DEBUG_SERIAL_OUTPUT
+                    Serial.println("HTTP_UPDATE_OK");
+                #endif
                 break;
         }
     }
@@ -147,36 +158,30 @@ void speicher_diagnose()
 
 void load_conf_sys(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Sys- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Sys- Variablen ...");
+    #endif
     system_funktion.fw_art = doc["fw"] | "main";
 }
 
 StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Sys- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Sys- Variablen ...");
+    #endif
     doc["fw"] = system_funktion.fw_art;
 
     return doc;
 }
-
-/*String firmware_path ()
-{
-    String temp ;
-    temp += "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" ;
-    temp += system_funktion.fw_art ;
-    temp += "/" ;
-
-    return temp;
-}*/
 
 const String& firmware_path() {
     static String temp;
     temp = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/";
     temp += system_funktion.fw_art;
     temp += "/";
-    Serial.println(temp);
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println(temp);
+    #endif
     return temp;
 }
 

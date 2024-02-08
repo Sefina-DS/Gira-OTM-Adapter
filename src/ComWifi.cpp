@@ -8,28 +8,36 @@ void wlan_connect()
     WiFi.setHostname(wifi.esp_name.c_str());
     WiFi.begin(wifi.ssid.c_str(), wifi.pw.c_str());
 
-    Serial.print("Wifi - Verbinden : ");
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.print("Wifi - Verbinden - start : ");
+    #endif
 
     for (int i = 0; i < 20; i++)
     {
         if (WiFi.isConnected())
         {
-            Serial.println(" / erfolgreich ");
-            Serial.println("die Mac ist : " + WiFi.macAddress());
-            Serial.print("die IP Adresse ist : ");
-            Serial.println(WiFi.localIP());
-            Serial.println();
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println(" / erfolgreich ");
+                Serial.println("die Mac ist : " + WiFi.macAddress());
+                Serial.print("die IP Adresse ist : ");
+                Serial.println(WiFi.localIP());
+                Serial.println();
+            #endif
             server->begin();
             delay(2000);
             return;
         }
         else
         {
-            Serial.print(".");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.print(".");
+            #endif
             led_flash_timer(500, 500, 1);
         }
     }
-    Serial.println(" / fehlgeschlagen ");
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println(" / fehlgeschlagen ");
+    #endif
 }
 
 void wlan_config()
@@ -52,7 +60,9 @@ void wlan_config()
             IPAddress temp_subnet = ipwandeln(wifi.subnet);
             IPAddress temp_dns = ipwandeln(wifi.dns);
             
-            Serial.println("Es wird mit Statischer IP verbunden");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Es wird mit Statischer IP verbunden");
+            #endif
             WiFi.mode(WIFI_STA);
             WiFi.config(temp_ip, temp_gw, temp_subnet, temp_dns);
             delay(1000);
@@ -61,7 +71,9 @@ void wlan_config()
         else
         {
             // dynamisch oder kein Typ gewählt
-            Serial.println("Es wird mit DHCP verbunden");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Es wird mit DHCP verbunden");
+            #endif
             WiFi.mode(WIFI_STA);
             WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
             delay(1000);
@@ -71,8 +83,9 @@ void wlan_config()
     else
     {
         AP_Mode = true;
-
-        Serial.println("Acces- Modus wird gestartet");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("Acces- Modus wird gestartet");
+        #endif
         IPAddress IP = IPAddress(10, 50, 0, 1);
         IPAddress gateway = IPAddress(10, 50, 0, 1);
         IPAddress NMask = IPAddress(255, 255, 255, 0);
@@ -83,12 +96,13 @@ void wlan_config()
         WiFi.softAPConfig(IP, gateway, NMask);
         delay(1000);
         IPAddress myIP = WiFi.softAPIP();
-        Serial.println();
-        Serial.print("AP IP address: ");
-        Serial.println(myIP);
-        Serial.println("mit der SSID : " + wifi.esp_name);
-        Serial.println();
-
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println();
+            Serial.print("AP IP address: ");
+            Serial.println(myIP);
+            Serial.println("mit der SSID : " + wifi.esp_name);
+            Serial.println();
+        #endif
         server->begin();
     }
 }
@@ -191,8 +205,9 @@ void webserver_triger_wifi(String name, String msg)
 
 void load_conf_wifi(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... WiFi- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... WiFi- Variablen ...");
+    #endif
     wifi.esp_name = doc["esp_name"] | "";
     wifi.ssid = doc["wifi_ssid"] | "-";
     wifi.pw = doc["wifi_pw"] | "";
@@ -217,8 +232,9 @@ void load_conf_wifi(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... WiFi- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... WiFi- Variablen ...");
+    #endif
     doc["esp_name"] = wifi.esp_name;
     doc["wifi_ssid"] = wifi.ssid;
     doc["wifi_pw"] = wifi.pw;

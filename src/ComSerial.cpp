@@ -4,8 +4,9 @@ COMSERIAL comserial;
 
 void load_conf_serial(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Serial- Variablen ...");
-
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Serial- Variablen ...");
+    #endif
     String temp;
     
     comserial.aktiv                = doc["serial"] | true;
@@ -13,8 +14,9 @@ void load_conf_serial(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_serial(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Serial- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Serial- Variablen ...");
+    #endif
     doc["serial"]                   = comserial.aktiv;
 
     return doc;
@@ -73,21 +75,25 @@ void serial_send(String msg_funktion = "", int status = 1)
             }
             Serial2.write(0x03);
             //      Massage komplet ausgeben über Serial 1 (Debug)
-            Serial.print("Die Nachricht : ");
-            number = 0;
-            while (number < length)
-            {
-                Serial.print(msg[number], byte());
-                number++;
-            }
-            Serial.print("-");
-            Serial.print(msg[length], byte());
-            Serial.print(msg[length + 1], byte());
-            Serial.println(" / wird gesendet (gestartet)");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.print("Die Nachricht : ");
+                number = 0;
+                while (number < length)
+                {
+                    Serial.print(msg[number], byte());
+                    number++;
+                }
+                Serial.print("-");
+                Serial.print(msg[length], byte());
+                Serial.print(msg[length + 1], byte());
+                Serial.println(" / wird gesendet (gestartet)");
+            #endif
         }
         else
         {
-            Serial.println("Senden- Serial abgebrochen");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Senden- Serial abgebrochen");
+            #endif
             comserial.com_status = 0;
             msg_speicher = "";
         }
@@ -108,7 +114,9 @@ void serial_read()
         byte buff[size];
         char letter;
 
-        Serial.println("Nachricht wird Empfangen !");
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("Nachricht wird Empfangen !");
+        #endif
         int rlen = Serial2.readBytes(buff, size);
         for (int i = 0; i < rlen; i++)
         {
@@ -123,7 +131,9 @@ void serial_read()
         }
         if (buff[0] == 0x06)
         {
-            Serial.println("Senden- Serial erfolgreich");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Senden- Serial erfolgreich");
+            #endif
             comserial.com_status = 0;
             if (buff[2] != 0x02)
             {
@@ -132,7 +142,9 @@ void serial_read()
         }
         if (buff[0] == 0x15)
         {
-            Serial.println("Senden- Serial nicht erfolgreich");
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Senden- Serial nicht erfolgreich");
+            #endif
             comserial.com_status++;
             if (buff[2] != 0x02)
             {
@@ -167,7 +179,9 @@ void serial_read()
                 shex[ssize] = letter;
                 ssize++;
             }
-            Serial.println("Nachricht wurde erfolgreich empfangen : " + temp_receive);
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Nachricht wurde erfolgreich empfangen : " + temp_receive);
+            #endif
             filter(shex, ssize);
         }
         else
@@ -179,7 +193,9 @@ void serial_read()
                 letter = buff[i];
                 temp_receive += letter;
             }
-            Serial.println("Nachricht wurde abgelehnt : " + temp_receive);
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("Nachricht wurde abgelehnt : " + temp_receive);
+            #endif
         }
     }
 }

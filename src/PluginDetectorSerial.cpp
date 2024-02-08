@@ -23,8 +23,10 @@ void filter(byte msg[10], int size)
         letter = msg[i];
         orderSTR += letter;
     }
-    Serial.print("Variable orderSTR : ");
-    Serial.println(orderSTR);
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.print("Variable orderSTR : ");
+        Serial.println(orderSTR);
+    #endif
     //      "order" wird ab hier gifiltert
     //      ACHTUNG in 2x DECIMAL !!!!!
     switch (order)
@@ -257,11 +259,13 @@ void filter(byte msg[10], int size)
         if ( detectordiag.status == 3 ) detectordiag.status ++;
         break;
     default:
-        Serial.print("Achtung, falscher Wert / ");
-        Serial.print("Order String : ");
-        Serial.print(orderSTR);
-        Serial.print(" | Decimal : ");
-        Serial.println(order);
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.print("Achtung, falscher Wert / ");
+            Serial.print("Order String : ");
+            Serial.print(orderSTR);
+            Serial.print(" | Decimal : ");
+            Serial.println(order);
+        #endif
         break;
     }
 }

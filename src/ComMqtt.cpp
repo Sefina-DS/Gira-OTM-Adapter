@@ -16,11 +16,13 @@ void mqtt_read(char *topic, byte *message, unsigned int length)
   // Subscribe auswerten !
   topicTemp = String(topic);
 
-  Serial.print("Ankomende Nachricht / das Topic : ");
-  Serial.print(topicTemp);
-  Serial.print(" || die Message : ");
-  Serial.println(messageTemp);
-  
+  #ifdef DEBUG_SERIAL_OUTPUT
+  	Serial.print("Ankomende Nachricht / das Topic : ");
+    Serial.print(topicTemp);
+    Serial.print(" || die Message : ");
+    Serial.println(messageTemp);
+  #endif
+
   // Subscriber übergeben
   mqtt_mqtt_sub_read(topicTemp, messageTemp);
   mqtt_detector_sub_read(topicTemp, messageTemp);
@@ -31,10 +33,12 @@ void mqtt_read(char *topic, byte *message, unsigned int length)
 void mqtt_config()
 {
   //    Serververbindungen
-  Serial.print("MQTT Verbindung mit : ");
-  Serial.print(mqtt.ip);
-  Serial.print(" : ");
-  Serial.println(mqtt.port);
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.print("MQTT Verbindung mit : ");
+    Serial.print(mqtt.ip);
+    Serial.print(" : ");
+    Serial.println(mqtt.port);
+  #endif
   client.setServer(mqtt.ip.c_str(), mqtt.port.toInt());
   client.setCallback(mqtt_read);
   mqtt_connect();
@@ -57,7 +61,9 @@ void mqtt_connect()
   {
     // timer_bluetooth = 0;
     led_flash_timer(250, 150, 3);
-    Serial.print("MQTT verbinden");
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.print("MQTT verbinden");
+    #endif
     String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP/";
     ///         Connect mit LastWill Message
     if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
@@ -71,9 +77,10 @@ void mqtt_connect()
       
       mqtt_esp_status();
       
-      
-      Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
-      Serial.println("");
+      #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
+        Serial.println("");
+      #endif
       
       // Subscriben
       mqtt_mqtt_sub_register();
@@ -86,8 +93,10 @@ void mqtt_connect()
     else
     {
       mqtt.false_number ++;
-      Serial.print(" / nicht erfolgreich / neuer Versuch in 5 Sekunden / False-Counter : ");
-      Serial.println(mqtt.false_number);
+      #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.print(" / nicht erfolgreich / neuer Versuch in 5 Sekunden / False-Counter : ");
+        Serial.println(mqtt.false_number);
+      #endif
       if (mqtt.false_number == 12)
       {
         ESP.restart();
@@ -109,18 +118,20 @@ void mqtt_publish(String topic, String msg, String funktion)
   const char* temp_topic =  topic.c_str();
   const char* temp_msg =  msg.c_str();
   
-  Serial.print("MQTT Send - Funktion : ");
-  Serial.print(funktion);
-  Serial.print(" || Topic (");
-  Serial.print(topic_size);
-  Serial.print(") : ");
-  Serial.print(temp_topic);
-  Serial.print(" / ");
-  Serial.print(topic);
-  Serial.print(" || Msg (");
-  Serial.print(msg_size);
-  Serial.print(") : ");
-  Serial.println(temp_msg);
+  #ifdef DEBUG_SERIAL_OUTPUT
+    Serial.print("MQTT Send - Funktion : ");
+    Serial.print(funktion);
+    Serial.print(" || Topic (");
+    Serial.print(topic_size);
+    Serial.print(") : ");
+    Serial.print(temp_topic);
+    Serial.print(" / ");
+    Serial.print(topic);
+    Serial.print(" || Msg (");
+    Serial.print(msg_size);
+    Serial.print(") : ");
+    Serial.println(temp_msg);
+  #endif
 
   client.publish(temp_topic, temp_msg);
 }
@@ -204,8 +215,9 @@ void webserver_triger_mqtt(String name, String msg)
 
 void load_conf_mqtt(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... MQTT- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("... MQTT- Variablen ...");
+    #endif
     mqtt.aktiv = doc["mqtt"] | false;
     mqtt.ip = doc["mqtt_ip"] | "x-x-x-x";
     mqtt.port = doc["mqtt_port"] | "1883";
@@ -215,8 +227,9 @@ void load_conf_mqtt(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... MQTT- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.println("... MQTT- Variablen ...");
+    #endif
     doc["mqtt"] = mqtt.aktiv;
     doc["mqtt_ip"] = mqtt.ip;
     doc["mqtt_port"] = mqtt.port;

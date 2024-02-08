@@ -9,5 +9,5 @@ void spiffs_config_save();
 void spiffs_config_load();
 void spiffs_config_read();
 
-String webserver_call_spiffs(const String &var);
+String web_request_spiff(const String &var);
 

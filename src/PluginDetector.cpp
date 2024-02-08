@@ -4,8 +4,9 @@ DETECTOR detector;
 
 void load_conf_detector(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Detector- Variablen ...");
-
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Detector- Variablen ...");
+    #endif
     String temp;
     
     detector.group = doc["detector_group"] | 0;
@@ -17,8 +18,9 @@ void load_conf_detector(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc)
 {
-    Serial.println("... Detector- Variablen ...");
-    
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("... Detector- Variablen ...");
+    #endif
     doc["detector_group"] = detector.group;
     doc["detector_alarm_group"] = detector.alarm_group_safe;
     doc["detector_location"] = detector.location;
@@ -72,10 +74,12 @@ void alarm_group_diagnose(String msg)
     detector.alarm_group_size = temp_size;
     for (int i = 0; i < temp_size; i++)
     {
-        Serial.print("Gruppe ");
-        Serial.print(i);
-        Serial.print(" : ");
-        Serial.println(detector.alarm_group[i]);
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.print("Gruppe ");
+            Serial.print(i);
+            Serial.print(" : ");
+            Serial.println(detector.alarm_group[i]);
+        #endif
         temp_safe += detector.alarm_group[i];
         temp_safe += " ";
     }

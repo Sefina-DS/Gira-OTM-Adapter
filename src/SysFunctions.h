@@ -11,6 +11,8 @@ struct SYSTEM_FUNKTION
 };
 extern SYSTEM_FUNKTION system_funktion;
 
+#define DEBUG_SERIAL_OUTPUT // Aktivieren für Serial- Ausgabe
+
 //      Inputs
 #define RXD2 17
 #define TXD2 16
@@ -27,7 +29,6 @@ extern SYSTEM_FUNKTION system_funktion;
 
 void system_timer();
 void version_check();
-//String firmware_path();
 const String& firmware_path();
 
 void firmwareupdate_http();
