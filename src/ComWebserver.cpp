@@ -148,11 +148,18 @@ String webserver_call(const String &var)
   // Überschrift
   if (var == "header_esp_name" ) return wifi.esp_name;
   if (var == "header_detector_location" ) return detector.location;
+  
+  //  Web - Requests
+  if          ( String temp = web_request_wifi(var); temp != "")       { return temp;
+  } else if   ( String temp = webserver_call_mqtt(var); temp != "")    { return temp;
+  }
+  
   // Netzwerk
-  temp = webserver_call_wifi(var);
+  
+  /*temp = web_request_wifi(var);
   if (temp != "") { return temp; }
   temp = webserver_call_mqtt(var);
-  if (temp != "") { return temp; }
+  if (temp != "") { return temp; }*/
   
   // Detector
   temp = webserver_call_detector(var);
@@ -195,6 +202,7 @@ String webserver_call(const String &var)
 
 void webserver_triger(String name, String msg)
 {
+    Serial.println("globaler trigger");
     webserver_triger_wifi(name, msg);
     webserver_triger_mqtt(name, msg);
     webserver_triger_detector(name, msg);

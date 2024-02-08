@@ -23,7 +23,8 @@ void wlan_config();
 
 IPAddress ipwandeln(String temp);
 
-String webserver_call_wifi(const String &var);
+String getSelectedOption(const String &option);
+String web_request_wifi(const String &var);
 void webserver_triger_wifi(String name, String msg);
 
 void load_conf_wifi(StaticJsonDocument<1024> doc);

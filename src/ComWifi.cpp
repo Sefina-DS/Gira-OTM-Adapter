@@ -124,105 +124,45 @@ void scan_wifi_ssid()
     }
 }
 
-String webserver_call_wifi(const String &var)
-{
-    String temp = "";
-    if (var == "web_network_ip")
-    {
-        temp += F("<div class='network'><br/><div class='box'>");
-        temp += F("<h3>Netzwerk Einstellungen</h3>");
-        temp += F("<form action='/get'>");
-        temp += F("<table>");
-        // ESP - Name
-        temp += F("<tr><td>ESP- Name :</td>");
-        temp += F("<td><input class='setting' type='text' name='esp_name' placeholder='");
-        temp +=     wifi.esp_name;
-        temp += F("'></td></tr>");
-        // WiFi - SSID
-        temp += F("<tr><td>WiFi - SSID :</td>");
-        temp += F("<td><select name='wifi_ssid'>");
-        if (wifi.ssid != "")
-        {
-            temp += F("<option value='");
-            temp += wifi.ssid;
-            temp += F("' selected>");
-            temp += wifi.ssid;
-            temp += F("</option>");
+String getSelectedOption(const String &option) {
+    return "<option value='" + option + "' selected>" + option + "</option>";
+}
+
+String web_request_wifi(const String &var) {
+    if (var == "ph_wifi_esp") {
+        return wifi.esp_name;
+    } else if (var == "ph_wifi_ssid") {
+        if (wifi.ssid != "") {
+            return getSelectedOption(wifi.ssid);
+        } else {
+            return "<option selected>keins ausgewählt</option>";
         }
-        else
-        {
-            temp += F("<option selected>keins ausgewählt</option>");
-        }
+    } else if (var == "ph_wifi_ssiddisplay") {
         scan_wifi_ssid();
-        temp += webserver.wifi_ssid;
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        // WiFi - Passwort
-        temp += F("<tr><td>WiFi - Passwort :</td>");
-        temp += F("<td><input class='setting' type='text' name='wifi_pw' placeholder='");
-        if (wifi.pw != "")
-        {
-            temp += F("---FFF---FFF---'");
-        }
-        else
-        {
-            temp += F("Bitte eintragen !'");
-        }
-        temp += F("'></td></tr>");
-        if (!webserver.notbetrieb)
-        {
-            // IP - Typ
-            temp += F("<tr><td>IP- Adressen Typ :</td>");
-            temp += F("<td><select name='wifi_dhcp'><option value='");
-            if (wifi.dhcp)
-            {
-                temp += F("dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch");
-            } else {
-                temp += F("statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch");
-            }
-            temp += F("</select>");
-            temp += F("</td></tr>");
-            temp += F("</table>");
-            // Verdeckte Einstellungen (Statische IP Config)
-            temp += F("<table ");
-            if (wifi.dhcp)
-            {
-                temp += F("style='display: none'>");
-            } else {
-                temp += F(">");
-            }
-            // IP - Adresse
-            temp += F("<tr><td>IP Adresse :</td>");
-            temp += F("<td><input class='setting' type='text' name='wifi_ip' placeholder='");
-            temp +=     wifi.ip;
-            temp += F("'></td></tr>");
-            // Subnet- Maske
-            temp += F("<tr><td>Subnet- Mask :</td>");
-            temp += F("<td><input class='setting' type='text' name='wifi_subnet' placeholder='");
-            temp +=     wifi.subnet;
-            temp += F("'></td></tr>");
-            // Gateway
-            temp += F("<tr><td>Gateway :</td>");
-            temp += F("<td><input class='setting' type='text' name='wifi_gw' placeholder='");
-            temp +=     wifi.gw;
-            temp += F("'></td></tr>");
-            // DNS
-            temp += F("<tr><td>DNS :</td>");
-            temp += F("<td><input class='setting' type='text' name='wifi_dns' placeholder='");
-            temp +=     wifi.dns;
-            temp += F("'></td></tr>");
-        }
-        temp += F("</table><br/>");
-        temp += F("<input type='submit' value='Submit' />");
-        temp += F("</form></div></div>");
-        return temp;
+        return webserver.wifi_ssid;
+    } else if (var == "ph_wifi_pw") {
+        return (wifi.pw != "") ? "---FFF---FFF---" : "Bitte eintragen !";
+    } else if (var == "ph_wifi_dhcp") {
+        return (wifi.dhcp) ? "'dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch" 
+                           : "'statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch";
+    } else if (var == "ph_wifi_dhcpdisplay") {
+        return (wifi.dhcp) ? " style='display: none'" : "";
+    } else if (var == "ph_wifi_ip") {
+        return wifi.ip;
+    } else if (var == "ph_wifi_subnet") {
+        return wifi.subnet;
+    } else if (var == "ph_wifi_gw") {
+        return wifi.gw;
+    } else if (var == "ph_wifi_dns") {
+        return wifi.dns;
     }
-    
+
     return String();
 }
 
 void webserver_triger_wifi(String name, String msg)
 {
+    Serial.println("Wifi trigger");
     if (msg != "")
     {
         if (name == "esp_name")     { wifi.esp_name = msg; }
