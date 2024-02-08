@@ -162,7 +162,6 @@ String web_request_wifi(const String &var) {
 
 void webserver_triger_wifi(String name, String msg)
 {
-    Serial.println("Wifi trigger");
     if (msg != "")
     {
         if (name == "esp_name")     { wifi.esp_name = msg; }

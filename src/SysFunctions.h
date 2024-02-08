@@ -3,7 +3,7 @@
 struct SYSTEM_FUNKTION
 {
     unsigned long timer = 0;
-    String version_old = "20240207";
+    String version_old = "beta-20240208";
     String github_path = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/Firmwareupdate";
     String version_new ;
     String fw_art ;
@@ -34,6 +34,10 @@ void firmwareupdate_http();
 void update_webpage();
 void led_flash_timer(int timer_on,int timer_off, int number);
 void speicher_diagnose();
+
+String web_request_sys(const String &var);
+void web_response_sys(String name, String msg);
+
 
 void load_conf_sys(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc);

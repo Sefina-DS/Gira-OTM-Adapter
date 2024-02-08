@@ -179,3 +179,22 @@ const String& firmware_path() {
     Serial.println(temp);
     return temp;
 }
+
+String web_request_sys(const String &var) {
+    if          (var == "ph_sys_fwtyp") {
+        return (system_funktion.fw_art == "main" )  ? "'main' selected='main'>main</option><option value='beta'>beta" 
+                                                    : "'beta' selected='beta'>beta</option><option value='main'>main";
+    } else if   (var == "ph_sys_fwold") {
+        return system_funktion.version_old ;
+    } else if   (var == "ph_sys_fwnew") {
+        return system_funktion.version_new ;
+    }
+    return String();
+}
+void web_response_sys(String name, String msg) {
+    if (msg != "")
+    {
+        if (name == "fw_build")         { system_funktion.fw_art = msg; version_check(); }
+        if (name == "Firmwareupdate")   { firmwareupdate_http(); }
+    }
+}

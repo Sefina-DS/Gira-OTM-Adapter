@@ -148,30 +148,26 @@ String webserver_call(const String &var)
   // Überschrift
   if (var == "header_esp_name" ) return wifi.esp_name;
   if (var == "header_detector_location" ) return detector.location;
-  
+  /*
   //  Web - Requests
   if          ( String temp = web_request_wifi(var); temp != "")       { return temp;
   } else if   ( String temp = webserver_call_mqtt(var); temp != "")    { return temp;
-  }
+  }*/
   
   // Netzwerk
   
-  /*temp = web_request_wifi(var);
-  if (temp != "") { return temp; }
-  temp = webserver_call_mqtt(var);
-  if (temp != "") { return temp; }*/
+  temp = web_request_wifi(var);         if (temp != "") return temp; 
+  temp = webserver_call_mqtt(var);      if (temp != "") return temp;
   
   // Detector
-  temp = webserver_call_detector(var);
-  if (temp != "") { return temp; }
+  temp = webserver_call_detector(var);  if (temp != "") return temp;
 
   // Sensor
-  temp = webserver_call_sensor(var);
-  if (temp != "") { return temp; }
+  temp = webserver_call_sensor(var);    if (temp != "") return temp;
 
   // System
-  temp = webserver_call_spiffs(var);
-  if (temp != "") { return temp; }
+  temp = web_request_sys(var);          if (temp != "") return temp;
+  temp = webserver_call_spiffs(var);    if (temp != "") return temp;
   
   
   if (var == "navigation-network" &&
@@ -203,6 +199,7 @@ String webserver_call(const String &var)
 void webserver_triger(String name, String msg)
 {
     Serial.println("globaler trigger");
+    web_response_sys(name,msg);
     webserver_triger_wifi(name, msg);
     webserver_triger_mqtt(name, msg);
     webserver_triger_detector(name, msg);
@@ -212,6 +209,8 @@ void webserver_triger(String name, String msg)
     {
         webserver.navigation = msg;
     }
+    if (name == "config_save" && msg == "Änderungen übernehmen")    spiffs_config_save();
+    
     if (name == "config_save_restart")
     {
         if (msg == "geänderte Config übertragen und Modul neustarten !")
