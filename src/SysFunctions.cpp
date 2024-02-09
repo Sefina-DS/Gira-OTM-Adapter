@@ -109,7 +109,8 @@ void firmwareupdate_http() {
         #endif
 
         //String firmwareURL = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin";
-        t_httpUpdate_return ret = ESPhttpUpdate.update("Url ist : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
+        t_httpUpdate_return ret = ESPhttpUpdate.update("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
+                
         switch (ret) {
             case HTTP_UPDATE_FAILED:
                 #ifdef DEBUG_SERIAL_OUTPUT
