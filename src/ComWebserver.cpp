@@ -169,17 +169,22 @@ String webserver_call(const String &var)
   
   // Netzwerk
   temp = web_request_wifi(var);         if (temp != "") return temp; 
-  temp = webserver_call_mqtt(var);      if (temp != "") return temp;
+  temp = web_request_mqtt(var);         if (temp != "") return temp;
   
   // Detector
-  temp = webserver_call_detector(var);  if (temp != "") return temp;
+  temp = web_request_detector(var);     if (temp != "") return temp;
 
   // Sensor
-  temp = webserver_call_sensor(var);    if (temp != "") return temp;
+  temp = web_request_sensor(var);    if (temp != "") return temp;
 
   // System
   temp = web_request_sys(var);          if (temp != "") return temp;
   temp = web_request_spiff(var);        if (temp != "") return temp;
+  
+  if ( var == "ph_web_config" ) { return (!webserver.config)   ? "display: none; " 
+                                                              : "";
+  }
+  
   
   
   if (var == "navigation-network" &&
@@ -214,18 +219,11 @@ void webserver_triger(String name, String msg)
   webserver_triger_detector(name, msg);
   webserver_triger_sensor(name, msg);
 
-  if (name == "navigation")                                       webserver.navigation = msg;
-  if (name == "config_save" && msg == "Änderungen übernehmen")    spiffs_config_save();
-  if (name == "config_save_restart") {
-    if (msg == "geänderte Config übertragen und Modul neustarten !") {
-      spiffs_config_save();
-      #ifdef DEBUG_SERIAL_OUTPUT
-        Serial.println("ESP wird in 6 Sekunden neugestartet !");
-      #endif
-      delay(6000);
-      ESP.restart();
-    }
-  }
+  if        (name == "navigation")                                          webserver.navigation = msg;
+  else if   (name == "config_save" && msg == "Änderungen übernehmen") {     spiffs_config_save();
+                                                                            webserver.config = true; }
+  else if   (name == "ESP-Neustart")                                        ESP.restart();
+  
   if (name == "reset_config") {
     if (msg == "Werkseinstellungen laden !") {
       SPIFFS.remove(safefile);

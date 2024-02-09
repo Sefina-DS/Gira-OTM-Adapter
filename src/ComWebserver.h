@@ -5,6 +5,7 @@ struct WEBSERVER
     String navigation;
     String wifi_ssid;
     boolean notbetrieb = false;
+    boolean config = false;
     unsigned long timer = 0;
 };
 extern WEBSERVER webserver;

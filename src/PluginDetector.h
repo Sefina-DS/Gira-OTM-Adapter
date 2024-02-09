@@ -22,7 +22,7 @@ void alarm_group_diagnose(String msg);
 String web_server_detector(const String &var);
 void web_server_detector_get(String name, String msg);
 
-String webserver_call_detector(const String &var);
+String web_request_detector(const String &var);
 void webserver_triger_detector(String name, String msg);
 
 void load_conf_detector(StaticJsonDocument<1024> doc);

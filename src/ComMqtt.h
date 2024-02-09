@@ -21,7 +21,7 @@ void mqtt_connect();
 void mqtt_publish(String topic, String msg, String funktion);
 //void mqtt_publish_int(String topic, int msg);
 
-String webserver_call_mqtt(const String &var);
+String web_request_mqtt(const String &var);
 void webserver_triger_mqtt(String name, String msg);
 
 void load_conf_mqtt(StaticJsonDocument<1024> doc);

@@ -129,179 +129,33 @@ void ubext_refresh(StaticJsonDocument<1024> temp_json)
 
 }
 
-String webserver_call_sensor(const String &var)
-{
-    String temp = "";
-    if (var == "web_sensor_sensor")
-    {
-
-        temp += F("<div class='sensor'><br/><div class='box'>");
-        temp += F("<h3>Senso Einstellungen</h3>");
-        temp += F("<form action='/get'>");
-        temp += F("<table>");
-        // BME280 Aktiv/Deaktiv
-        temp += F("<tr><td>BME Art :</td>");
-        temp += F("<td><select name='bme'><option value='");
-        temp += sensor.bme;
-        temp += F("' selected>");
-        temp += sensor.bme;
-        temp += F("</option>");
-        temp += F("<option value='keiner vorhanden'>keiner vorhanden</option>");
-        temp += F("<option value='BME - 280'>BME - 280</option>");
-        temp += F("<option value='BME - 680'>BME - 680</option>");
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        temp += F("</table>");
-        // Verdeckte Einstellungen (BME 280 Aktiv)
-        temp += F("<table ");
-        if (sensor.bme == "keiner vorhanden")
-        {
-            temp += F("style='display: none'>");
-        }
-        else
-        {
-            temp += F(">");
-        }
-            // Temperatur
-            temp += F("<tr><td>Temperatur :</td>");
-            temp += F("<td><select name='bme-temperature'><option value='");
-            if (sensor.bme_temperature)
-            {
-                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-            }
-            else
-            {
-                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-            }
-            temp += F("</select>");
-            temp += F("</td></tr>");
-            // Feuchtigkeit
-            temp += F("<tr><td>Feuchtigkeit :</td>");
-            temp += F("<td><select name='bme-humidity'><option value='");
-            if (sensor.bme_humidity)
-            {
-                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-            }
-            else
-            {
-                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-            }
-            temp += F("</select>");
-            temp += F("</td></tr>");
-            // Druck
-            temp += F("<tr><td>Druck :</td>");
-            temp += F("<td><select name='bme-pressure'><option value='");
-            if (sensor.bme_pressure)
-            {
-                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-            }
-            else
-            {
-                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-            }
-            temp += F("</select>");
-            temp += F("</td></tr>");
-            // Höhe
-            temp += F("<tr><td>Höhe :</td>");
-            temp += F("<td><select name='bme-high'><option value='");
-            if (sensor.bme_high)
-            {
-                temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-            }
-            else
-            {
-                temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-            }
-            temp += F("</select>");
-            temp += F("</td></tr>");
-            temp += F("</table>");
-            // Verdeckte Einstellungen (BME 680 Aktiv)
-            temp += F("<table ");
-            if (sensor.bme != "BME - 680")
-            {
-                temp += F("style='display: none'>");
-            }
-            else
-            {
-                temp += F(">");
-            }
-                // Gas Ohm
-                temp += F("<tr><td>Gas in KOhm :</td>");
-                temp += F("<td><select name='bme-gas-ohm'><option value='");
-                if (sensor.bme_gas_ohm)
-                {
-                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-                }
-                else
-                {
-                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-                }
-                temp += F("</select>");
-                temp += F("</td></tr>");
-                // Gas Score
-                temp += F("<tr><td>Raumklimabewertung im Score :</td>");
-                temp += F("<td><select name='bme-gas-score'><option value='");
-                if (sensor.bme_gas_score)
-                {
-                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-                }
-                else
-                {
-                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-                }
-                temp += F("</select>");
-                temp += F("</td></tr>");
-                // Gas Text
-                temp += F("<tr><td>Raumklimebewertung im Text :</td>");
-                temp += F("<td><select name='bme-gas-text'><option value='");
-                if (sensor.bme_gas_text)
-                {
-                    temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-                }
-                else
-                {
-                    temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-                }
-                temp += F("</select>");
-                temp += F("</td></tr>");
-                temp += F("</table><br/>");
-        // Light Aktiv/Deaktiv
-        temp += F("<table>");
-        temp += F("<tr><td>Lichtsensor :</td>");
-        temp += F("<td><select name='light'><option value='");
-        if (sensor.light)
-        {
-            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-        }
-        else
-        {
-            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-        }
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        temp += F("</table><br/>");
-        // Spannung Aktiv/Deaktiv
-        temp += F("<table>");
-        temp += F("<tr><td>Versorgungsspannung :</td>");
-        temp += F("<td><select name='ubext'><option value='");
-        if (sensor.ubext)
-        {
-            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-        }
-        else
-        {
-            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-        }
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        temp += F("</table><br/>");
-        temp += F("<input type='submit' value='Submit' />");
-        temp += F("</form></div></div>");
-        return temp;
+String web_request_sensor(const String &var) {
+    if          ( var == "ph_sensor_bme")           { return sensor.bme;
+    } else if   ( var == "ph_sensor_bmedisplay")    { return (sensor.bme == "keiner vorhanden")         ? "display: none; " 
+                                                                                                        : "";
+    } else if   ( var == "ph_sensor_temp")          { return ( sensor.bme_temperature )     ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_humidity")      { return ( sensor.bme_humidity )        ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_pressure")      { return ( sensor.bme_pressure )        ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_high")          { return ( sensor.bme_high )            ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_bme680")        { return ( sensor.bme != "BME - 680" )  ? "display: none; " 
+                                                                                            : "";
+    } else if   ( var == "ph_sensor_gasohm")        { return ( sensor.bme_gas_ohm )         ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_gasscore")      { return ( sensor.bme_gas_score )       ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_gastext")       { return ( sensor.bme_gas_text )        ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_light")         { return ( sensor.light )               ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_sensor_ubext")         { return ( sensor.ubext )               ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                            : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
     }
-    
+
     return String();
-    
 }
 
 void webserver_triger_sensor(String name, String msg)

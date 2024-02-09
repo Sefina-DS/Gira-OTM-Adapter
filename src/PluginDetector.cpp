@@ -86,51 +86,15 @@ void alarm_group_diagnose(String msg)
     detector.alarm_group_safe = temp_safe;
 }
 
-String webserver_call_detector(const String &var)
-{
-    String temp = "";
-    if (var == "web_detector_detector")
-    {
-        temp += F("<div class='detector'><br/><div class='box'>");
-        temp += F("<h3>Rauchmelder Einstellungen</h3>");
-        temp += F("<form action='/get'>");
-        temp += F("<table>");
-        // Komunikation (Serial)
-        temp += F("<tr><td>Komunikation :</td>");
-        temp += F("<td><select name='detector_komunikation'><option value='");
-        if (comserial.aktiv)
-        {
-            temp += F("aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert");
-        }
-        else
-        {
-            temp += F("deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert");
-        }
-        temp += F("</select>");
-        temp += F("</td></tr>");
-        // Einbauort
-        temp += F("<tr><td>Einbauort :</td>");
-        temp += F("<td><input class='setting' type='text' name='detector_location' placeholder='");
-        temp +=     detector.location;
-        temp += F("'></td></tr>");
-        // Meldegruppe
-        temp += F("<tr><td>Meldegruppe :</td>");
-        temp += F("<td><input class='setting' type='text' name='detector_group' placeholder='");
-        temp +=     detector.group;
-        temp += F("'></td></tr>");
-        // Alarmierungsgruppen
-        temp += F("<tr><td>Alarmierungsgruppen :</td>");
-        temp += F("<td><textarea rows='3' cols='40' name='detector_alarm_group' placeholder='");
-        temp +=     detector.alarm_group_safe;
-        temp += F("'></textarea></td></tr>");
-        temp += F("</table><br/>");
-        temp += F("<input type='submit' value='Submit' />");
-        temp += F("</form></div></div>");
-        return temp;
+String web_request_detector(const String &var) {
+    if          ( var == "ph_detector_aktiv")       { return ( comserial.aktiv )    ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                    : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   ( var == "ph_detector_location")    { return  detector.location;
+    } else if   ( var == "ph_detector_grp")         { return  String(detector.group);
+    } else if   ( var == "ph_detector_alarmgrp")    { return  detector.alarm_group_safe;
     }
-    
+
     return String();
-    
 }
 
 void webserver_triger_detector(String name, String msg)

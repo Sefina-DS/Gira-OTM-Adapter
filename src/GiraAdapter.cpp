@@ -37,6 +37,8 @@ void setup()
     Serial.println();
   #endif
 
+  //SPIFFS.remove("/config.html");
+
   webserver_art();
   wlan_config();
   version_check();

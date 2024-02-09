@@ -143,32 +143,21 @@ String getSelectedOption(const String &option) {
 }
 
 String web_request_wifi(const String &var) {
-    if (var == "ph_wifi_esp") {
-        return wifi.esp_name;
-    } else if (var == "ph_wifi_ssid") {
-        if (wifi.ssid != "") {
-            return getSelectedOption(wifi.ssid);
-        } else {
-            return "<option selected>keins ausgewählt</option>";
-        }
-    } else if (var == "ph_wifi_ssiddisplay") {
-        scan_wifi_ssid();
-        return webserver.wifi_ssid;
-    } else if (var == "ph_wifi_pw") {
-        return (wifi.pw != "") ? "---FFF---FFF---" : "Bitte eintragen !";
-    } else if (var == "ph_wifi_dhcp") {
-        return (wifi.dhcp) ? "'dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch" 
-                           : "'statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch";
-    } else if (var == "ph_wifi_dhcpdisplay") {
-        return (wifi.dhcp) ? " style='display: none'" : "";
-    } else if (var == "ph_wifi_ip") {
-        return wifi.ip;
-    } else if (var == "ph_wifi_subnet") {
-        return wifi.subnet;
-    } else if (var == "ph_wifi_gw") {
-        return wifi.gw;
-    } else if (var == "ph_wifi_dns") {
-        return wifi.dns;
+    if          (var == "ph_wifi_esp")          { return wifi.esp_name;
+    } else if   (var == "ph_wifi_ssid")         { return (wifi.ssid != "")      ? getSelectedOption(wifi.ssid)
+                                                                                : "<option selected>keins ausgewählt</option>";
+    } else if   (var == "ph_wifi_ssiddisplay")  { scan_wifi_ssid();
+                                                  return webserver.wifi_ssid;
+    } else if   (var == "ph_wifi_pw")           { return (wifi.pw != "")        ? "---FFF---FFF---" 
+                                                                                : "Bitte eintragen !";
+    } else if   (var == "ph_wifi_dhcp")         { return (wifi.dhcp)            ? "'dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch" 
+                                                                                : "'statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch";
+    } else if   (var == "ph_wifi_dhcpdisplay")  { return (wifi.dhcp)            ? "display: none; " 
+                                                                                : "";
+    } else if   (var == "ph_wifi_ip")           { return wifi.ip;
+    } else if   (var == "ph_wifi_subnet")       { return wifi.subnet;
+    } else if   (var == "ph_wifi_gw")           { return wifi.gw;
+    } else if   (var == "ph_wifi_dns")          { return wifi.dns;
     }
 
     return String();
