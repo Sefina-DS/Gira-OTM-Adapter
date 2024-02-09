@@ -3,13 +3,14 @@
 struct SYSTEM_FUNKTION
 {
     unsigned long timer = 0;
-    String version_old = "beta-20240209";
+    String version_old = "beta-20240209B";
     String github_path = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/Firmwareupdate";
     String version_new ;
     String fw_art ;
     boolean new_version ;
 };
 extern SYSTEM_FUNKTION system_funktion;
+extern HTTPClient http;
 
 //#define DEBUG_SERIAL_OUTPUT // Aktivieren für Serial- Ausgabe
 
@@ -32,7 +33,7 @@ void version_check();
 const String& firmware_path();
 
 void firmwareupdate_http();
-void update_webpage();
+void file_download(String filePath);
 void led_flash_timer(int timer_on,int timer_off, int number);
 void speicher_diagnose();
 

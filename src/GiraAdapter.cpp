@@ -3,6 +3,7 @@
 AsyncWebServer *server;
 WiFiClient espClient;
 PubSubClient client(espClient);
+HTTPClient http;
 
 void setup()
 {
@@ -62,9 +63,10 @@ void setup()
   if ( webserver.notbetrieb && WiFi.isConnected() == true )
   {
     #ifdef DEBUG_SERIAL_OUTPUT
-      Serial.print("config.html und config.css wird runtergeladen");
+      Serial.print("Wifi ist vorhanden, nötige Daten werden gedownloadet");
     #endif
-    update_webpage();
+    file_download("/config.html");
+    file_download("/config.css");
     delay(1000);
     ESP.restart();
   }

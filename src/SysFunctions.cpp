@@ -53,77 +53,89 @@ void version_check()
     }
 }
 
-void update_webpage()
-{
-    if (WiFi.isConnected() == true )
-    {
-        SPIFFS.remove("/config.html");
-        File file_html = SPIFFS.open("/config.html", "w");
-        if (file_html) 
-        {
-            HTTPClient http;
-            http.begin( firmware_path() + "data/config.html" );
-            int httpCode = http.GET();
-            if(httpCode > 0) 
-            {
-                if(httpCode == HTTP_CODE_OK) 
-                {
-                    file_html.print( http.getString()) ;
-                    file_html.close();
-                }
-            } 
-            http.end();
+void file_download(String filePath) {
+    #ifdef DEBUG_SERIAL_OUTPUT
+        Serial.println("Fieledownload URL : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + filePath);
+    #endif
+  
+    // HTTP-Anfrage senden
+    http.begin("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/data" + filePath);
+  
+    // Überprüfen der Antwort
+    int httpCode = http.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        // Datei öffnen, um im SPIFFS zu speichern
+        File file = SPIFFS.open(filePath, "w");
+        if(!file) {
+            #ifdef DEBUG_SERIAL_OUTPUT
+                Serial.println("File kann nicht erstellt werden");
+            #endif
+            return;
         }
-        SPIFFS.remove("/config.css");
-        File file_css = SPIFFS.open("/config.css", "w");
-        if (file_css) 
-        {
-            HTTPClient http;
-            http.begin( firmware_path() + "data/config.css" );
-            int httpCode = http.GET();
-            if(httpCode > 0) 
-            {
-                if(httpCode == HTTP_CODE_OK) 
-                {
-                    file_css.print( http.getString()) ;
-                    file_css.close();
-                }
-            } 
-            http.end();
+    
+        // Dateiinhalt von der HTTP-Antwort lesen und im SPIFFS speichern
+        Stream* stream = http.getStreamPtr();
+        if(stream) {
+            while(stream->available()) {
+                file.write(stream->read());
+            }
         }
+    
+        // Datei schließen
+        file.close();
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("File " + filePath + " erfolgreich gedownloadet");
+        #endif
+    } else {
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.printf("File download fehlgeschlagen mit : : %d\n", httpCode);
+        #endif
     }
+  
+    // HTTP-Verbindung schließen
+    http.end();
 }
 
-void firmwareupdate_http()
-// https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/main/firmware/firmware.bin
-{
-    if (WiFi.isConnected() &&
-        system_funktion.new_version )
-    {
+void firmwareupdate_http() {
+    if (WiFi.isConnected() && system_funktion.new_version) {
+        system_funktion.new_version = false;
+        webserver.sperre = true;
+        file_download("/config.html");
+        file_download("/config.css");
+
         #ifdef DEBUG_SERIAL_OUTPUT
-            Serial.println(firmware_path());
+            Serial.println("Firmware-Update wird gestartet...");
+            Serial.println("Url ist : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
         #endif
-        update_webpage();
-        t_httpUpdate_return ret = ESPhttpUpdate.update( firmware_path() + "firmware/firmware.bin" );
-        switch(ret) {
+
+        //String firmwareURL = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin";
+        t_httpUpdate_return ret = ESPhttpUpdate.update("Url ist : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
+        switch (ret) {
             case HTTP_UPDATE_FAILED:
                 #ifdef DEBUG_SERIAL_OUTPUT
-                    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                    Serial.printf("Firmware-Update fehlgeschlagen. Fehler (%d): %s\n", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
                 #endif
+                    webserver.sperre = false;
                 break;
             case HTTP_UPDATE_NO_UPDATES:
                 #ifdef DEBUG_SERIAL_OUTPUT
-                    Serial.println("HTTP_UPDATE_NO_UPDATES");
-                #endif 
+                    Serial.println("Keine neuen Firmware-Updates verfügbar.");
+                #endif
                 break;
             case HTTP_UPDATE_OK:
                 #ifdef DEBUG_SERIAL_OUTPUT
-                    Serial.println("HTTP_UPDATE_OK");
+                    Serial.println("Firmware-Update erfolgreich.");
                 #endif
                 break;
         }
+    } else {
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("Firmware-Update abgebrochen da vorgaben nicht erfüllt ...");
+        #endif
+        mqtt_publish( mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/Firmwareupdate", "false", "mqtt_mqtt_sub_read");
     }
 }
+
 
 void led_flash_timer(int timer_on,int timer_off, int number)
 {

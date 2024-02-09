@@ -158,6 +158,7 @@ void webserver_normalbetrieb()
 
 String webserver_call(const String &var)
 {
+  if ( webserver.sperre ) return String();
   #ifdef DEBUG_SERIAL_OUTPUT
     Serial.print("Web-Server call mit : ");
     Serial.println(var);

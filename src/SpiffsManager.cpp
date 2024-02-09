@@ -57,7 +57,9 @@ void spiffs_scan()
     {
         #ifdef DEBUG_SERIAL_OUTPUT
             Serial.print("FILE: ");
-            Serial.println(file.name());
+            Serial.print(file.name());
+            Serial.print(" // ");
+            Serial.println(file.size());
         #endif
         file = root.openNextFile();
     }

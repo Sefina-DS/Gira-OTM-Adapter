@@ -191,7 +191,9 @@ void mqtt_mqtt_sub_register()
 {
   String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
   client.subscribe((temp + "Neustart-ESP").c_str());
+  mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
   client.subscribe((temp + "Firmwareupdate").c_str());
+  mqtt_publish(temp + "Firmwareupdate", "false", "mqtt_mqtt_sub_read");
 
 }
 
@@ -200,14 +202,12 @@ void mqtt_mqtt_sub_read(String topic, String msg)
   String temp;
   temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
   
-  if ( topic == temp + "Neustart-ESP" && msg == "")   mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
   if ( topic == temp + "Neustart-ESP" && msg == "true" )
   {
     mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
     delay(3000);
     ESP.restart();
   }
-  if ( topic == temp + "Firmwareupdate" && msg == "")   mqtt_publish(temp + "Firmwareupdate", "false", "mqtt_mqtt_sub_read");
   if ( topic == temp + "Firmwareupdate" && msg == "true" )
   {
     delay(1000);

@@ -5,6 +5,7 @@ struct WEBSERVER
     String navigation;
     String wifi_ssid;
     boolean notbetrieb = false;
+    boolean sperre = false;
     boolean config = false;
     unsigned long timer = 0;
 };
