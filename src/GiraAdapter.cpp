@@ -27,12 +27,7 @@ void setup()
 
   if (digitalRead(input_reset) == 0)
   {
-    #ifdef DEBUG_SERIAL_OUTPUT
-      Serial.println("Config- Datein werden gelöscht : ");
-      Serial.print(safefile);
-      Serial.println("...");
-    #endif
-    SPIFFS.remove(safefile);
+    spiffs_format();
   }
   
   #ifdef DEBUG_SERIAL_OUTPUT
