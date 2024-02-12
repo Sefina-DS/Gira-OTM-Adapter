@@ -44,7 +44,8 @@ void setup()
   wlan_config();
   version_check();
 
-  if ( mqtt.aktiv )     { mqtt_setup(); }
+  if ( mqtt.aktiv )     mqtt_setup(); 
+  if ( sensors.bme )    bme_setup();
 
 
   //comserial.aktiv = true;
