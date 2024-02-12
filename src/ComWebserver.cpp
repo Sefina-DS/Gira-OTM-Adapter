@@ -139,7 +139,7 @@ void webserver_notbetrieb()
     #ifdef DEBUG_SERIAL_OUTPUT
       Serial.println("Client:" + request->client()->remoteIP().toString() + + " " + request->url());
     #endif
-    request->send_P(200, "text/html", notbetrieb_html, webserver_call); });
+    request->send_P(200, "text/html", notbetrieb_html, web_request); });
 
   webserver_config();
 }
@@ -147,7 +147,7 @@ void webserver_notbetrieb()
 void webserver_normalbetrieb()
 {
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-             { request->send(SPIFFS, "/config.html", String(), false, webserver_call); });
+             { request->send(SPIFFS, "/config.html", String(), false, web_request); });
   
 
   server->on("/config.css", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -156,7 +156,7 @@ void webserver_normalbetrieb()
   webserver_config();
 }
 
-String webserver_call(const String &var)
+String web_request(const String &var)
 {
   if ( webserver.sperre ) return String();
   #ifdef DEBUG_SERIAL_OUTPUT
@@ -212,13 +212,13 @@ String webserver_call(const String &var)
   return String();
 }
 
-void webserver_triger(String name, String msg)
+void web_response(String name, String msg)
 {
   web_response_sys(name,msg);
   webserver_triger_wifi(name, msg);
-  webserver_triger_mqtt(name, msg);
+  web_response_mqtt(name, msg);
   webserver_triger_detector(name, msg);
-  webserver_triger_sensor(name, msg);
+  web_response_sensor(name, msg);
 
   if        (name == "navigation")                                          webserver.navigation = msg;
   else if   (name == "config_save" && msg == "Änderungen übernehmen") {     spiffs_config_save();
@@ -288,7 +288,7 @@ void webserver_config()
                       Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
                     #endif
                 }
-                webserver_triger(id,msg);
+                web_response(id,msg);
 
                 #ifdef DEBUG_SERIAL_OUTPUT
                   Serial.print("MSG : ");
@@ -299,5 +299,5 @@ void webserver_config()
                   Serial.println(msg);
                 #endif
             }
-            request->send(SPIFFS, "/config.html", String(), false, webserver_call); });
+            request->send(SPIFFS, "/config.html", String(), false, web_request); });
 }

@@ -2,138 +2,139 @@
 
 MQTT mqtt;
 
-///         MQTT Nachrichten Empfangen
-void mqtt_read(char *topic, byte *message, unsigned int length)
+void mqtt_publish(String topic, String msg, String funktion)
 {
-  String messageTemp;
-  String topicTemp;
-
-  for (int i = 0; i < length; i++)
-  {
-    messageTemp += (char)message[i];
-  }
-
-  // Subscribe auswerten !
-  topicTemp = String(topic);
-
-  #ifdef DEBUG_SERIAL_OUTPUT
-  	Serial.print("Ankomende Nachricht / das Topic : ");
-    Serial.print(topicTemp);
-    Serial.print(" || die Message : ");
-    Serial.println(messageTemp);
-  #endif
-
-  // Subscriber übergeben
-  mqtt_mqtt_sub_read(topicTemp, messageTemp);
-  mqtt_detector_sub_read(topicTemp, messageTemp);
-
 }
 
-///         MQTT einrichten
-void mqtt_config()
-{
-  //    Serververbindungen
+void mqtt_incoming_msg(String topic, String msg){
+  if ( topic == mqtt.topic + "ESP/Neustart-ESP"         && msg == "true")     ESP.restart();
+  if ( topic == mqtt.topic + "ESP/Firmwareupdate"       && msg == "true")     firmwareupdate_http();
+  
+  
+}
+
+void mqtt_setup(){
   #ifdef DEBUG_SERIAL_OUTPUT
     Serial.print("MQTT Verbindung mit : ");
     Serial.print(mqtt.ip);
     Serial.print(" : ");
     Serial.println(mqtt.port);
   #endif
-  client.setServer(mqtt.ip.c_str(), mqtt.port.toInt());
-  client.setCallback(mqtt_read);
-  mqtt_connect();
+  IPAddress server_ip;
+  server_ip.fromString(mqtt.ip);
+  int server_port = mqtt.port.toInt();
+  client.setServer(server_ip, server_port);
+  client.setCallback(mqtt_callback);
+  mqtt.configured = true ;
 }
 
-///         MQTT verbinden
-void mqtt_connect()
-{
-  if (mqtt.topic_base == "")
-  {
-    mqtt.topic_base = "Rauchmelder";
-  }
-  if (mqtt.topic_define == "")
-  {
-    mqtt.topic_define = wifi.esp_name;
-  }
-  if (WiFi.isConnected() == true &&
-      !client.connected())
-
-  {
-    // timer_bluetooth = 0;
-    led_flash_timer(250, 150, 3);
-    #ifdef DEBUG_SERIAL_OUTPUT
-      Serial.print("MQTT verbinden");
-    #endif
-    String temp_topic = mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP/";
-    ///         Connect mit LastWill Message
-    if (client.connect(wifi.esp_name.c_str(), (temp_topic + "Online").c_str(), 1, true, "false"))
-    {
-      mqtt.false_number = 0;
-      mqtt.reconnect_counter ++;
-      ///         Online Status setzen
-      // timer_bluetooth = millis();
-      mqtt_publish(temp_topic + "Online", "true", "mqtt_connect");
-      mqtt_publish(temp_topic + "Firmwareupdate", "false", "mqtt_connect");
-      
-      mqtt_esp_status();
-      
+void mqtt_reconnect() {
+  static int fail_mqtt = 0;
+  if ( !client.connected() ) {
+    if ( millis() >= mqtt.timer ) {
       #ifdef DEBUG_SERIAL_OUTPUT
-        Serial.println(" / erfolgreich / mit Topic : " + mqtt.topic_base + "/" + mqtt.topic_define + "/");
-        Serial.println("");
+      Serial.print("Aufbauende MQTT verbindung ... ");
       #endif
-      
-      // Subscriben
-      mqtt_mqtt_sub_register();
-      mqtt_detector_sub_register();
-
-      //detector_mqtt_config();
-
-      
-    }
-    else
-    {
-      mqtt.false_number ++;
-      #ifdef DEBUG_SERIAL_OUTPUT
-        Serial.print(" / nicht erfolgreich / neuer Versuch in 5 Sekunden / False-Counter : ");
-        Serial.println(mqtt.false_number);
-      #endif
-      if (mqtt.false_number == 12)
-      {
-        ESP.restart();
+      const char* mqtt_client = wifi.esp_name.c_str();
+      mqtt.topic = mqtt.topic_base + "/" + mqtt.topic_define + "/";
+      String mqtt_topic_str = mqtt.topic + "ESP/Online" ;
+      const char* mqtt_topic = mqtt_topic_str.c_str();
+      int mqtt_qos = 1;
+      bool mqtt_retain = true;
+      const char* mqtt_msg = "false";
+      if (client.connect(mqtt_client, mqtt_topic, mqtt_qos, mqtt_retain, mqtt_msg)) {
+        #ifdef DEBUG_SERIAL_OUTPUT
+          Serial.println("connected (" + wifi.esp_name + ")" );
+        #endif
+        mqtt_publish("ESP/Online", "true");
+        mqtt_publish("ESP/Neustart-ESP", "false");
+        mqtt_publish("ESP/Firmwareupdate", "false");
+        mqtt_subscribe_list ();
+        mqtt.reconnect_counter ++;
+      } else {
+        #ifdef DEBUG_SERIAL_OUTPUT
+          Serial.print("failed, rc=");
+          Serial.print(client.state());
+          Serial.println(" try again in 5 seconds");
+        #endif
+        fail_mqtt ++;
+        mqtt.timer = millis() + 5000;
+        if ( fail_mqtt == 6 ) ESP.restart();
       }
     }
+  } else {
+    client.loop();
+    fail_mqtt = 0;
+    if ( millis() >= mqtt.timer_status ) {
+      StaticJsonDocument<1024> temp_json;
+      String temp_string;
+      temp_json["ESP-ID"]              = wifi.esp_id;
+      temp_json["Version-Alt"]         = system_funktion.version_old;
+      temp_json["updatebar"]           = system_funktion.new_version;
+      temp_json["ESP-Name"]            = wifi.esp_name;
+      temp_json["Mac-Adresse"]         = WiFi.macAddress();
+      temp_json["IP-Adresse"]          = WiFi.localIP().toString();
+      temp_json["Reconnect"]           = String(mqtt.reconnect_counter);
+      temp_json["Betriebsstunden"]     = String(((millis() / 1000) / 60) / 60);
+      serializeJson(temp_json, temp_string);
+      mqtt_publish("ESP/Status", temp_string);
+      mqtt.timer_status = millis() + 300000;
+    }
   }
 }
 
-void mqtt_publish(String topic, String msg, String funktion)
-{
-  if (!client.connected()) return;
-  int topic_size = topic.length();
-  int msg_size = msg.length();
-  /*char temp_topic[topic_size];
-  char temp_msg[msg_size];
-  topic.toCharArray(temp_topic, topic_size + 1);
-  msg.toCharArray(temp_msg, msg_size + 1);*/
+bool mqtt_publish (String topic, String msg){
+  if (!client.connected()) {
+    return false;
+  } else {
+    String temp_topic_str = mqtt.topic + topic;
+    const char* temp_topic =  temp_topic_str.c_str();
+    const char* temp_msg =  msg.c_str();
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.print("Mqtt-publish ... Topic : ");
+      Serial.print(temp_topic);
+      Serial.print(" ... Message : ");
+      Serial.println(temp_msg);
+    #endif
+    client.publish(temp_topic, temp_msg);
+    return true;
+  }
+}
 
-  const char* temp_topic =  topic.c_str();
-  const char* temp_msg =  msg.c_str();
-  
+void mqtt_subscribe_list (){
+  if (client.connected()) {
+    mqtt_subscribe("ESP/Neustart-ESP");
+    mqtt_subscribe("ESP/Firmwareupdate");
+  }
+}
+
+bool mqtt_subscribe (String topic){
+  if (client.connected()) {
+    String temp_topic = mqtt.topic + topic;
+    client.subscribe(temp_topic.c_str());
+    #ifdef DEBUG_SERIAL_OUTPUT
+      Serial.print("Mqtt-subscribe ... Topic : ");
+      Serial.println(temp_topic);
+    #endif
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
+  String temp_topic = topic ;
+  String temp_msg;
+  for (int i = 0; i < length; i++) {
+    temp_msg += (char)payload[i];
+  }
   #ifdef DEBUG_SERIAL_OUTPUT
-    Serial.print("MQTT Send - Funktion : ");
-    Serial.print(funktion);
-    Serial.print(" || Topic (");
-    Serial.print(topic_size);
-    Serial.print(") : ");
-    Serial.print(temp_topic);
-    Serial.print(" / ");
-    Serial.print(topic);
-    Serial.print(" || Msg (");
-    Serial.print(msg_size);
-    Serial.print(") : ");
-    Serial.println(temp_msg);
+      Serial.print("Mqtt-incoming ... Topic : ");
+      Serial.print(temp_topic);
+      Serial.print(" ... Message : ");
+      Serial.println(temp_msg);
   #endif
-
-  client.publish(temp_topic, temp_msg);
+  mqtt_incoming_msg(temp_topic, temp_msg);
 }
 
 String web_request_mqtt(const String &var) {
@@ -150,7 +151,7 @@ String web_request_mqtt(const String &var) {
     return String();
 }
 
-void webserver_triger_mqtt(String name, String msg)
+void web_response_mqtt(String name, String msg)
 {
   if (name == "mqtt" && msg == "aktiviert")     mqtt.aktiv = true;
   if (name == "mqtt" && msg == "deaktiviert")   mqtt.aktiv = false;
@@ -185,53 +186,4 @@ StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
     doc["mqtt_topic_define"] = mqtt.topic_define;
 
     return doc;
-}
-
-void mqtt_mqtt_sub_register()
-{
-  String temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
-  client.subscribe((temp + "Neustart-ESP").c_str());
-  mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
-  client.subscribe((temp + "Firmwareupdate").c_str());
-  mqtt_publish(temp + "Firmwareupdate", "false", "mqtt_mqtt_sub_read");
-
-}
-
-void mqtt_mqtt_sub_read(String topic, String msg)
-{
-  String temp;
-  temp = mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/";
-  
-  if ( topic == temp + "Neustart-ESP" && msg == "true" )
-  {
-    mqtt_publish(temp + "Neustart-ESP", "false", "mqtt_mqtt_sub_read");
-    delay(3000);
-    ESP.restart();
-  }
-  if ( topic == temp + "Firmwareupdate" && msg == "true" )
-  {
-    delay(1000);
-    firmwareupdate_http();
-  }
-
-}
-
-void mqtt_esp_status()
-{
-  StaticJsonDocument<1024> temp_json;
-  String temp_string;
-  
-  temp_json["ESP-ID"]              = wifi.esp_name;
-  temp_json["Version-Alt"]         = system_funktion.version_old;
-  temp_json["updatebar"]           = system_funktion.new_version;
-  temp_json["ESP-ID"]              = wifi.esp_name;
-  temp_json["Mac-Adresse"]         = WiFi.macAddress();
-  temp_json["IP-Adresse"]          = WiFi.localIP().toString();
-  temp_json["Reconnect"]           = String(mqtt.reconnect_counter);
-  temp_json["Betriebsstunden"]     = String(((millis() / 1000) / 60) / 60);
-
-  serializeJson(temp_json, temp_string);
-  mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/" + "ESP" + "/" + "Status", temp_string, "mqtt_esp_status");
-
-  mqtt.timer = millis() + 300000 ;
 }

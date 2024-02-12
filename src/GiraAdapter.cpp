@@ -44,7 +44,7 @@ void setup()
   wlan_config();
   version_check();
 
-  if ( mqtt.aktiv )     { mqtt_config(); }
+  if ( mqtt.aktiv )     { mqtt_setup(); }
 
 
   //comserial.aktiv = true;
@@ -75,10 +75,16 @@ void setup()
 void loop()
 {
   if ( !WiFi.isConnected() && !AP_Mode )                              wlan_connect(); 
+  if ( mqtt.configured ) mqtt_reconnect() ;
+  sensor_data();
+  
+  
+  /*
+  
   if ( WiFi.isConnected() && mqtt.aktiv && !client.connected() )      mqtt_connect(); 
   if ( client.connected() && mqtt.aktiv )                             client.loop();
   
-  /*
+  
   serial_status();
   if ( client.connected() && detectordiag.timer <= millis() && comserial.gestartet == true ) detector_serial_timer(); 
   if ( client.connected() && mqtt.timer <= millis() ) mqtt_esp_status();

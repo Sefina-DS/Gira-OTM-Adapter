@@ -6,7 +6,6 @@ void system_timer()
 {
     system_funktion.timer = millis() + 10000 ;
 
-    if ( WiFi.isConnected() && mqtt.aktiv && !client.connected() ) mqtt_connect();
     if (!WiFi.isConnected() && !AP_Mode ) wlan_connect();
         
     led_flash_timer(100 ,0 ,1);

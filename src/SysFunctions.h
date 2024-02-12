@@ -3,7 +3,7 @@
 struct SYSTEM_FUNKTION
 {
     unsigned long timer = 0;
-    String version_old = "beta-20240209C";
+    String version_old = "beta-20240212";
     String github_path = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/Firmwareupdate";
     String version_new ;
     String fw_art ;

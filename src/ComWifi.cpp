@@ -5,6 +5,7 @@ boolean AP_Mode = false;
 
 void wlan_connect()
 {
+    static int fail_wifi = 0;
     WiFi.setHostname(wifi.esp_name.c_str());
     WiFi.begin(wifi.ssid.c_str(), wifi.pw.c_str());
 
@@ -23,6 +24,7 @@ void wlan_connect()
                 Serial.println(WiFi.localIP());
                 Serial.println();
             #endif
+            fail_wifi = 0;
             server->begin();
             delay(2000);
             return;
@@ -32,7 +34,9 @@ void wlan_connect()
             #ifdef DEBUG_SERIAL_OUTPUT
                 Serial.print(".");
             #endif
+            fail_wifi ++;
             led_flash_timer(500, 500, 1);
+            if ( fail_wifi == 15 ) ESP.restart();
         }
     }
     #ifdef DEBUG_SERIAL_OUTPUT
@@ -206,17 +210,13 @@ void load_conf_wifi(StaticJsonDocument<1024> doc)
     wifi.subnet = doc["wifi_subnet"] | "0.0.0.0";
     wifi.dns = doc["wifi_dns"] | "0.0.0.0";
 
-    if (wifi.esp_name == "")
-    {
-        uint32_t chipId = 0;
+    uint32_t chipId = 0;
         for (int i = 0; i < 17; i = i + 8)
         {
             chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
         }
-        wifi.esp_name = chipId;
-        wifi.esp_name = "ESP-" + wifi.esp_name;
-        
-    }
+    if (wifi.esp_name == "") wifi.esp_name = "ESP-" + chipId;
+    wifi.esp_id = chipId;
 }
 
 StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)

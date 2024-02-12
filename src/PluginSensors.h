@@ -24,6 +24,10 @@ struct SENSOR
 };
 extern SENSOR sensor;
 
+void sensor_data();
+String data_ubext();
+String data_light();
+
 void bme_config();
 void bme_refresh();
 void air_quality(StaticJsonDocument<1024> temp_json);
@@ -31,7 +35,7 @@ void light_refresh(StaticJsonDocument<1024> temp_json);
 void ubext_refresh(StaticJsonDocument<1024> temp_json);
 
 String web_request_sensor(const String &var);
-void webserver_triger_sensor(String name, String msg);
+void web_response_sensor(String name, String msg);
 
 void load_conf_sensor(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_sensor(StaticJsonDocument<1024> doc);

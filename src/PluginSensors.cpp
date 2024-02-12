@@ -11,6 +11,14 @@ float gas_reference = 250000;
 float hum_reference = 40;
 int   getgasreference_count = 0;
 
+void sensor_data(){
+    if ( millis() <= sensor.timer ) return;
+    sensor.timer = millis() + 10000;
+    if ( sensor.ubext ) mqtt_publish("Erweiterungen/UB-Ext", data_ubext());
+    if ( sensor.light ) mqtt_publish("Erweiterungen/Light", data_light());
+}
+
+
 void bme_config()
 {
     if ( sensor.bme == "BME - 680" && !bme680.begin()) 
@@ -113,6 +121,26 @@ void light_refresh(StaticJsonDocument<1024> temp_json)
     ubext_refresh(temp_json);
 }
 
+String data_light(){
+    StaticJsonDocument<1024> temp_json;
+    String temp_string;
+    static int temp_light = 0;
+    int input_light_reading = analogRead(input_light);
+
+    // Berechnung der Differenz zwischen aktuellen und vorherigen Lichtwerten
+    int light_difference = abs(input_light_reading - temp_light);
+
+    // Aktualisierung des vorherigen Lichtwerts
+    temp_light = input_light_reading;
+
+    // Formatieren der Lichtwerte für die Ausgabe
+    temp_json["Lichtzahl"] = String(input_light_reading);
+    temp_json["Lichtwert"] = String(map(input_light_reading, 0, 4095, 100, 0));
+
+    serializeJson(temp_json, temp_string);
+    return temp_string;
+}
+
 void ubext_refresh(StaticJsonDocument<1024> temp_json)
 {
     if (sensor.ubext)
@@ -127,6 +155,18 @@ void ubext_refresh(StaticJsonDocument<1024> temp_json)
 
     sensor_mqtt_send(temp_json);
 
+}
+String data_ubext(){
+    StaticJsonDocument<1024> temp_json;
+    String temp_string;
+    int R1 = 10490;
+    int R2 = 2140;
+    int faktor = 1026;
+    float temp_roh = analogRead(input_ubext);
+    float temp_ubext = ((temp_roh * 100000) / faktor) / ((100000 * R2) / (R1 + R2));
+    temp_json["UB-Ext"]  =   String(temp_ubext);
+    serializeJson(temp_json, temp_string);
+    return temp_string;
 }
 
 String web_request_sensor(const String &var) {
@@ -158,27 +198,30 @@ String web_request_sensor(const String &var) {
     return String();
 }
 
-void webserver_triger_sensor(String name, String msg)
-{
-    if (name == "bme" && msg != "")     sensor.bme = msg;
-    if (name == "bme-temperature"   && msg == "aktiviert")      sensor.bme_temperature = true;
-    if (name == "bme-temperature"   && msg == "deaktiviert")    sensor.bme_temperature = false;
-    if (name == "bme-humidity"   && msg == "aktiviert")      sensor.bme_humidity = true;
-    if (name == "bme-humidity"   && msg == "deaktiviert")    sensor.bme_humidity = false;
-    if (name == "bme-pressure"   && msg == "aktiviert")      sensor.bme_pressure = true;
-    if (name == "bme-pressure"   && msg == "deaktiviert")    sensor.bme_pressure = false;
-    if (name == "bme-high"   && msg == "aktiviert")      sensor.bme_high = true;
-    if (name == "bme-high"   && msg == "deaktiviert")    sensor.bme_high = false;
-    if (name == "bme-gas-ohm"   && msg == "aktiviert")      sensor.bme_gas_ohm = true;
-    if (name == "bme-gas-ohm"   && msg == "deaktiviert")    sensor.bme_gas_ohm = false;
-    if (name == "bme-gas-score"   && msg == "aktiviert")      sensor.bme_gas_score = true;
-    if (name == "bme-gas-score"   && msg == "deaktiviert")    sensor.bme_gas_score = false;
-    if (name == "bme-gas-text"   && msg == "aktiviert")      sensor.bme_gas_text = true;
-    if (name == "bme-gas-text"   && msg == "deaktiviert")    sensor.bme_gas_text = false;
-    if (name == "light"   && msg == "aktiviert")      sensor.light = true;
-    if (name == "light"   && msg == "deaktiviert")    sensor.light = false;
-    if (name == "ubext"   && msg == "aktiviert")      sensor.ubext = true;
-    if (name == "ubext"   && msg == "deaktiviert")    sensor.ubext = false;
+void web_response_sensor(String name, String msg) {
+    if          (msg == "aktiviert") {
+        if      (name == "bme")                 sensor.bme = msg;
+        else if (name == "bme-temperature")     sensor.bme_temperature = true;
+        else if (name == "bme-humidity")        sensor.bme_humidity = true;
+        else if (name == "bme-pressure")        sensor.bme_pressure = true;
+        else if (name == "bme-high")            sensor.bme_high = true;
+        else if (name == "bme-gas-ohm")         sensor.bme_gas_ohm = true;
+        else if (name == "bme-gas-score")       sensor.bme_gas_score = true;
+        else if (name == "bme-gas-text")        sensor.bme_gas_text = true;
+        else if (name == "light")               sensor.light = true;
+        else if (name == "ubext")               sensor.ubext = true;
+    } else if   (msg == "deaktiviert") {
+        if      (name == "bme")                 sensor.bme = msg;
+        else if (name == "bme-temperature")     sensor.bme_temperature = false;
+        else if (name == "bme-humidity")        sensor.bme_humidity = false;
+        else if (name == "bme-pressure")        sensor.bme_pressure = false;
+        else if (name == "bme-high")            sensor.bme_high = false;
+        else if (name == "bme-gas-ohm")         sensor.bme_gas_ohm = false;
+        else if (name == "bme-gas-score")       sensor.bme_gas_score = false;
+        else if (name == "bme-gas-text")        sensor.bme_gas_text = false;
+        else if (name == "light")               sensor.light = false;
+        else if (name == "ubext")               sensor.ubext = false;
+    }
 }
 
 void load_conf_sensor(StaticJsonDocument<1024> doc)

@@ -3,6 +3,7 @@
 struct WIFI
 {
     String esp_name;
+    String esp_id;
     String ssid;
     String pw;
     boolean dhcp;

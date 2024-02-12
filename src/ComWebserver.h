@@ -24,7 +24,7 @@ String listFiles(bool ishtml);
 void webserver_notbetrieb();
 void webserver_normalbetrieb();
 
-String webserver_call(const String &var);
-void webserver_triger(String name, String msg);
+String web_request(const String &var);
+void web_response(String name, String msg);
 
 void webserver_config();
