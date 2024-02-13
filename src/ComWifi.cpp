@@ -215,8 +215,10 @@ void load_conf_wifi(StaticJsonDocument<1024> doc)
         {
             chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
         }
-    if (wifi.esp_name == "") wifi.esp_name = "ESP-" + chipId;
-    wifi.esp_id = chipId;
+    String temp = String(chipId);
+    
+    if (wifi.esp_name == "") wifi.esp_name = "ESP-" + temp;
+    wifi.esp_id = temp;
 }
 
 StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)

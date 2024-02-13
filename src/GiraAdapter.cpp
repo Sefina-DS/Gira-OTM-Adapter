@@ -23,29 +23,22 @@ void setup()
   led_flash_timer(5000, 0, 1);
 
   spiffs_starten();
-  spiffs_scan();
-  spiffs_config_read();
-
-  if (digitalRead(input_reset) == 0)
-  {
-    spiffs_format();
-  }
   
-  #ifdef DEBUG_SERIAL_OUTPUT
-    Serial.println();
-    Serial.print(wifi.esp_name);
-    Serial.println(" wird gestartet");
-    Serial.println();
-  #endif
+  if (digitalRead(input_reset) == 0) {
+    spiffs_format();
+  } else {
+    spiffs_scan();
+    spiffs_config_read();
+    spiffs_config_load();
 
-  //SPIFFS.remove("/config.html");
+    webserver_art();
+    wlan_config();
+    version_check();
 
-  webserver_art();
-  wlan_config();
-  version_check();
+    if ( mqtt.aktiv )     mqtt_setup(); 
+    if ( sensors.bme )    bme_setup();
+  }
 
-  if ( mqtt.aktiv )     mqtt_setup(); 
-  if ( sensors.bme )    bme_setup();
 
 
   //comserial.aktiv = true;
@@ -75,8 +68,9 @@ void setup()
 
 void loop()
 {
-  if ( !WiFi.isConnected() && !AP_Mode )                              wlan_connect(); 
-  if ( mqtt.configured ) mqtt_reconnect() ;
+  
+  if ( !WiFi.isConnected() && !AP_Mode )    wlan_connect(); 
+  if ( mqtt.configured )                    mqtt_reconnect() ;
   sensor_data();
   
   
