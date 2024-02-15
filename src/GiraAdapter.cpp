@@ -7,7 +7,7 @@ HTTPClient http;
 
 void setup()
 {
-  #ifdef DEBUG_SERIAL_OUTPUT  
+  #ifdef DEBUG_SERIAL_START  
     Serial.begin(115200);
     Serial.println("Serial, Debug gestartet ...");
   #endif
@@ -39,21 +39,8 @@ void setup()
     if ( sensors.bme )    bme_setup();
   }
 
+  serial_setup();
 
-
-  //comserial.aktiv = true;
-
-  /*
-  if (comserial.aktiv == true)
-  {
-    digitalWrite(output_comport_activ, LOW);
-    Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-  }
-  if ( mqtt.aktiv ) { mqtt_config(); }
-
-  bme_config();
-
-  */
   if ( webserver.notbetrieb && WiFi.isConnected() == true )
   {
     #ifdef DEBUG_SERIAL_OUTPUT
@@ -72,6 +59,10 @@ void loop()
   if ( !WiFi.isConnected() && !AP_Mode )    wlan_connect(); 
   if ( mqtt.configured )                    mqtt_reconnect() ;
   sensor_data();
+
+  if ( comserial.aktiv ) serial_receive();
+  if ( comserial.aktiv ) serial_transceive_diagnose();
+
   
   
   /*

@@ -105,7 +105,7 @@ void webserver_triger_detector(String name, String msg)
     if (name == "detector_group" && msg != "")          detector.group = msg.toInt();
     if (name == "detector_alarm_group" && msg != "")    alarm_group_diagnose(msg);
 }
-
+/*
 void mqtt_detector_sub_register()
 {
     String local_topic_detector = mqtt.topic_base + "/" + mqtt.topic_define + "/Melder-Steuern/" ;
@@ -149,11 +149,11 @@ void mqtt_detector_sub_read(String topic, String msg)
         {
             if (msg_bool == true)
             {
-                serial_send("070020", 1); // Melder- Finden An
+                //serial_send("070020", 1); // Melder- Finden An
             }
             else
             {
-                serial_send("070040", 1); // Melder- Finden Aus
+                //serial_send("070040", 1); // Melder- Finden Aus
             }
         }
     }
@@ -166,11 +166,11 @@ void mqtt_detector_sub_read(String topic, String msg)
         {
             if (msg_bool == true)
             {
-                serial_send("030080", 1); // Test- Alarm
+                //serial_send("030080", 1); // Test- Alarm
             }
             else
             {
-                serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
+                //serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
             }
         }
     }
@@ -183,7 +183,7 @@ void mqtt_detector_sub_read(String topic, String msg)
         {
             if (msg_bool == true)
             {
-                serial_send("030000", 1); // Test- Alarm- Reset
+                //serial_send("030000", 1); // Test- Alarm- Reset
                 mqtt_publish(local_topic_detector + "Reset_Test|Funk_Alarme", "false", "mqtt_detector_sub_read");
             }
         }
@@ -198,7 +198,7 @@ void mqtt_detector_sub_read(String topic, String msg)
     {
         if (comserial.com_status == 0 && msg != "" )
         {
-            serial_send(msg, 1); // Testnachricht (Als String)
+            //serial_send(msg, 1); // Testnachricht (Als String)
             //mqtt_publish(local_topic_detector + "Seriele_Nachricht", "", "mqtt_detector_sub_read");
         }
         else
@@ -215,7 +215,7 @@ void mqtt_detector_sub_read(String topic, String msg)
         {
             if (msg_bool == true)
             {
-                serial_send("030210", 1); // Alarm Funk
+                //serial_send("030210", 1); // Alarm Funk
             }
         }
     }
@@ -234,12 +234,12 @@ void mqtt_detector_sub_read(String topic, String msg)
                     if (comserial.timer_alarm < millis())
                     {
                         comserial.timer_alarm = millis() + 300000;
-                        serial_send("030210", 1); // Alarm Funk
+                        //serial_send("030210", 1); // Alarm Funk
                     }
                 }
                 else
                 {
-                    serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
+                    //serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
                 }
             }
         }
@@ -251,14 +251,34 @@ void mqtt_detector_sub_read(String topic, String msg)
             {
                 if (msg_bool == true)
                 {
-                    serial_send("030080", 1); // Test- Alarm
+                    //serial_send("030080", 1); // Test- Alarm
                 }
                 else
                 {
-                    serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
+                    //serial_send("030200", 1); // Reset Funk-Alarm + Test-Alarm
                 }
             }
         }
     }
     
+}
+*/
+void mqtt_subscribe_detector() {
+    mqtt_publish("Detector-Steuerung/Melder_Finden","false");
+    mqtt_subscribe("Detector-Steuerung/Melder_Finden");
+    mqtt_publish("Detector-Steuerung/Serial_Send","frei");
+    mqtt_subscribe("Detector-Steuerung/Serial_Send");
+}
+
+void mqtt_incoming_msg_detector(String topic, String msg){
+  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"  && msg == "true")      serial_transceive( "070020" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"  && msg == "false")     serial_transceive( "070040" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Serial_Send"  && msg != "frei" ) {          
+        serial_transceive( msg );
+        mqtt_publish("Detector-Steuerung/Serial_Send", "frei");
+  }
+  
+  
+  
+  
 }

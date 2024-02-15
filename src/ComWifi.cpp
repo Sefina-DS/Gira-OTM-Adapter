@@ -9,7 +9,7 @@ void wlan_connect()
     WiFi.setHostname(wifi.esp_name.c_str());
     WiFi.begin(wifi.ssid.c_str(), wifi.pw.c_str());
 
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WIFI
         Serial.print("Wifi - Verbinden - start : ");
     #endif
 
@@ -17,7 +17,7 @@ void wlan_connect()
     {
         if (WiFi.isConnected())
         {
-            #ifdef DEBUG_SERIAL_OUTPUT
+            #ifdef DEBUG_SERIAL_WIFI
                 Serial.println(" / erfolgreich ");
                 Serial.println("die Mac ist : " + WiFi.macAddress());
                 Serial.print("die IP Adresse ist : ");
@@ -31,7 +31,7 @@ void wlan_connect()
         }
         else
         {
-            #ifdef DEBUG_SERIAL_OUTPUT
+            #ifdef DEBUG_SERIAL_WIFI
                 Serial.print(".");
             #endif
             fail_wifi ++;
@@ -39,7 +39,7 @@ void wlan_connect()
             if ( fail_wifi == 15 ) ESP.restart();
         }
     }
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WIFI
         Serial.println(" / fehlgeschlagen ");
     #endif
 }
@@ -64,7 +64,7 @@ void wlan_config()
             IPAddress temp_subnet = ipwandeln(wifi.subnet);
             IPAddress temp_dns = ipwandeln(wifi.dns);
             
-            #ifdef DEBUG_SERIAL_OUTPUT
+            #ifdef DEBUG_SERIAL_WIFI
                 Serial.println("Es wird mit Statischer IP verbunden");
             #endif
             WiFi.mode(WIFI_STA);
@@ -75,7 +75,7 @@ void wlan_config()
         else
         {
             // dynamisch oder kein Typ gewählt
-            #ifdef DEBUG_SERIAL_OUTPUT
+            #ifdef DEBUG_SERIAL_WIFI
                 Serial.println("Es wird mit DHCP verbunden");
             #endif
             WiFi.mode(WIFI_STA);
@@ -87,7 +87,7 @@ void wlan_config()
     else
     {
         AP_Mode = true;
-        #ifdef DEBUG_SERIAL_OUTPUT
+        #ifdef DEBUG_SERIAL_WIFI
             Serial.println("Acces- Modus wird gestartet");
         #endif
         IPAddress IP = IPAddress(10, 50, 0, 1);
@@ -100,7 +100,7 @@ void wlan_config()
         WiFi.softAPConfig(IP, gateway, NMask);
         delay(1000);
         IPAddress myIP = WiFi.softAPIP();
-        #ifdef DEBUG_SERIAL_OUTPUT
+        #ifdef DEBUG_SERIAL_WIFI
             Serial.println();
             Serial.print("AP IP address: ");
             Serial.println(myIP);
@@ -198,7 +198,7 @@ void webserver_triger_wifi(String name, String msg)
 
 void load_conf_wifi(StaticJsonDocument<1024> doc)
 {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WIFI
         Serial.println("... WiFi- Variablen ...");
     #endif
     wifi.esp_name = doc["esp_name"] | "";
@@ -223,7 +223,7 @@ void load_conf_wifi(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)
 {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WIFI
         Serial.println("... WiFi- Variablen ...");
     #endif
     doc["esp_name"] = wifi.esp_name;

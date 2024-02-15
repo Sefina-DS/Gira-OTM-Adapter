@@ -7,14 +7,14 @@ void webserver_art()
   server = new AsyncWebServer(80);
   if (SPIFFS.exists("/config.html"))
   {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("config.html ist vorhanden = Normalbetrieb");
     #endif
     webserver_normalbetrieb();
   }
   else
   {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("config.html ist nicht vorhanden = Notbetrieb");
     #endif
     webserver.notbetrieb=true;
@@ -54,7 +54,7 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
-  #ifdef DEBUG_SERIAL_OUTPUT
+  #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
   #endif
 
@@ -62,7 +62,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
   {
     // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open("/" + filename, "w");
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Start: " + String(filename));
     #endif
   }
@@ -71,7 +71,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
   {
     // stream the incoming chunk to the opened file
     request->_tempFile.write(data, len);
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len));
     #endif
   }
@@ -80,7 +80,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
   {
     // close the file handle as the upload is now done
     request->_tempFile.close();
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Complete: " + String(filename) + ",size: " + String(index + len));
     #endif
     request->redirect("/");
@@ -102,7 +102,7 @@ String humanReadableSize(const size_t bytes)
 String listFiles(bool ishtml)
 {
   String returnText = "";
-  #ifdef DEBUG_SERIAL_OUTPUT
+  #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Listing files stored on SPIFFS");
   #endif
   File root = SPIFFS.open("/");
@@ -136,7 +136,7 @@ void webserver_notbetrieb()
 {
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
              {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Client:" + request->client()->remoteIP().toString() + + " " + request->url());
     #endif
     request->send_P(200, "text/html", notbetrieb_html, web_request); });
@@ -159,7 +159,7 @@ void webserver_normalbetrieb()
 String web_request(const String &var)
 {
   if ( webserver.sperre ) return String();
-  #ifdef DEBUG_SERIAL_OUTPUT
+  #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.print("Web-Server call mit : ");
     Serial.println(var);
   #endif
@@ -228,7 +228,7 @@ void web_response(String name, String msg)
   if (name == "reset_config") {
     if (msg == "Werkseinstellungen laden !") {
       SPIFFS.remove(safefile);
-      #ifdef DEBUG_SERIAL_OUTPUT
+      #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Savefile wurde gelöscht !");
         Serial.println();
         Serial.println("ESP wird in 6 Sekunden neugestartet !");
@@ -266,7 +266,7 @@ void webserver_config()
                     art = "File";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_OUTPUT
+                    #ifdef DEBUG_SERIAL_WEBSERVER
                       Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
                     #endif
                 }
@@ -275,7 +275,7 @@ void webserver_config()
                     art = "Post";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_OUTPUT
+                    #ifdef DEBUG_SERIAL_WEBSERVER
                       Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
                     #endif
                 }
@@ -284,13 +284,13 @@ void webserver_config()
                     art = "Get";
                     id = p->name().c_str();
                     msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_OUTPUT
+                    #ifdef DEBUG_SERIAL_WEBSERVER
                       Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
                     #endif
                 }
                 web_response(id,msg);
 
-                #ifdef DEBUG_SERIAL_OUTPUT
+                #ifdef DEBUG_SERIAL_WEBSERVER
                   Serial.print("MSG : ");
                   Serial.print(art);
                   Serial.print(" | ");

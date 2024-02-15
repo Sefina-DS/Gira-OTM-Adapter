@@ -14,7 +14,7 @@ void mqtt_incoming_msg(String topic, String msg){
 }
 
 void mqtt_setup(){
-  #ifdef DEBUG_SERIAL_OUTPUT
+  #ifdef DEBUG_SERIAL_MQTT
     Serial.print("MQTT Verbindung mit : ");
     Serial.print(mqtt.ip);
     Serial.print(" : ");
@@ -32,7 +32,7 @@ void mqtt_reconnect() {
   static int fail_mqtt = 0;
   if ( !client.connected() ) {
     if ( millis() >= mqtt.timer ) {
-      #ifdef DEBUG_SERIAL_OUTPUT
+      #ifdef DEBUG_SERIAL_MQTT
       Serial.print("Aufbauende MQTT verbindung ... ");
       #endif
       const char* mqtt_client = wifi.esp_name.c_str();
@@ -43,7 +43,7 @@ void mqtt_reconnect() {
       bool mqtt_retain = true;
       const char* mqtt_msg = "false";
       if (client.connect(mqtt_client, mqtt_topic, mqtt_qos, mqtt_retain, mqtt_msg)) {
-        #ifdef DEBUG_SERIAL_OUTPUT
+        #ifdef DEBUG_SERIAL_MQTT
           Serial.println("connected (" + wifi.esp_name + ")" );
         #endif
         mqtt_publish("ESP/Online", "true");
@@ -52,7 +52,7 @@ void mqtt_reconnect() {
         mqtt_subscribe_list ();
         mqtt.reconnect_counter ++;
       } else {
-        #ifdef DEBUG_SERIAL_OUTPUT
+        #ifdef DEBUG_SERIAL_MQTT
           Serial.print("failed, rc=");
           Serial.print(client.state());
           Serial.println(" try again in 5 seconds");
@@ -90,7 +90,7 @@ bool mqtt_publish (String topic, String msg){
     String temp_topic_str = mqtt.topic + topic;
     const char* temp_topic =  temp_topic_str.c_str();
     const char* temp_msg =  msg.c_str();
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_MQTT
       Serial.print("Mqtt-publish ... Topic : ");
       Serial.print(temp_topic);
       Serial.print(" ... Message : ");
@@ -105,6 +105,8 @@ void mqtt_subscribe_list (){
   if (client.connected()) {
     mqtt_subscribe("ESP/Neustart-ESP");
     mqtt_subscribe("ESP/Firmwareupdate");
+
+    if ( comserial.aktiv ) mqtt_subscribe_detector();
   }
 }
 
@@ -112,7 +114,7 @@ bool mqtt_subscribe (String topic){
   if (client.connected()) {
     String temp_topic = mqtt.topic + topic;
     client.subscribe(temp_topic.c_str());
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_MQTT
       Serial.print("Mqtt-subscribe ... Topic : ");
       Serial.println(temp_topic);
     #endif
@@ -128,24 +130,25 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     temp_msg += (char)payload[i];
   }
-  #ifdef DEBUG_SERIAL_OUTPUT
+  #ifdef DEBUG_SERIAL_MQTT
       Serial.print("Mqtt-incoming ... Topic : ");
       Serial.print(temp_topic);
       Serial.print(" ... Message : ");
       Serial.println(temp_msg);
   #endif
   mqtt_incoming_msg(temp_topic, temp_msg);
+  if (comserial.aktiv) mqtt_incoming_msg_detector(temp_topic, temp_msg);
 }
 
 String web_request_mqtt(const String &var) {
     if        ( var == "ph_mqtt_aktivdisplay" )     { return ( !mqtt.aktiv )    ? "display: none; "
                                                                                 : "";
-    } else if ( var == "ph_mqtt_aktiv")            { return ( mqtt.aktiv )      ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+    } else if   ( var == "ph_mqtt_aktiv")            { return ( mqtt.aktiv )      ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
                                                                                 : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if ( var == "ph_mqtt_ip")                { return  mqtt.ip;
-    } else if ( var == "ph_mqtt_port")              { return  mqtt.port;
-    } else if ( var == "ph_mqtt_base")              { return  mqtt.topic_base;
-    } else if ( var == "ph_mqtt_define")            { return  mqtt.topic_define;
+    } else if   ( var == "ph_mqtt_ip")                { return  mqtt.ip;
+    } else if   ( var == "ph_mqtt_port")              { return  mqtt.port;
+    } else if   ( var == "ph_mqtt_base")              { return  mqtt.topic_base;
+    } else if   ( var == "ph_mqtt_define")            { return  mqtt.topic_define;
     }
 
     return String();
@@ -164,7 +167,7 @@ void web_response_mqtt(String name, String msg)
 
 void load_conf_mqtt(StaticJsonDocument<1024> doc)
 {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_MQTT
       Serial.println("... MQTT- Variablen ...");
     #endif
     mqtt.aktiv = doc["mqtt"] | false;
@@ -176,7 +179,7 @@ void load_conf_mqtt(StaticJsonDocument<1024> doc)
 
 StaticJsonDocument<1024> safe_conf_mqtt(StaticJsonDocument<1024> doc)
 {
-    #ifdef DEBUG_SERIAL_OUTPUT
+    #ifdef DEBUG_SERIAL_MQTT
       Serial.println("... MQTT- Variablen ...");
     #endif
     doc["mqtt"] = mqtt.aktiv;

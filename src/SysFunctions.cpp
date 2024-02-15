@@ -19,7 +19,7 @@ void version_check()
             Serial.println("Version- Update wird geprüfft ... ");
         #endif
         HTTPClient http;
-        http.begin( firmware_path() + "firmware/version.txt" );
+        http.begin( "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + + "firmware/version.txt" );
         int httpCode = http.GET();
         if(httpCode > 0) 
         {
@@ -136,7 +136,6 @@ void firmwareupdate_http() {
     }
 }
 
-
 void led_flash_timer(int timer_on,int timer_off, int number)
 {
     for (int i = 0; i < number; i++)
@@ -148,24 +147,6 @@ void led_flash_timer(int timer_on,int timer_off, int number)
         digitalWrite(output_led_esp, LOW);
         delay(timer_off);
     }
-}
-
-void speicher_diagnose()
-{
-    StaticJsonDocument<1024> temp_json;
-    String temp_string;
-  
-    temp_json["getHeapSize"]        = ESP.getHeapSize();
-    temp_json["getPsramSize"]       = ESP.getPsramSize();
-    temp_json["getFreeHeap"]        = ESP.getFreeHeap();
-    temp_json["getFreePsram"]       = ESP.getFreePsram();
-    temp_json["getMinFreeHeap"]     = ESP.getMinFreeHeap();
-    temp_json["getMinFreePsram"]    = ESP.getMinFreePsram();
-    temp_json["getMaxAllocHeap"]    = ESP.getMaxAllocHeap();
-    temp_json["getMaxAllocPsram"]   = ESP.getMaxAllocPsram();
-
-    serializeJson(temp_json, temp_string);
-    mqtt_publish(mqtt.topic_base + "/" + mqtt.topic_define + "/ESP/-Speicher-Status-", temp_string, "mqtt_esp_status");
 }
 
 void load_conf_sys(StaticJsonDocument<1024> doc)
@@ -186,16 +167,6 @@ StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
     return doc;
 }
 
-const String& firmware_path() {
-    static String temp;
-    temp = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/";
-    temp += system_funktion.fw_art;
-    temp += "/";
-    #ifdef DEBUG_SERIAL_OUTPUT
-        Serial.println(temp);
-    #endif
-    return temp;
-}
 
 String web_request_sys(const String &var) {
     if          (var == "ph_sys_fwtyp") {

@@ -2,8 +2,9 @@
 
 struct DETECTORDIAG
 {
-    unsigned long timer = 0;
+    unsigned long timer = 10000;
     int status = 0;
+    int counter = 0;
     String nr_talarm_k; // Anzahl - Test - Alarm - Kabel / Funk / Lokal
     String nr_talarm_f;
     String nr_talarm_l;
@@ -22,7 +23,5 @@ struct DETECTORDIAG
 };
 extern DETECTORDIAG detectordiag;
 
-void filter(byte msg[10], int size);
-void mqtt_link(String topic, String msg);
-
-void detector_serial_timer();
+void serial_transceive_diagnose();
+void serial_receive_diagnose(String msg);
