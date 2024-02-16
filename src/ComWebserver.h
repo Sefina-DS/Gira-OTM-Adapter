@@ -4,10 +4,10 @@ struct WEBSERVER
 {
     String navigation;
     String wifi_ssid;
-    boolean notbetrieb = false;
     boolean sperre = false;
     boolean config = false;
     unsigned long timer = 0;
+    bool notbetrieb = true;
 };
 extern WEBSERVER webserver;
 
@@ -28,3 +28,7 @@ String web_request(const String &var);
 void web_response(String name, String msg);
 
 void webserver_config();
+
+
+void webserver_setup();
+void webserver_file(AsyncWebServerRequest *request, String path, String contentType);

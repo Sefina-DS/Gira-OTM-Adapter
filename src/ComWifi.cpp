@@ -27,7 +27,6 @@ void wlan_connect()
                 Serial.println();
             #endif
             fail_wifi = 0;
-            server->begin();
             delay(2000);
             return;
         }

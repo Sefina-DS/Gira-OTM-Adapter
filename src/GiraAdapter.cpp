@@ -34,8 +34,16 @@ void setup()
     spiffs_config_read();
     spiffs_config_load();
 
-    webserver_art();
     wlan_config();
+
+    //SPIFFS.remove("/config.html");
+    //SPIFFS.remove("/config.css");
+    if (SPIFFS.exists("/config.html")) webserver.notbetrieb = false;
+    webserver_setup();
+
+
+    //webserver_art();
+
     version_check();
 
     void time_setup();
@@ -46,7 +54,7 @@ void setup()
 
   serial_setup();
 
-  if ( webserver.notbetrieb && WiFi.isConnected() == true )
+  /*if ( webserver.notbetrieb && WiFi.isConnected() == true )
   {
     #ifdef DEBUG_SERIAL_OUTPUT
       Serial.print("Wifi ist vorhanden, nötige Daten werden gedownloadet");
@@ -55,7 +63,7 @@ void setup()
     file_download("/config.css");
     delay(1000);
     ESP.restart();
-  }
+  }*/
 }
 
 void loop()

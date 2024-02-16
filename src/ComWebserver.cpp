@@ -306,3 +306,51 @@ void webserver_config()
             }
             request->send(SPIFFS, "/config.html", String(), false, web_request); });
 }
+
+void webserver_setup(){
+  #ifdef DEBUG_SERIAL_WEBSERVER
+    Serial.println("Webserver wird konfiguriert");
+  #endif
+  server = new AsyncWebServer(80);
+  
+  // Routen festlegen
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    #ifdef DEBUG_SERIAL_WEBSERVER
+      Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
+    #endif
+    if (webserver.notbetrieb) {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.println("Notbetrieb");
+      #endif
+      // Logik für Notbetriebsseite
+      request->send_P(200, "text/html", notbetrieb_html);
+    } else {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.println("Normalbetrieb");
+      #endif
+      // Seite aus dem SPIFFS laden
+      webserver_file(request, "/config.html", "text/html");
+    }
+  });
+  
+  // Start des Servers
+  #ifdef DEBUG_SERIAL_WEBSERVER
+    Serial.println("Starten des Webservers");
+  #endif
+  server->begin();
+}
+
+void webserver_file(AsyncWebServerRequest *request, String path, String contentType) {
+  #ifdef DEBUG_SERIAL_WEBSERVER
+    Serial.println("das funktioniert auch");
+  #endif
+  #ifdef DEBUG_SERIAL_WEBSERVER
+    Serial.println("Daten von den File laden : " + path );
+  #endif
+  if (SPIFFS.exists(path)) {
+    AsyncWebServerResponse *response = request->beginResponse(SPIFFS, path, contentType);
+    request->send(response);
+  } else {
+    request->send(404, "text/plain", "Datei nicht gefunden");
+  }
+}
