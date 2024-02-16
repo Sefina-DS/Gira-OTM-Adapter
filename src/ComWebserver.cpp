@@ -315,8 +315,17 @@ void webserver_setup(){
   
   // Routen festlegen
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    String art;
+    String id;
+    String msg;
+    int params = request->params();
     #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
+      Serial.print("URL der Anfrage: ");
+      Serial.println(request->url());
+      Serial.print("HTTP-Methode der Anfrage: ");
+      Serial.println(request->methodToString());
+      Serial.print("IP-Adresse des Clients: ");
+      Serial.println(request->client()->remoteIP().toString());
     #endif
     if (webserver.notbetrieb) {
       #ifdef DEBUG_SERIAL_WEBSERVER
@@ -329,8 +338,56 @@ void webserver_setup(){
         Serial.println("Normalbetrieb");
       #endif
       // Seite aus dem SPIFFS laden
-      webserver_file(request, "/config.html", "text/html");
+      request->send(SPIFFS, "/config.html", String(), false, web_request);
+      request->send(SPIFFS, "/config.css", "text/css");
     }
+  
+    // Behandlung von GET- und POST-Anfragen
+    if (request->method() == HTTP_GET) {
+      art = "Get"; // Hier initialisieren
+      id = "";
+      msg = "";
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        id = p->name().c_str();
+        msg = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        #endif
+            // Hier können Sie die GET-Parameter verarbeiten
+            // z.B. p->name() und p->value()
+      }
+        // Logik für GET-Anfragen
+        // Hier können Sie die GET-Parameter verarbeiten
+        // und entsprechend reagieren
+    } else if (request->method() == HTTP_POST) {
+      art = "Post"; // Hier initialisieren
+      id = "";
+      msg = "";
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        id = p->name().c_str();
+        msg = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        #endif
+            // Hier können Sie die POST-Daten verarbeiten
+            // z.B. p->name() und p->value()
+      }
+        // Logik für POST-Anfragen
+        // Hier können Sie die POST-Daten verarbeiten
+        // und entsprechend reagieren
+    }
+    web_response(id,msg);
+
+    #ifdef DEBUG_SERIAL_WEBSERVER
+      Serial.print("MSG : ");
+      Serial.print(art);
+      Serial.print(" | ");
+      Serial.print(id);
+      Serial.print(" | ");
+      Serial.println(msg);
+    #endif
   });
   
   // Start des Servers

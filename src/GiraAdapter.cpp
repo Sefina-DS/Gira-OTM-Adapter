@@ -54,8 +54,7 @@ void setup()
 
   serial_setup();
 
-  /*if ( webserver.notbetrieb && WiFi.isConnected() == true )
-  {
+  if ( webserver.notbetrieb && WiFi.isConnected() == true ) {
     #ifdef DEBUG_SERIAL_OUTPUT
       Serial.print("Wifi ist vorhanden, nötige Daten werden gedownloadet");
     #endif
@@ -63,7 +62,7 @@ void setup()
     file_download("/config.css");
     delay(1000);
     ESP.restart();
-  }*/
+  }
 }
 
 void loop()
