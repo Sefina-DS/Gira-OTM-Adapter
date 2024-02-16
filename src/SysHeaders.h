@@ -14,6 +14,15 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_BME680.h>
 
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <set>
+
 //#include <AsyncTCP.h>
 //#include <Update.h>
 

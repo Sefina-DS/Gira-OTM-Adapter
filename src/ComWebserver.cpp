@@ -208,6 +208,11 @@ String web_request(const String &var)
   {
     return "display: none;";
   }
+  if (var == "navigation-log" &&
+      webserver.navigation != "Logging")
+  {
+    return "display: none;";
+  }
  
   return String();
 }

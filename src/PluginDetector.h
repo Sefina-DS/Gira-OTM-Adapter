@@ -16,6 +16,8 @@ struct DETECTOR
 };
 extern DETECTOR detector;
 
+extern std::vector<int> groups;
+
 //void detector_mqtt_config();
 void alarm_group_diagnose(String msg);
 
@@ -27,11 +29,10 @@ void webserver_triger_detector(String name, String msg);
 
 void load_conf_detector(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc);
-
-//void mqtt_detector_sub_register();
-//void mqtt_detector_sub_read(String topic, String msg);
-
-
+void diagnose_groups(String group_string);
 
 void mqtt_subscribe_detector();
 void mqtt_incoming_msg_detector(String topic, String msg);
+
+void test(String testtest);
+std::vector<int> extractAndSortNumbers(const std::string& input);

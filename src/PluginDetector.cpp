@@ -2,6 +2,8 @@
 
 DETECTOR detector;
 
+std::vector<int> groups;
+
 void load_conf_detector(StaticJsonDocument<1024> doc)
 {
     #ifdef DEBUG_SERIAL_OUTPUT
@@ -13,7 +15,7 @@ void load_conf_detector(StaticJsonDocument<1024> doc)
     temp = doc["detector_alarm_group"] | "0";
     detector.location = doc["detector_location"] | "";
 
-    alarm_group_diagnose(temp);
+    diagnose_groups(temp);
 }
 
 StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc)
@@ -26,6 +28,39 @@ StaticJsonDocument<1024> safe_conf_detector(StaticJsonDocument<1024> doc)
     doc["detector_location"] = detector.location;
 
     return doc;
+}
+
+void diagnose_groups(String group_string) {
+    std::string input = group_string.c_str();
+    groups.push_back(0); // Füge die Null am Anfang hinzu
+
+    std::string currentNumber;
+
+    for (char c : input) {
+        if (std::isdigit(c)) {
+            currentNumber += c;
+        } else if (!currentNumber.empty()) {
+            groups.push_back(std::stoi(currentNumber));
+            currentNumber.clear();
+        }
+    }
+    if (!currentNumber.empty()) {
+        groups.push_back(std::stoi(currentNumber));
+    }
+    // Sortieren der Zahlen
+    std::sort(groups.begin(), groups.end());
+
+    // Entfernen von Duplikaten
+    std::set<int> uniqueNumbers(groups.begin(), groups.end());
+    groups.assign(uniqueNumbers.begin(), uniqueNumbers.end());
+
+    String temp = "";
+    for (int group : groups) {
+        temp += group;
+        temp += " ";
+    }
+    Serial.print("Auf folgenden Gruppen wird gehört : ");
+    Serial.println(temp);
 }
 
 void alarm_group_diagnose(String msg)
@@ -266,16 +301,43 @@ void mqtt_detector_sub_read(String topic, String msg)
 void mqtt_subscribe_detector() {
     mqtt_publish("Detector-Steuerung/Melder_Finden","false");
     mqtt_subscribe("Detector-Steuerung/Melder_Finden");
+    mqtt_publish("Detector-Steuerung/Alarm","false");
+    mqtt_subscribe("Detector-Steuerung/Alarm");
+    mqtt_publish("Detector-Steuerung/Test-Alarm","false");
+    mqtt_subscribe("Detector-Steuerung/Test-Alarm");
     mqtt_publish("Detector-Steuerung/Serial_Send","frei");
     mqtt_subscribe("Detector-Steuerung/Serial_Send");
+    mqtt_publish("Detector-Steuerung/TestString","frei");
+    mqtt_subscribe("Detector-Steuerung/TestString");
+    for (int group : groups) {
+        mqtt_subscribe_group(group, "Melder_Finden");
+        mqtt_subscribe_group(group, "Alarm");
+        mqtt_subscribe_group(group, "Test-Alarm");
+    }
 }
 
 void mqtt_incoming_msg_detector(String topic, String msg){
-  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"  && msg == "true")      serial_transceive( "070020" );
-  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"  && msg == "false")     serial_transceive( "070040" );
-  if ( topic == mqtt.topic + "Detector-Steuerung/Serial_Send"  && msg != "frei" ) {          
+  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"     && msg == "true")      serial_transceive( "070020" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Melder_Finden"     && msg == "false")     serial_transceive( "070040" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Alarm"             && msg == "true")      serial_transceive( "030210" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Alarm"             && msg == "false")     serial_transceive( "030200" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Test-Alarm"        && msg == "true")      serial_transceive( "030080" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Test-Alarm"        && msg == "false")     serial_transceive( "030000" );
+  if ( topic == mqtt.topic + "Detector-Steuerung/Serial_Send"       && msg != "frei" ) {          
         serial_transceive( msg );
         mqtt_publish("Detector-Steuerung/Serial_Send", "frei");
+  }
+  if ( topic == mqtt.topic + "Detector-Steuerung/TestString"       && msg != "frei" ) {          
+        diagnose_groups( msg );
+        mqtt_publish("Detector-Steuerung/TestString", "frei");
+  }
+  for (int group : groups){
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Melder_Finden"    && msg == "true" )  serial_transceive( "070020" );
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Melder_Finden"    && msg == "false" ) serial_transceive( "070040" );
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Alarm"            && msg == "true" )  serial_transceive( "030210" );
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Alarm"            && msg == "false" ) serial_transceive( "030200" );
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Test-Alarm"       && msg == "true" )  serial_transceive( "030080" );
+    if ( topic == mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/Test-Alarm"       && msg == "false" ) serial_transceive( "030000" );
   }
   
   

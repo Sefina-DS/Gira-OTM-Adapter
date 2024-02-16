@@ -165,3 +165,54 @@ String web_request_spiff(const String &var)
     }
     return String();
 }
+
+void log_write(String msg){
+    String temp = wifi.ntp_date + ";" + timeClient->getFormattedTime() + " ;; " + msg;
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.print( "LOGG-FILE-WRITE : ");
+        Serial.println(temp);
+    #endif
+
+    File file = SPIFFS.open(LOG_FILE_PATH, "r+");
+    if (!file) {
+        file = SPIFFS.open(LOG_FILE_PATH, "w+");
+    }
+
+    if (file) {
+        int lineCount = 0;
+        while (file.available()) {
+            if (file.read() == '\n') {
+                lineCount++;
+            }
+        }
+
+        while (lineCount >= MAX_LINES) {
+            file.seek(0);
+            while (file.available()) {
+                char c = file.read();
+                if (c == '\n') {
+                    break;
+                }
+            }
+            lineCount--;
+        }
+
+        file.seek(0);
+
+        String existingContent = file.readString();
+        
+        file.seek(0);
+        file.print(temp);
+        file.print('\n');
+        file.print(existingContent);
+
+        file.close();
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.println("Logeintragung erfolgreich");
+        #endif
+    } else {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.println("Fehler beim Öffnen der Log-Datei!");
+        #endif
+    }
+}

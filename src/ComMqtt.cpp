@@ -101,6 +101,24 @@ bool mqtt_publish (String topic, String msg){
   }
 }
 
+bool mqtt_publish_group (int group, String topic, String msg){
+  if (!client.connected()) {
+    return false;
+  } else {
+    String temp_topic_str = mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/" + topic;
+    const char* temp_topic =  temp_topic_str.c_str();
+    const char* temp_msg =  msg.c_str();
+    #ifdef DEBUG_SERIAL_MQTT
+      Serial.print("Mqtt-publish ... Topic : ");
+      Serial.print(temp_topic);
+      Serial.print(" ... Message : ");
+      Serial.println(temp_msg);
+    #endif
+    client.publish(temp_topic, temp_msg);
+    return true;
+  }
+}
+
 void mqtt_subscribe_list (){
   if (client.connected()) {
     mqtt_subscribe("ESP/Neustart-ESP");
@@ -113,6 +131,20 @@ void mqtt_subscribe_list (){
 bool mqtt_subscribe (String topic){
   if (client.connected()) {
     String temp_topic = mqtt.topic + topic;
+    client.subscribe(temp_topic.c_str());
+    #ifdef DEBUG_SERIAL_MQTT
+      Serial.print("Mqtt-subscribe ... Topic : ");
+      Serial.println(temp_topic);
+    #endif
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool mqtt_subscribe_group (int group, String topic){
+  if (client.connected()) {
+    String temp_topic = mqtt.topic_base + "/0-Gruppen-Steuerung-0/" + group + "/" + topic;
     client.subscribe(temp_topic.c_str());
     #ifdef DEBUG_SERIAL_MQTT
       Serial.print("Mqtt-subscribe ... Topic : ");

@@ -11,12 +11,16 @@ struct WIFI
     String gw;
     String subnet;
     String dns;
-    
+    String ntp_date;
+    const char* ntpServer = "time.google.com";
+    unsigned long ntp_timer = 10000;
 };
 extern WIFI wifi;
 extern String hostname;
 
 extern boolean AP_Mode;
+extern WiFiUDP ntpUDP;
+extern NTPClient* timeClient;
 
 void wlan_connect();
 void scan_wifi_ssid();
@@ -30,3 +34,6 @@ void webserver_triger_wifi(String name, String msg);
 
 void load_conf_wifi(StaticJsonDocument<1024> doc);
 StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc);
+
+void time_setup();
+void time_sync();

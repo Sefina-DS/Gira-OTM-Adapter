@@ -25,8 +25,10 @@ void mqtt_publish(String topic, String msg, String funktion);
 void mqtt_setup();
 void mqtt_reconnect();
 bool mqtt_publish (String topic, String msg);
+bool mqtt_publish_group (int group, String topic, String msg);
 void mqtt_subscribe_list ();
 bool mqtt_subscribe (String topic);
+bool mqtt_subscribe_group (int group, String topic);
 void mqtt_callback(char* topic, byte* payload, unsigned int length);
 void mqtt_incoming_msg(String topic, String msg);
 

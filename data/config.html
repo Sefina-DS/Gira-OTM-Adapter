@@ -19,6 +19,9 @@
         div.system {
             %navigation-system%
         }
+        div.log {
+            %navigation-log%
+        }
     </style>
     <body>
         <!-- BEREICH ÜBERSCHRIFT BEGINN -->
@@ -65,6 +68,11 @@
                     <td>
                         <form action="/get">
                             <input type="submit" value="System" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/get">
+                            <input type="submit" value="Logging" name="navigation" />
                         </form>
                     </td>
                 </tr>
@@ -398,7 +406,48 @@
             </div>
         </div>
         <!-- BEREICH SYSTEM ENDE -->
+        
+        <!-- BEREICH LOGGING BEGINN -->
+            <!-- LOGGING -->
+        <div class="log">
+            <br>
+            <div class="box">
+                <h3>Firmware einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Firmware- build</td>
+                                <td>
+                                    <select name="fw_build">
+                                        <option value=%ph_sys_fwtyp%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (Vorhanden)</td>
+                                <td>
+                                    %ph_sys_fwold%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (zum download)</td>
+                                <td>
+                                    %ph_sys_fwnew%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+                <br>
+                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+            </div>
+        </div>
+        <!-- BEREICH LOGGING ENDE -->
         <br>
+        
         <!-- BEREICH UNTEN BEGINN -->
         <div class="save">
             <table>

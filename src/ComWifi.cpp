@@ -2,6 +2,8 @@
 
 WIFI wifi;
 boolean AP_Mode = false;
+WiFiUDP ntpUDP;
+NTPClient* timeClient = new NTPClient(ntpUDP, wifi.ntpServer);
 
 void wlan_connect()
 {
@@ -236,4 +238,20 @@ StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)
     doc["wifi_dns"] = wifi.dns;
 
     return doc;
+}
+
+void time_setup(){
+    timeClient->begin();
+    timeClient->setTimeOffset(3600); // Mitteleuropäische Zeit (UTC+1)
+    time_sync();
+}
+
+void time_sync(){
+    wifi.ntp_timer = millis() + 900000;
+    timeClient->update();
+    time_t rawTime = timeClient->getEpochTime();
+    struct tm *timeInfo = localtime(&rawTime);
+    char formattedDate[11];
+    strftime(formattedDate, sizeof(formattedDate), "%d.%m.%Y", timeInfo);
+    wifi.ntp_date = formattedDate;
 }

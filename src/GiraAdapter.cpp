@@ -5,6 +5,9 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 HTTPClient http;
 
+static unsigned long ntp_timer = 10000;
+static long log_counter = 0;
+
 void setup()
 {
   #ifdef DEBUG_SERIAL_START  
@@ -35,6 +38,8 @@ void setup()
     wlan_config();
     version_check();
 
+    void time_setup();
+
     if ( mqtt.aktiv )     mqtt_setup(); 
     if ( sensors.bme )    bme_setup();
   }
@@ -59,9 +64,18 @@ void loop()
   if ( !WiFi.isConnected() && !AP_Mode )    wlan_connect(); 
   if ( mqtt.configured )                    mqtt_reconnect() ;
   sensor_data();
-
+  if ( millis() > wifi.ntp_timer )          time_sync();
   if ( comserial.aktiv ) serial_receive();
   if ( comserial.aktiv ) serial_transceive_diagnose();
+
+  #ifdef DEBUG_SERIAL_WIFI
+      if ( millis() >= ntp_timer ) {
+        ntp_timer = millis() + 10000;
+        Serial.println(wifi.ntp_date + " " + timeClient->getFormattedTime() + " // " + timeClient->getDay());
+        log_counter++;
+        log_write("Logcounter = " + log_counter);
+      }
+  #endif
 
   
   
