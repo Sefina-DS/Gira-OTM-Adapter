@@ -30,7 +30,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 01</h1>
+                <h1>Rauchmelderadapter - Config</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -93,13 +93,103 @@
             <!-- BEREICH Wifi  -->
             <div class="box">
                 <h3>Netzwerk Einstellungen</h3>
-                
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>ESP- Name :</td>
+                                <td><input class="setting" type="text" name="esp_name" placeholder="%ph_wifi_esp%"></td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - SSID :</td>
+                                <td>
+                                    <select name="wifi_ssid">
+                                        %ph_wifi_ssid%
+                                        %ph_wifi_ssiddisplay%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - Passwort :</td>
+                                <td><input class="setting" type="text" name="wifi_pw" placeholder="%ph_wifi_pw%"></td>
+                            </tr>
+                            <tr>
+                                <td>IP- Adressen Typ :</td>
+                                <td>
+                                    <select name="wifi_dhcp">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table %display_network_dhcp%>
+                        <tbody>
+                            <tr>
+                                <td>IP Adresse :</td>
+                                <td><input class="setting" type="text" name="wifi_ip" placeholder=%ph_wifi_ip%></td>
+                            </tr>
+                            <tr>
+                                <td>Subnet- Mask :</td>
+                                <td><input class="setting" type="text" name="wifi_subnet" placeholder=%ph_wifi_subnet%></td>
+                            </tr>
+                            <tr>
+                                <td>Gateway :</td>
+                                <td><input class="setting" type="text" name="wifi_gw" placeholder=%ph_wifi_gw%></td>
+                            </tr>
+                            <tr>
+                                <td>DNS :</td>
+                                <td><input class="setting" type="text" name="wifi_dns" placeholder=%ph_wifi_dns%></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
             </div>
             <br>
             <!-- BEREICH MQTT  -->
             <div class="box">
                 <h3>MQTT Einstellungen</h3>
-                
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>MQTT :</td>
+                                <td>
+                                    <select name="mqtt">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table %display_network_mqtt%>
+                        <tbody>
+                            <tr>
+                                <td>IP Broker :</td>
+                                <td><input class="setting" type="text" name="mqtt_ip" placeholder="%ph_mqtt_ip%"></td>
+                            </tr>
+                            <tr>
+                                <td>Port Broker :</td>
+                                <td><input class="setting" type="text" name="mqtt_port" placeholder="%ph_mqtt_port%"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"> MQTT - Topic <br>Achtung : Grund- Topic / Melder- Topic / <br>der Aufbau darf nicht geändert werden ! <br></td>
+                            </tr>
+                            <tr>
+                                <td>Grund- Topic :</td>
+                                <td><input class="setting" type="text" name="mqtt_base" placeholder="%ph_mqtt_base%"></td>
+                            </tr>
+                            <tr>
+                                <td>Melder- Topic :</td>
+                                <td><input class="setting" type="text" name="mqtt_define" placeholder="%ph_mqtt_define%"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
             </div>
         </div>
         <!-- BEREICH Detector  -->
@@ -107,7 +197,6 @@
             <br>
             <!-- BEREICH Detector (innen)  -->
             <div class="box">
-                <h3>Rauchmelder Einstellungen</h3>
                 
             </div>
         </div>
@@ -116,7 +205,6 @@
             <br>
             <!-- BEREICH Sensor (innen)  -->
             <div class="box">
-                <h3>Senso Einstellungen</h3>
                 
             </div>
         </div>
@@ -125,13 +213,12 @@
             <br>
             <!-- Firmware -->
             <div class="box">
-                <h3>Firmware einstellungen</h3>
                 
             </div>
             <!-- Filemanager -->
             <br>
             <div class="box">
-                <h3>File- Manager</h3>
+                
             </div>
         </div>
         <!-- BEREICH LOGGING BEGINN -->
@@ -139,7 +226,6 @@
             <br>
             <!-- LOGGING -->
             <div class="box">
-                <h3>Logging</h3>
                 
             </div>
         </div>
