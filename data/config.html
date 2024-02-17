@@ -8,21 +8,7 @@
     </head>
     <style>
         
-        div.network {
-            %navigation-network%
-        }
-        div.detector {
-            %navigation-detector%
-        }
-        div.sensor {
-            %navigation-sensor%
-        }
-        div.system {
-            %navigation-system%
-        }
-        div.log {
-            %navigation-log%
-        }
+    
     </style>
     <body>
         <!-- BEREICH ÜBERSCHRIFT BEGINN -->
@@ -83,7 +69,7 @@
 
         <!-- BEREICH Netzwerk  -->
             <!-- BEREICH Wifi  -->
-        <div class="network">
+        <div class="network" style="%display_network%">
             <br>
             <div class="box">
                 <h3>Netzwerk Einstellungen</h3>
@@ -141,9 +127,7 @@
                     <input type="submit" value="Änderungen übernehmen" name="config_save">
                 </form>
             </div>
-        </div>
             <!-- BEREICH MQTT  -->
-        <div class="network">
             <br>
             <div class="box">
                 <h3>MQTT Einstellungen</h3>
@@ -190,7 +174,7 @@
         </div>
         <!-- BEREICH Netzwerk ENDE -->
         <!-- BEREICH Detector  -->
-        <div class="detector">
+        <div class="detector" style="%display_detector%">
             <br>
             <div class="box">
                 <h3>Rauchmelder Einstellungen</h3>
@@ -227,7 +211,7 @@
         <!-- BEREICH Detector ENDE -->
 
         <!-- BEREICH Sensor  -->
-        <div class="sensor">
+        <div class="sensor" style="%display_sensors%">
             <br>
             <div class="box">
                 <h3>Senso Einstellungen</h3>
@@ -340,7 +324,7 @@
 
         <!-- BEREICH SYSTEM BEGINN -->
             <!-- Firmware -->
-        <div class="system">
+        <div class="system" style="%display_system%">
             <br>
             <div class="box">
                 <h3>Firmware einstellungen</h3>
@@ -376,7 +360,6 @@
                 <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
             </div>
             <!-- Filemanager -->
-        <div class="system">
             <br>
             <div class="box">
                 <h3>Systeminfos</h3>
@@ -410,10 +393,10 @@
         
         <!-- BEREICH LOGGING BEGINN -->
             <!-- LOGGING -->
-        <div class="log">
+        <div class="log" style="%display_logging%">
             <br>
             <div class="box">
-                <h3>Firmware einstellungen</h3>
+                <h3>Logging - Übersicht</h3>
                 <form action="/get">
                     <table>
                         <tbody>

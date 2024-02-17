@@ -187,7 +187,7 @@ String web_request(const String &var)
   }
   
   
-  
+  Serial.println("Variable - navigation = " + webserver.navigation);
   if (var == "navigation-network" &&
       webserver.navigation != "Netzwerk")
   {
@@ -217,21 +217,29 @@ String web_request(const String &var)
   return String();
 }
 
-void web_response(String name, String msg)
+void web_response_GET(String name, String value)
 {
-  web_response_sys(name,msg);
-  webserver_triger_wifi(name, msg);
-  web_response_mqtt(name, msg);
-  webserver_triger_detector(name, msg);
-  web_response_sensor(name, msg);
+  #ifdef DEBUG_SERIAL_WEBSERVER
+    Serial.print("*web_response_GET* name : ");
+    Serial.print(name);
+    Serial.print(" value : ");
+    Serial.println(value);
+  #endif 
+  
+  web_response_sys(name,value);
+  webserver_triger_wifi(name, value);
+  web_response_mqtt(name, value);
+  webserver_triger_detector(name, value);
+  web_response_sensor(name, value);
 
-  if        (name == "navigation")                                          webserver.navigation = msg;
-  else if   (name == "config_save" && msg == "Änderungen übernehmen") {     spiffs_config_save();
+  if        (name == "navigation")                                      {    webserver.navigation = value; Serial.println("Variable - navigation = " + webserver.navigation);}
+  
+  else if   (name == "config_save" && value == "Änderungen übernehmen") {     spiffs_config_save();
                                                                             webserver.config = true; }
   else if   (name == "ESP-Neustart")                                        ESP.restart();
   
   if (name == "reset_config") {
-    if (msg == "Werkseinstellungen laden !") {
+    if (value == "Werkseinstellungen laden !") {
       SPIFFS.remove(safefile);
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Savefile wurde gelöscht !");
@@ -293,7 +301,7 @@ void webserver_config()
                       Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
                     #endif
                 }
-                web_response(id,msg);
+                //web_response(id,msg);
 
                 #ifdef DEBUG_SERIAL_WEBSERVER
                   Serial.print("MSG : ");
@@ -316,8 +324,8 @@ void webserver_setup(){
   // Routen festlegen
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     String art;
-    String id;
-    String msg;
+    String name;
+    String value;
     int params = request->params();
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.print("URL der Anfrage: ");
@@ -327,35 +335,19 @@ void webserver_setup(){
       Serial.print("IP-Adresse des Clients: ");
       Serial.println(request->client()->remoteIP().toString());
     #endif
-    if (webserver.notbetrieb) {
-      #ifdef DEBUG_SERIAL_WEBSERVER
-        Serial.println("Notbetrieb");
-      #endif
-      // Logik für Notbetriebsseite
-      request->send_P(200, "text/html", notbetrieb_html);
-    } else {
-      #ifdef DEBUG_SERIAL_WEBSERVER
-        Serial.println("Normalbetrieb");
-        Serial.print("*Request- Methode : ");
-        Serial.println(request->method());
-      #endif
-      // Seite aus dem SPIFFS laden
-      request->send(SPIFFS, "/config.html", String(), false, web_request);
-      request->send(SPIFFS, "/config.css", "text/css");
-    }
-  
     // Behandlung von GET- und POST-Anfragen
     if (request->method() == HTTP_GET) {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.printf("-> Get Funktion <-");
       #endif
       art = "Get"; // Hier initialisieren
-      id = "";
-      msg = "";
+      name = "";
+      value = "";
       for (int i = 0; i < params; i++) {
         AsyncWebParameter *p = request->getParam(i);
-        id = p->name().c_str();
-        msg = p->value().c_str();
+        name = p->name().c_str();
+        value = p->value().c_str();
+        web_response_GET(name,value);
         #ifdef DEBUG_SERIAL_WEBSERVER
           Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
         #endif
@@ -365,7 +357,7 @@ void webserver_setup(){
         // Logik für GET-Anfragen
         // Hier können Sie die GET-Parameter verarbeiten
         // und entsprechend reagieren
-    } else if (request->method() == HTTP_POST) {
+    } /*else if (request->method() == HTTP_POST) {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.printf("-> Post Funktion <-");
       #endif
@@ -386,17 +378,27 @@ void webserver_setup(){
         // Logik für POST-Anfragen
         // Hier können Sie die POST-Daten verarbeiten
         // und entsprechend reagieren
+    }*/
+    
+    if (webserver.notbetrieb) {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.println("Notbetrieb");
+      #endif
+      // Logik für Notbetriebsseite
+      request->send_P(200, "text/html", notbetrieb_html);
+    } else {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.println("Normalbetrieb");
+        Serial.print("*Request- Methode : ");
+        Serial.println(request->method());
+      #endif
+      // Seite aus dem SPIFFS laden
+      request->send(SPIFFS, "/config.html", String(), false, web_request);
+      request->send(SPIFFS, "/config.css", "text/css");
     }
-    web_response(id,msg);
-
-    #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.print("MSG : ");
-      Serial.print(art);
-      Serial.print(" | ");
-      Serial.print(id);
-      Serial.print(" | ");
-      Serial.println(msg);
-    #endif
+  
+    
+  
   });
   
   // Start des Servers

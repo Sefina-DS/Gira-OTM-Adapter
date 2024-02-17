@@ -25,7 +25,7 @@ void webserver_notbetrieb();
 void webserver_normalbetrieb();
 
 String web_request(const String &var);
-void web_response(String name, String msg);
+void web_response_GET(String name, String value);
 
 void webserver_config();
 
