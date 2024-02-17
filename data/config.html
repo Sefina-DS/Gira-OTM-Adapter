@@ -30,7 +30,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 03</h1>
+                <h1>Rauchmelderadapter - Config 04</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -117,7 +117,108 @@
             <!-- BEREICH Sensor (innen)  -->
             <div class="box">
                 <h3>Sensor Einstellungen</h3>
-                
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>BME :</td>
+                                <td>
+                                    <select name="bme">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table >
+                        <tbody>
+                            <tr>
+                                <td>Temperatur :</td>
+                                <td>
+                                    <select name="bme-temperature">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Feuchtigkeit :</td>
+                                <td>
+                                    <select name="bme-humidity">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Druck :</td>
+                                <td>
+                                    <select name="bme-pressure">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Höhe :</td>
+                                <td>
+                                    <select name="bme-high">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Gas in KOhm :</td>
+                                <td>
+                                    <select name="bme-gas-ohm">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimabewertung im Score :</td>
+                                <td>
+                                    <select name="bme-gas-score">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimebewertung im Text :</td>
+                                <td>
+                                    <select name="bme-gas-text">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Lichtsensor :</td>
+                                <td>
+                                    <select name="light">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Versorgungsspannung :</td>
+                                <td>
+                                    <select name="ubext">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
             </div>
         </div>
         <!-- BEREICH SYSTEM BEGINN -->
@@ -126,7 +227,36 @@
             <!-- Firmware -->
             <div class="box">
                 <h3>Firmware einstellungen</h3>
-                
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Firmware- build</td>
+                                <td>
+                                    <select name="fw_build">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (Vorhanden)</td>
+                                <td>
+                                    %ph_sys_fwold%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (zum download)</td>
+                                <td>
+                                    %ph_sys_fwnew%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+                <br>
+                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
             </div>
             <!-- Filemanager -->
             <br>
