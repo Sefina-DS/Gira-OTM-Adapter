@@ -14,12 +14,12 @@ extern HTTPClient http;
 
 #define DEBUG_SERIAL_START
 #define DEBUG_SERIAL_OUTPUT // Aktivieren für Serial- Ausgabe
-#define DEBUG_SERIAL_SENSOR
+//#define DEBUG_SERIAL_SENSOR
 #define DEBUG_SERIAL_SPIFFS
-#define DEBUG_SERIAL_MQTT
+//#define DEBUG_SERIAL_MQTT
 #define DEBUG_SERIAL_WIFI
 #define DEBUG_SERIAL_WEBSERVER
-#define DEBUG_SERIAL_DETECTOR
+//#define DEBUG_SERIAL_DETECTOR
 
 //      Inputs
 #define RXD2 17

@@ -121,9 +121,9 @@ IPAddress ipwandeln(String temp)
     return temp_ip;
 }
 
-void scan_wifi_ssid()
+String scan_wifi_ssid()
 {
-    webserver.wifi_ssid = "";
+    String temp = "";
     int n = WiFi.scanNetworks();
     if (n > 0)
     {
@@ -131,38 +131,34 @@ void scan_wifi_ssid()
         {
             if (WiFi.SSID(i) != "")
             {
-                webserver.wifi_ssid += F("<option value='");
-                webserver.wifi_ssid += WiFi.SSID(i);
-                webserver.wifi_ssid += F("'>");
-                webserver.wifi_ssid += WiFi.SSID(i);
-                webserver.wifi_ssid += F(" | ");
-                webserver.wifi_ssid += WiFi.RSSI(i);
-                webserver.wifi_ssid += F("</option>");
+                temp += F("<option value='");
+                temp += WiFi.SSID(i);
+                temp += F("'>");
+                temp += WiFi.SSID(i);
+                temp += F(" | ");
+                temp += WiFi.RSSI(i);
+                temp += F("</option>");
             }
         }
     }
-}
-
-String getSelectedOption(const String &option) {
-    return "<option value='" + option + "' selected>" + option + "</option>";
+    return temp;
 }
 
 String web_request_wifi(const String &var) {
-    if          (var == "ph_wifi_esp")          { return wifi.esp_name;
-    } else if   (var == "ph_wifi_ssid")         { return (wifi.ssid != "")      ? getSelectedOption(wifi.ssid)
-                                                                                : "<option selected>keins ausgewählt</option>";
-    } else if   (var == "ph_wifi_ssiddisplay")  { scan_wifi_ssid();
-                                                  return webserver.wifi_ssid;
-    } else if   (var == "ph_wifi_pw")           { return (wifi.pw != "")        ? "---FFF---FFF---" 
-                                                                                : "Bitte eintragen !";
-    } else if   (var == "ph_wifi_dhcp")         { return (wifi.dhcp)            ? "'dynamisch' selected>dynamisch</option><option value='statisch'</option>statisch" 
-                                                                                : "'statisch' selected>statisch</option><option value='dynamisch'</option>dynamisch";
-    } else if   (var == "ph_wifi_dhcpdisplay")  { return (wifi.dhcp)            ? "display: none; " 
-                                                                                : "";
-    } else if   (var == "ph_wifi_ip")           { return wifi.ip;
-    } else if   (var == "ph_wifi_subnet")       { return wifi.subnet;
-    } else if   (var == "ph_wifi_gw")           { return wifi.gw;
-    } else if   (var == "ph_wifi_dns")          { return wifi.dns;
+    if          (var == "textarea_network_esp")             { return wifi.esp_name;
+    } else if   (var == "button_network_ssid_selected")     { return (wifi.ssid != "")  ? "<option value='" + wifi.ssid + "' selected>" + wifi.ssid + "</option>"
+                                                                                        : "<option selected>keins ausgewählt</option>";
+    } else if   (var == "button_network_ssid_option")       { return scan_wifi_ssid();  
+    } else if   (var == "textarea_network_pw")              { return (wifi.pw != "")    ? "---FFF---FFF---" 
+                                                                                        : "Bitte eintragen !";
+    } else if   (var == "button_network_dhcp")              { return (wifi.dhcp)        ? "<option value='dynamisch' selected>dynamisch</option><option value='statisch'>statisch</option>" 
+                                                                                        : "<option value='statisch' selected>statisch</option><option value='dynamisch'>statisch</option>";
+    } else if   (var == "display_network_dhcp")             { return ( !wifi.dhcp )     ? ""
+                                                                                        : "style= 'display: none'";
+    } else if   (var == "textarea_network_ip")              { return wifi.ip;
+    } else if   (var == "textarea_network_sub")             { return wifi.subnet;
+    } else if   (var == "textarea_network_gw")              { return wifi.gw;
+    } else if   (var == "textarea_network_dns")             { return wifi.dns;
     }
 
     return String();

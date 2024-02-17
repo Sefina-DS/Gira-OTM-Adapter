@@ -34,9 +34,13 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 <h1>! Notbetrieb !</h1>
 <h3>Netzwerk Einstellungen</h3>
 <form action="/get"><table><tbody>
-<tr><td>ESP- Name :</td><td><input class="setting" type="text" name="esp_name" placeholder="%ph_wifi_esp%"></td></tr>
-<tr><td>WiFi - SSID :</td><td><select name="wifi_ssid">%ph_wifi_ssid% %ph_wifi_ssiddisplay%</select></td></tr>
-<tr><td>WiFi - Passwort :</td><td><input class="setting" type="text" name="wifi_pw" placeholder="%ph_wifi_pw%"></td></tr>
+<tr><td>ESP- Name :</td><td><input class="setting" type="text" name="esp_name" placeholder="%textarea_network_esp%"></td></tr>
+<tr><td>WiFi - SSID :</td><td>
+<select name="wifi_ssid">
+%button_network_ssid_selected%
+%button_network_ssid_option%
+</select></td></tr>
+<tr><td>WiFi - Passwort :</td><td><input class="setting" type="text" name="wifi_pw" placeholder="%textarea_network_pw%"></td></tr>
 </tbody></table><br><input type="submit" value="Änderungen übernehmen" name="config_save"></form>
 <br>
 <h3>Datein Upload</h3>
