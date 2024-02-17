@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Konfiguration</title>
+        <link rel="stylesheet" type="text/css" href="/config.css">
+    </head>
+    <style>
+        
+    
+    </style>
+    <body>
+        <!-- BEREICH ÜBERSCHRIFT BEGINN -->
+        <div class="ueberschrift">
+            <h1>Rauchmelderadapter - Config</h1>
+            %header_esp_name% | %header_detector_location%
+        </div>
+        <!-- BEREICH ÜBERSCHRIFT ENDE -->
+        <br />
+        <div class="infozeile" style="%ph_web_config%">
+            <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
+                <tbody>
+                    <tr>
+                        <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
+                        <td style="text-align: left">
+                            <form action="/get">
+                                <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
+                            </form>
+                        </td>                                            
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+        </div>
+        <!-- BEREICH NAVIGATION BEGINN -->
+        <div class="box">
+            <table class="navigation">
+                <tr>
+                    <td>
+                        <form action="/" method="GET">
+                            <input type="submit" value="Netzwerk" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/" method="GET">
+                            <input type="submit" value="Rauchmelder" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/" method="GET">
+                            <input type="submit" value="Sensoren" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/" method="GET">
+                            <input type="submit" value="System" name="navigation" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/" method="GET">
+                            <input type="submit" value="Logging" name="navigation" />
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- BEREICH NAVIGATION ENDE -->
+
+        <!-- BEREICH Netzwerk  -->
+            <!-- BEREICH Wifi  -->
+        <div class="network" style="%display_network%">
+            <br>
+            <div class="box">
+                <h3>Netzwerk Einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>ESP- Name :</td>
+                                <td><input class="setting" type="text" name="esp_name" placeholder="%ph_wifi_esp%"></td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - SSID :</td>
+                                <td>
+                                    <select name="wifi_ssid">
+                                        %ph_wifi_ssid%
+                                        %ph_wifi_ssiddisplay%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - Passwort :</td>
+                                <td><input class="setting" type="text" name="wifi_pw" placeholder="%ph_wifi_pw%"></td>
+                            </tr>
+                            <tr>
+                                <td>IP- Adressen Typ :</td>
+                                <td>
+                                    <select name="wifi_dhcp">
+                                        <option value=%ph_wifi_dhcp%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="%ph_wifi_dhcpdisplay%">
+                        <tbody>
+                            <tr>
+                                <td>IP Adresse :</td>
+                                <td><input class="setting" type="text" name="wifi_ip" placeholder=%ph_wifi_ip%></td>
+                            </tr>
+                            <tr>
+                                <td>Subnet- Mask :</td>
+                                <td><input class="setting" type="text" name="wifi_subnet" placeholder=%ph_wifi_subnet%></td>
+                            </tr>
+                            <tr>
+                                <td>Gateway :</td>
+                                <td><input class="setting" type="text" name="wifi_gw" placeholder=%ph_wifi_gw%></td>
+                            </tr>
+                            <tr>
+                                <td>DNS :</td>
+                                <td><input class="setting" type="text" name="wifi_dns" placeholder=%ph_wifi_dns%></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+            </div>
+            <!-- BEREICH MQTT  -->
+            <br>
+            <div class="box">
+                <h3>MQTT Einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>MQTT :</td>
+                                <td>
+                                    <select name="mqtt">
+                                        <option value=%ph_mqtt_aktiv%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="%ph_mqtt_aktivdisplay%">
+                        <tbody>
+                            <tr>
+                                <td>IP Broker :</td>
+                                <td><input class="setting" type="text" name="mqtt_ip" placeholder="%ph_mqtt_ip%"></td>
+                            </tr>
+                            <tr>
+                                <td>Port Broker :</td>
+                                <td><input class="setting" type="text" name="mqtt_port" placeholder="%ph_mqtt_port%"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"> MQTT - Topic <br>Achtung : Grund- Topic / Melder- Topic / <br>der Aufbau darf nicht geändert werden ! <br></td>
+                            </tr>
+                            <tr>
+                                <td>Grund- Topic :</td>
+                                <td><input class="setting" type="text" name="mqtt_base" placeholder="%ph_mqtt_base%"></td>
+                            </tr>
+                            <tr>
+                                <td>Melder- Topic :</td>
+                                <td><input class="setting" type="text" name="mqtt_define" placeholder="%ph_mqtt_define%"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+            </div>
+        </div>
+        <!-- BEREICH Netzwerk ENDE -->
+        <!-- BEREICH Detector  -->
+        <div class="detector" style="%display_detector%">
+            <br>
+            <div class="box">
+                <h3>Rauchmelder Einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Komunikation :</td>
+                                <td>
+                                    <select name="detector_komunikation">
+                                        <option value=%ph_detector_aktiv%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Einbauort :</td>
+                                <td><input class="setting" type="text" name="detector_location" placeholder="%ph_detector_location%"></td>
+                            </tr>
+                            <tr>
+                                <td>Meldegruppe :</td>
+                                <td><input class="setting" type="text" name="detector_group" placeholder="%ph_detector_grp%"></td>
+                            </tr>
+                            <tr>
+                                <td>Alarmierungsgruppen :</td>
+                                <td><textarea rows="3" cols="40" name="detector_alarm_group" placeholder="%ph_detector_alarmgrp%"></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+            </div>
+        </div>
+        <!-- BEREICH Detector ENDE -->
+
+        <!-- BEREICH Sensor  -->
+        <div class="sensor" style="%display_sensors%">
+            <br>
+            <div class="box">
+                <h3>Senso Einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>BME :</td>
+                                <td>
+                                    <select name="bme">
+                                        <option value=%ph_sensor_bme%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table style="%ph_sensor_bmedisplay%">
+                        <tbody>
+                            <tr>
+                                <td>Temperatur :</td>
+                                <td>
+                                    <select name="bme-temperature">
+                                        <option value=%ph_sensor_temp%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Feuchtigkeit :</td>
+                                <td>
+                                    <select name="bme-humidity">
+                                        <option value=%ph_sensor_humidity%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Druck :</td>
+                                <td>
+                                    <select name="bme-pressure">
+                                        <option value=%ph_sensor_pressure%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Höhe :</td>
+                                <td>
+                                    <select name="bme-high">
+                                        <option value=%ph_sensor_high%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Gas in KOhm :</td>
+                                <td>
+                                    <select name="bme-gas-ohm">
+                                        <option value=%ph_sensor_gasohm%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimabewertung im Score :</td>
+                                <td>
+                                    <select name="bme-gas-score">
+                                        <option value=%ph_sensor_gasscore%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimebewertung im Text :</td>
+                                <td>
+                                    <select name="bme-gas-text">
+                                        <option value=%ph_sensor_gastext%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Lichtsensor :</td>
+                                <td>
+                                    <select name="light">
+                                        <option value=%ph_sensor_light%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Versorgungsspannung :</td>
+                                <td>
+                                    <select name="ubext">
+                                        <option value=%ph_sensor_ubext%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+            </div>
+        </div>
+        
+        <!-- BEREICH Sensor ENDE -->
+
+        <!-- BEREICH SYSTEM BEGINN -->
+            <!-- Firmware -->
+        <div class="system" style="%display_system%">
+            <br>
+            <div class="box">
+                <h3>Firmware einstellungen</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Firmware- build</td>
+                                <td>
+                                    <select name="fw_build">
+                                        <option value=%ph_sys_fwtyp%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (Vorhanden)</td>
+                                <td>
+                                    %ph_sys_fwold%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (zum download)</td>
+                                <td>
+                                    %ph_sys_fwnew%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+                <br>
+                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+            </div>
+            <!-- Filemanager -->
+            <br>
+            <div class="box">
+                <h3>Systeminfos</h3>
+                <table class="upload">
+                    <tr>
+                        <td>! File upload !</td>
+                    </tr>
+                </table>
+                <table class="upload-33">
+                    <tr>
+                        <td>Free Storage: %FREESPIFFS%</td>
+                        <td>Used Storage: %USEDSPIFFS%</td> 
+                        <td>Total Storage: %TOTALSPIFFS%</td>
+                    </tr>
+                </table>
+                <table class="upload-50">
+                    <tr>
+                        <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
+                        <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
+                    </tr>
+                </table>
+                <table class="upload-33">
+                    <tr>
+                        <td>Auf dem ESP vorhandene Daten :</td>
+                        <td>%FILELIST%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- BEREICH SYSTEM ENDE -->
+        
+        <!-- BEREICH LOGGING BEGINN -->
+            <!-- LOGGING -->
+        <div class="log" style="%display_logging%">
+            <br>
+            <div class="box">
+                <h3>Logging - Übersicht</h3>
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Firmware- build</td>
+                                <td>
+                                    <select name="fw_build">
+                                        <option value=%ph_sys_fwtyp%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (Vorhanden)</td>
+                                <td>
+                                    %ph_sys_fwold%
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Firmware- version (zum download)</td>
+                                <td>
+                                    %ph_sys_fwnew%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                </form>
+                <br>
+                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+            </div>
+        </div>
+        <!-- BEREICH LOGGING ENDE -->
+        <br>
+        
+        <!-- BEREICH UNTEN BEGINN -->
+        <div class="save">
+            <table>
+                <tr>
+                    <td><br><form action="/get"><input type="submit" name="reset_config" value="Werkseinstellungen laden !" title="Reset - Config"></form></td>
+                </tr>
+            </table>
+        </div>
+
+
+
+
+
+    </body>
+</html>

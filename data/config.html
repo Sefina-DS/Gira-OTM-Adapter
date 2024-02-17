@@ -7,63 +7,76 @@
         <link rel="stylesheet" type="text/css" href="/config.css">
     </head>
     <style>
+        div.box {
+            background-color: rgb(20, 19, 19);
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+            border-radius: 30px;
+        }
         
     
     </style>
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
-            <h1>Rauchmelderadapter - Config</h1>
-            %header_esp_name% | %header_detector_location%
+            <div class="box">
+                <h1>Rauchmelderadapter - Config</h1>
+                %header_esp_name% | %header_detector_location%
+            </div>
         </div>
         <!-- INFOFENSTER -->
         <br />
         <div class="infozeile" style="%ph_web_config%">
-            <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
-                <tbody>
-                    <tr>
-                        <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
-                        <td style="text-align: left">
-                            <form action="/get">
-                                <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
-                            </form>
-                        </td>                                            
-                    </tr>
-                </tbody>
-            </table>
+            <div class="box">
+                <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
+                            <td style="text-align: left">
+                                <form action="/get">
+                                    <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
+                                </form>
+                            </td>                                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <br>
         </div>
         <!-- NAVIGATION -->
         <div class="box">
-            <table class="navigation">
-                <tr>
-                    <td>
-                        <form action="/" method="GET">
-                            <input type="submit" value="Netzwerk" name="navigation" />
-                        </form>
-                    </td>
-                    <td>
-                        <form action="/" method="GET">
-                            <input type="submit" value="Rauchmelder" name="navigation" />
-                        </form>
-                    </td>
-                    <td>
-                        <form action="/" method="GET">
-                            <input type="submit" value="Sensoren" name="navigation" />
-                        </form>
-                    </td>
-                    <td>
-                        <form action="/" method="GET">
-                            <input type="submit" value="System" name="navigation" />
-                        </form>
-                    </td>
-                    <td>
-                        <form action="/" method="GET">
-                            <input type="submit" value="Logging" name="navigation" />
-                        </form>
-                    </td>
-                </tr>
-            </table>
+            <div class="box">
+                <table class="navigation">
+                    <tr>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Netzwerk" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Rauchmelder" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Sensoren" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="System" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Logging" name="navigation" />
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <!-- BEREICH Netzwerk  -->
         <div class="network" style="%display_network%">
