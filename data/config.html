@@ -30,7 +30,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 05</h1>
+                <h1>Rauchmelderadapter - Config 06</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -93,7 +93,60 @@
             <!-- BEREICH Wifi  -->
             <div class="box">
                 <h3>Netzwerk Einstellungen</h3>
-                
+                <form action="/get">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>ESP- Name :</td>
+                                <td><input class="setting" type="text" name="esp_name" placeholder="%ph_wifi_esp%"></td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - SSID :</td>
+                                <td>
+                                    <select name="wifi_ssid">
+                                        %ph_wifi_ssid%
+                                        %ph_wifi_ssiddisplay%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>WiFi - Passwort :</td>
+                                <td><input class="setting" type="text" name="wifi_pw" placeholder="%ph_wifi_pw%"></td>
+                            </tr>
+                            <tr>
+                                <td>IP- Adressen Typ :</td>
+                                <td>
+                                    <select name="wifi_dhcp">
+                                        
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table >
+                        <tbody>
+                            <tr>
+                                <td>IP Adresse :</td>
+                                <td><input class="setting" type="text" name="wifi_ip" placeholder=%ph_wifi_ip%></td>
+                            </tr>
+                            <tr>
+                                <td>Subnet- Mask :</td>
+                                <td><input class="setting" type="text" name="wifi_subnet" placeholder=%ph_wifi_subnet%></td>
+                            </tr>
+                            <tr>
+                                <td>Gateway :</td>
+                                <td><input class="setting" type="text" name="wifi_gw" placeholder=%ph_wifi_gw%></td>
+                            </tr>
+                            <tr>
+                                <td>DNS :</td>
+                                <td><input class="setting" type="text" name="wifi_dns" placeholder=%ph_wifi_dns%></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">+
+                    <br>
+                </form>
             </div>
             <br>
             <!-- BEREICH MQTT  -->
@@ -135,6 +188,7 @@
                     </table>
                     <br>
                     <input type="submit" value="Änderungen übernehmen" name="config_save">
+                    <br>
                 </form>
             </div>
         </div>
@@ -245,6 +299,7 @@
                     </table>
                     <br>
                     <input type="submit" value="Änderungen übernehmen" name="config_save">
+                    <br>
                 </form>
             </div>
         </div>
@@ -281,6 +336,7 @@
                     </table>
                     <br>
                     <input type="submit" value="Änderungen übernehmen" name="config_save">
+                    <br>
                 </form>
                 <br>
                 <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
