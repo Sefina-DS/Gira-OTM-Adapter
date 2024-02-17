@@ -186,6 +186,18 @@ String web_request(const String &var)
                                                               : "";
   }
   
+  if          (var == "display_network")    { return ( webserver.navigation == "Netzwerk")      ? ""
+                                                                                                : "display: none";
+  } else if   (var == "display_detector")   { return ( webserver.navigation == "Rauchmelder")   ? ""
+                                                                                                : "display: none";
+  } else if   (var == "display_sensors")    { return ( webserver.navigation == "Sensoren")      ? ""
+                                                                                                : "display: none";
+  } else if   (var == "display_system")     { return ( webserver.navigation == "System")        ? ""
+                                                                                                : "display: none";
+  } else if   (var == "display_logging")    { return ( webserver.navigation == "Logging")       ? ""
+                                                                                                : "display: none";
+  }
+  
   
   Serial.println("Variable - navigation = " + webserver.navigation);
   if (var == "navigation-network" &&

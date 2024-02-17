@@ -36,6 +36,8 @@ void setup()
 
     wlan_config();
 
+    file_download("/config.html");
+
     //SPIFFS.remove("/config.html");
     //SPIFFS.remove("/config.css");
     if (SPIFFS.exists("/config.html")) webserver.notbetrieb = false;
