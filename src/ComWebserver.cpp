@@ -160,7 +160,7 @@ String web_request(const String &var)
 {
   if ( webserver.sperre ) return String();
   #ifdef DEBUG_SERIAL_WEBSERVER
-    Serial.print("Web-Server call mit : ");
+    Serial.print("* web_request mit : ");
     Serial.println(var);
   #endif
   String temp = "";
@@ -336,6 +336,8 @@ void webserver_setup(){
     } else {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Normalbetrieb");
+        Serial.print("*Request- Methode : ");
+        Serial.println(request->method());
       #endif
       // Seite aus dem SPIFFS laden
       request->send(SPIFFS, "/config.html", String(), false, web_request);
@@ -375,6 +377,7 @@ void webserver_setup(){
         id = p->name().c_str();
         msg = p->value().c_str();
         #ifdef DEBUG_SERIAL_WEBSERVER
+          Serial.println("WIR TESTEN EIN POST");
           Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
         #endif
             // Hier können Sie die POST-Daten verarbeiten
