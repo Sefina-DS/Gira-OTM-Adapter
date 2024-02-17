@@ -406,7 +406,7 @@ void webserver_setup(){
       #endif
       // Seite aus dem SPIFFS laden
       request->send(SPIFFS, "/config.html", String(), false, web_request);
-      request->send(SPIFFS, "/config.css", "text/css");
+      //request->send(SPIFFS, "/config.css", "text/css");
     }
   
     
