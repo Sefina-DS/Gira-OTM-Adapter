@@ -36,7 +36,7 @@
         </div>
         <!-- INFOFENSTER -->
         <br />
-        <div class="infozeile" style="%ph_web_config%">
+        <div class="infozeile" %ph_web_config%>
             <div class="box">
                 <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
                     <tbody>
@@ -88,7 +88,7 @@
             </div>
         </div>
         <!-- BEREICH Netzwerk  -->
-        <div class="network" style="%display_network%">
+        <div class="network" %display_network%>
             <br>
             <!-- BEREICH Wifi  -->
             <div class="box">
@@ -117,13 +117,13 @@
                                 <td>IP- Adressen Typ :</td>
                                 <td>
                                     <select name="wifi_dhcp">
-                                        <option value=%ph_wifi_dhcp%
+                                        
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <table style="%ph_wifi_dhcpdisplay%">
+                    <table %display_network_dhcp%>
                         <tbody>
                             <tr>
                                 <td>IP Adresse :</td>
@@ -150,14 +150,6 @@
             <br>
             <!-- BEREICH MQTT  -->
             <div class="box">
-
-            </div>
-        </div>
-        <!-- BEREICH Detector  -->
-        <div class="detector" style="%display_detector%">
-            <br>
-            <!-- BEREICH Detector (innen)  -->
-            <div class="box">
                 <h3>MQTT Einstellungen</h3>
                 <form action="/get">
                     <table>
@@ -166,13 +158,13 @@
                                 <td>MQTT :</td>
                                 <td>
                                     <select name="mqtt">
-                                        <option value=%ph_mqtt_aktiv%
+                                        
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <table style="%ph_mqtt_aktivdisplay%">
+                    <table %display_network_mqtt%>
                         <tbody>
                             <tr>
                                 <td>IP Broker :</td>
@@ -200,8 +192,16 @@
                 </form>
             </div>
         </div>
+        <!-- BEREICH Detector  -->
+        <div class="detector" %display_detector%>
+            <br>
+            <!-- BEREICH Detector (innen)  -->
+            <div class="box">
+                
+            </div>
+        </div>
         <!-- BEREICH Sensor  -->
-        <div class="sensor" style="%display_sensors%">
+        <div class="sensor" %display_sensors%>
             <br>
             <!-- BEREICH Sensor (innen)  -->
             <div class="box">
@@ -209,7 +209,7 @@
             </div>
         </div>
         <!-- BEREICH SYSTEM BEGINN -->
-        <div class="system" style="%display_system%">
+        <div class="system" %display_system%>
             <br>
             <!-- Firmware -->
             <div class="box">
@@ -222,7 +222,7 @@
             </div>
         </div>
         <!-- BEREICH LOGGING BEGINN -->
-        <div class="log" style="%display_logging%">
+        <div class="log" %display_loggong%>
             <br>
             <!-- LOGGING -->
             <div class="box">
