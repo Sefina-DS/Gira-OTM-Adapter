@@ -152,7 +152,7 @@ String web_request_wifi(const String &var) {
     } else if   (var == "textarea_network_pw")              { return (wifi.pw != "")    ? "---FFF---FFF---" 
                                                                                         : "Bitte eintragen !";
     } else if   (var == "button_network_dhcp")              { return (wifi.dhcp)        ? "<option value='dynamisch' selected>dynamisch</option><option value='statisch'>statisch</option>" 
-                                                                                        : "<option value='statisch' selected>statisch</option><option value='dynamisch'>statisch</option>";
+                                                                                        : "<option value='statisch' selected>statisch</option><option value='dynamisch'>dynamisch</option>";
     } else if   (var == "display_network_dhcp")             { return ( !wifi.dhcp )     ? ""
                                                                                         : "style= 'display: none'";
     } else if   (var == "textarea_network_ip")              { return wifi.ip;

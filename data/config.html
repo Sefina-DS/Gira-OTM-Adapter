@@ -30,7 +30,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 08</h1>
+                <h1>Rauchmelderadapter - Config 09</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -153,7 +153,7 @@
             <!-- BEREICH MQTT  -->
             <div class="box">
                 <h3>MQTT Einstellungen</h3>
-                <form action="/get">
+                <form action="/" method="GET">
                     <table>
                         <tbody>
                             <tr>
@@ -202,7 +202,7 @@
             <!-- BEREICH Detector (innen)  -->
             <div class="box">
                 <h3>Rauchmelder Einstellungen</h3>
-                <form action="/get">
+                <form action="/" method="GET">
                     <table>
                         <tbody>
                             <tr>
@@ -240,26 +240,26 @@
             <!-- BEREICH Sensor (innen)  -->
             <div class="box">
                 <h3>Sensor Einstellungen</h3>
-                <form action="/get">
+                <form action="/" method="GET">
                     <table>
                         <tbody>
                             <tr>
                                 <td>BME :</td>
                                 <td>
                                     <select name="bme">
-                                        
+                                        %button_sensors_bme%
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <table >
+                    <table %display_sensors_bme%>
                         <tbody>
                             <tr>
                                 <td>Temperatur :</td>
                                 <td>
                                     <select name="bme-temperature">
-                                        
+                                        %button_sensors_temp%
                                     </select>
                                 </td>
                             </tr>
@@ -267,7 +267,7 @@
                                 <td>Feuchtigkeit :</td>
                                 <td>
                                     <select name="bme-humidity">
-                                        
+                                        %button_sensors_humidity%
                                     </select>
                                 </td>
                             </tr>
@@ -275,7 +275,7 @@
                                 <td>Druck :</td>
                                 <td>
                                     <select name="bme-pressure">
-                                        
+                                        %button_sensors_pressure%
                                     </select>
                                 </td>
                             </tr>
@@ -283,7 +283,7 @@
                                 <td>Höhe :</td>
                                 <td>
                                     <select name="bme-high">
-                                        
+                                        %button_sensors_high%
                                     </select>
                                 </td>
                             </tr>
@@ -291,7 +291,7 @@
                                 <td>Gas in KOhm :</td>
                                 <td>
                                     <select name="bme-gas-ohm">
-                                        
+                                        %button_sensors_gasohm%
                                     </select>
                                 </td>
                             </tr>
@@ -299,7 +299,7 @@
                                 <td>Raumklimabewertung im Score :</td>
                                 <td>
                                     <select name="bme-gas-score">
-                                        
+                                        %button_sensors_gasscore%
                                     </select>
                                 </td>
                             </tr>
@@ -307,7 +307,7 @@
                                 <td>Raumklimebewertung im Text :</td>
                                 <td>
                                     <select name="bme-gas-text">
-                                        
+                                        %button_sensors_gastext%
                                     </select>
                                 </td>
                             </tr>
@@ -320,7 +320,7 @@
                                 <td>Lichtsensor :</td>
                                 <td>
                                     <select name="light">
-                                        
+                                        %button_sensors_light%
                                     </select>
                                 </td>
                             </tr>
@@ -333,7 +333,7 @@
                                 <td>Versorgungsspannung :</td>
                                 <td>
                                     <select name="ubext">
-                                        
+                                        %button_sensors_ubext%
                                     </select>
                                 </td>
                             </tr>

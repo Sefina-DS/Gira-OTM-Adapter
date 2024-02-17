@@ -169,41 +169,29 @@ String bme_680_airquality_text(float air_quality_score) {
 }
 
 String web_request_sensor(const String &var) {
-    if (var == "ph_sensor_bme") {
-        return (sensors.bme) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                             : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_bmedisplay") {
-        return (!sensors.bme) ? "display: none; "
-                              : "";
-    } else if (var == "ph_sensor_temp") {
-        return (sensors.bme_temperature) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                         : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_humidity") {
-        return (sensors.bme_humidity) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                       : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_pressure") {
-        return (sensors.bme_pressure) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                       : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_high") {
-        return (sensors.bme_high) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                   : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_gasohm") {
-        return (sensors.bme_gas_ohm) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                      : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_gasscore") {
-        return (sensors.bme_gas_score) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_gastext") {
-        return (sensors.bme_gas_text) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                       : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_light") {
-        return (sensors.light) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if (var == "ph_sensor_ubext") {
-        return (sensors.ubext) ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    if          (var == "button_sensors_bme")       { return (sensors.bme)              ? "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'>deaktiviert</option>"
+                                                                                        : "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'>aktiviert</option>";
+    } else if   (var == "display_sensors_bme")      { return (sensors.bme)              ? ""
+                                                                                        : "style= 'display: none'";
+    } else if   (var == "button_sensors_temp")      { return (sensors.bme_temperature)  ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_humidity")  { return (sensors.bme_humidity)     ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_pressure")  { return (sensors.bme_pressure)     ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_high")      { return (sensors.bme_high)         ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_gasohm")    { return (sensors.bme_gas_ohm)      ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_gasscore")  { return (sensors.bme_gas_score)    ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_gastext")   { return (sensors.bme_gas_text)     ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_light")     { return (sensors.light)            ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
+    } else if   (var == "button_sensors_ubext")     { return (sensors.ubext)            ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
+                                                                                        : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
     }
-
     return String();
 }
 
