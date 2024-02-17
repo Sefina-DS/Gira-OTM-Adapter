@@ -344,6 +344,9 @@ void webserver_setup(){
   
     // Behandlung von GET- und POST-Anfragen
     if (request->method() == HTTP_GET) {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.printf("-> Get Funktion <-");
+      #endif
       art = "Get"; // Hier initialisieren
       id = "";
       msg = "";
@@ -361,6 +364,9 @@ void webserver_setup(){
         // Hier können Sie die GET-Parameter verarbeiten
         // und entsprechend reagieren
     } else if (request->method() == HTTP_POST) {
+      #ifdef DEBUG_SERIAL_WEBSERVER
+        Serial.printf("-> Post Funktion <-");
+      #endif
       art = "Post"; // Hier initialisieren
       id = "";
       msg = "";
