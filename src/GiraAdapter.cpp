@@ -36,12 +36,14 @@ void setup()
 
     wlan_config();
 
-    file_download("/config.html");
-    file_download("/network_settings.html");
-    file_download("/sensor_settings.html");
-    file_download("/system_settings.html");
-    file_download("/detector_settings.html");
-    file_download("/logging_settings.html");
+    file_download("/data/config.html", "/config.html");
+    file_download("/data/html/network.html", "/html/network.html");
+    file_download("/data/html/detector.html", "/html/detector.html");
+    file_download("/data/html/sensor.html", "/html/sensor.html");
+    file_download("/data/html/system.html", "/html/system.html");
+    file_download("/data/html/logging.html", "/html/logging.html");
+    //folder_download("data/html", "html");
+
 
     //SPIFFS.remove("/config.html");
     //SPIFFS.remove("/config.css");
@@ -65,8 +67,8 @@ void setup()
     #ifdef DEBUG_SERIAL_OUTPUT
       Serial.print("Wifi ist vorhanden, nötige Daten werden gedownloadet");
     #endif
-    file_download("/config.html");
-    file_download("/config.css");
+    //file_download("/config.html");
+    //file_download("/config.css");
     delay(1000);
     ESP.restart();
   }

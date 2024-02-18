@@ -40,8 +40,12 @@ void version_check();
 const String& firmware_path();
 
 void firmwareupdate_http();
-void file_download(String filePath);
-void folder_download(const String& folderPath);
+void file_download(String download_file_path, String spiff_file_path);
+void downloadFile(const String& url, const String& filePath);
+void test();
+void processJsonArray(const String& jsonContent, const String& spiffs_folder_path);
+void processJsonStream(WiFiClient& client, const String& spiffs_folder_path);
+void folder_download(const String& download_folder_path, const String& spiffs_folder_path);
 void led_flash_timer(int timer_on,int timer_off, int number);
 
 String web_request_sys(const String &var);

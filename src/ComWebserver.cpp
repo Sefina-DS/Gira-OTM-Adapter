@@ -416,20 +416,20 @@ void webserver_setup(){
     
   
   });
-  server->on("/network_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/network_settings.html", String(), false, web_request);
+  server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/html/network.html", String(), false, web_request);
   });
-  server->on("/detector_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/detector_settings.html", String(), false, web_request);
+  server->on("/Rauchmelder", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/html/detector.html", String(), false, web_request);
   });
-  server->on("/sensor_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/sensor_settings.html", String(), false, web_request);
+  server->on("/Sensoren", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/html/sensor.html", String(), false, web_request);
   });
-  server->on("/system_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/system_settings.html", String(), false, web_request);
+  server->on("/System", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/html/system.html", String(), false, web_request);
   });
-  server->on("/logging_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/logging_settings.html", String(), false, web_request);
+  server->on("/Logging", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/html/logging.html", String(), false, web_request);
   }); 
   /*  
     File file = SPIFFS.open("/network_settings.html", "r");
