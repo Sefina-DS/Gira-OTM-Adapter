@@ -416,6 +416,10 @@ void webserver_setup(){
     
   
   });
+  server->on("/network_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    Serial.println("der Handler wird angesprochen");
+    request->send(SPIFFS, "/network_settings.html", "text/html");
+  });
   
   // Start des Servers
   #ifdef DEBUG_SERIAL_WEBSERVER
