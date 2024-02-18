@@ -417,6 +417,9 @@ void webserver_setup(){
   
   });
   server->on("/network_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/network_settings.html", String(), false, web_request);
+  }); 
+  /*  
     File file = SPIFFS.open("/network_settings.html", "r");
     if (!file) {
         request->send(404, "text/plain", "Datei nicht gefunden");
@@ -424,8 +427,12 @@ void webserver_setup(){
     }
     String fileContent = file.readString();
     file.close();
+
+    // Verarbeite die Platzhalter in fileContent mit dem Callback web_request
+    fileContent = web_request(fileContent);
+
     request->send(200, "text/html", fileContent);
-});
+});*/
   
   // Start des Servers
   #ifdef DEBUG_SERIAL_WEBSERVER

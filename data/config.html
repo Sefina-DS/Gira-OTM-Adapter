@@ -29,28 +29,37 @@
     <script>
         function showNetworkSettings() {
             var networkContentDiv = document.getElementById("networkContent");
+            var networkSectionDiv = document.getElementById("networkSection");
             var xhr = new XMLHttpRequest();
-            document.getElementById("networkSection").style.display = "block";
+            
+            // Zeige den Netzwerkbereich an
+            networkSectionDiv.style.display = "block";
+            
+            // Passe das Styling an
             document.body.style.backgroundColor = 'lightblue';
+            
+            // Lade den Inhalt der Netzwerkeinstellungen
             xhr.open('GET', '/network_settings.html', true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
+                        // Füge den Text in das Netzwerk-Inhalts-Div ein
                         networkContentDiv.innerHTML = xhr.responseText;
-                        alert("Die Datei wurde erfolgreich abgerufen.");
                     } else {
-                        alert("Die Datei konnte nicht abgerufen werden.");
+                        // Behandele den Fehlerfall hier
+                        console.error("Die Datei konnte nicht abgerufen werden.");
                     }
                 }
             };
             xhr.send();
         }
-    </script>  
+    </script>
+      
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 20</h1>
+                <h1>Rauchmelderadapter - Config 21</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -88,13 +97,7 @@
         </div>
         <!-- BEREICH Netzwerk  -->
         <div id="networkSection" style="display: none;">
-            <br>
-            <div class="box">
-                <h3>Netzwerk Einstellungen</h3>
-                <div id="networkContent">
-                    <!-- Hier wird der dynamisch hinzugefügte HTML-Code angezeigt -->
-                </div>
-            </div>
+            <div id="networkContent"></div>
         </div>
     
         <!-- BEREICH Detector  -->
