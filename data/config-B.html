@@ -26,22 +26,6 @@
         
     
     </style>
-    <script>
-        function showSection(sectionId) {
-            // Alle Abschnitte ausblenden
-            var sections = document.getElementsByClassName('section');
-            for (var i = 0; i < sections.length; i++) {
-                sections[i].style.display = 'none';
-            }
-            // Den gewählten Abschnitt anzeigen
-            var sectionToShow = document.getElementById(sectionId);
-            if (sectionToShow) {
-                sectionToShow.style.display = 'block';
-            }
-        }
-        // Standardmäßig die erste Sektion anzeigen
-        showSection('network');
-    </script>
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
@@ -74,17 +58,37 @@
             <div class="box">
                 <table class="navigation">
                     <tr>
-                        <td><input type="button" value="Netzwerk" onclick="showSection('network')" /></td>
-                        <td><input type="button" value="Rauchmelder" onclick="showSection('detector')" /></td>
-                        <td><input type="button" value="Sensoren" onclick="showSection('sensor')" /></td>
-                        <td><input type="button" value="System" onclick="showSection('system')" /></td>
-                        <td><input type="button" value="Logging" onclick="showSection('log')" /></td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Netzwerk" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Rauchmelder" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Sensoren" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="System" name="navigation" />
+                            </form>
+                        </td>
+                        <td>
+                            <form action="/" method="GET">
+                                <input type="submit" value="Logging" name="navigation" />
+                            </form>
+                        </td>
                     </tr>
                 </table>
             </div>
         </div>
         <!-- BEREICH Netzwerk  -->
-        <div id="network" class="section">
+        <div class="network" %display_network%>
             <br>
             <!-- BEREICH Wifi  -->
             <div class="box">
@@ -193,7 +197,7 @@
             </div>
         </div>
         <!-- BEREICH Detector  -->
-        <div id="detector" class="section">
+        <div class="detector" %display_detector%>
             <br>
             <!-- BEREICH Detector (innen)  -->
             <div class="box">
@@ -231,7 +235,7 @@
             </div>
         </div>
         <!-- BEREICH Sensor  -->
-        <div id="sensor" class="section">
+        <div class="sensor" %display_sensors%>
             <br>
             <!-- BEREICH Sensor (innen)  -->
             <div class="box">
@@ -343,7 +347,7 @@
             </div>
         </div>
         <!-- BEREICH SYSTEM BEGINN -->
-        <div id="system" class="section">
+        <div class="system" %display_system%>
             <br>
             <!-- Firmware -->
             <div class="box">
@@ -412,7 +416,7 @@
             </div>
         </div>
         <!-- BEREICH LOGGING BEGINN -->
-        <div id="log" class="section">
+        <div class="log" %display_logging%>
             <br>
             <!-- LOGGING -->
             <div class="box">
