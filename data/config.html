@@ -31,117 +31,23 @@
     </style>
     <script>
         function showNetwork() {
-            // Hier kannst du den Code einfügen, der den Netzwerk-Abschnitt dynamisch einfügt
             var networkSection = document.getElementById('networkSection');
-            networkSection.innerHTML = `
-            <br>
-            <!-- BEREICH Wifi  -->
-            <div class="box">
-                <h3>Netzwerk Einstellungen</h3>
-                <form action="/" method="GET">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>ESP- Name :</td>
-                                <td><input class="setting" type="text" name="esp_name" placeholder="%textarea_network_esp%"></td>
-                            </tr>
-                            <tr>
-                                <td>WiFi - SSID :</td>
-                                <td>
-                                    <select name="wifi_ssid">
-                                        %button_network_ssid_selected%
-                                        %button_network_ssid_option%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>WiFi - Passwort :</td>
-                                <td><input class="setting" type="text" name="wifi_pw" placeholder="%textarea_network_pw%"></td>
-                            </tr>
-                            <tr>
-                                <td>IP- Adressen Typ :</td>
-                                <td>
-                                    <select name="wifi_dhcp">
-                                        %button_network_dhcp%
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table %display_network_dhcp%>
-                        <tbody>
-                            <tr>
-                                <td>IP Adresse :</td>
-                                <td><input class="setting" type="text" name="wifi_ip" placeholder=%textarea_network_ip%></td>
-                            </tr>
-                            <tr>
-                                <td>Subnet- Mask :</td>
-                                <td><input class="setting" type="text" name="wifi_subnet" placeholder=%textarea_network_sub%></td>
-                            </tr>
-                            <tr>
-                                <td>Gateway :</td>
-                                <td><input class="setting" type="text" name="wifi_gw" placeholder=%textarea_network_gw%></td>
-                            </tr>
-                            <tr>
-                                <td>DNS :</td>
-                                <td><input class="setting" type="text" name="wifi_dns" placeholder=%textarea_network_dns%></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                    <br>
-                </form>
-            </div>
-            <br>
-            <!-- BEREICH MQTT  -->
-            <div class="box">
-                <h3>MQTT Einstellungen</h3>
-                <form action="/" method="GET">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>MQTT :</td>
-                                <td>
-                                    <select name="mqtt">
-                                        
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table >
-                        <tbody>
-                            <tr>
-                                <td>IP Broker :</td>
-                                <td><input class="setting" type="text" name="mqtt_ip" placeholder="%ph_mqtt_ip%"></td>
-                            </tr>
-                            <tr>
-                                <td>Port Broker :</td>
-                                <td><input class="setting" type="text" name="mqtt_port" placeholder="%ph_mqtt_port%"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2"> MQTT - Topic <br>Achtung : Grund- Topic / Melder- Topic / <br>der Aufbau darf nicht geändert werden ! <br></td>
-                            </tr>
-                            <tr>
-                                <td>Grund- Topic :</td>
-                                <td><input class="setting" type="text" name="mqtt_base" placeholder="%ph_mqtt_base%"></td>
-                            </tr>
-                            <tr>
-                                <td>Melder- Topic :</td>
-                                <td><input class="setting" type="text" name="mqtt_define" placeholder="%ph_mqtt_define%"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                    <br>
-                </form>
-            </div>
-            `;
-            networkSection.style.display = 'block';
+            var networkContent = document.getElementById('networkContent');
+
+            if (networkContent.innerHTML === '') {
+                // Hier kannst du AJAX verwenden, um den Inhalt aus einer externen Datei zu laden
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        networkContent.innerHTML = xhr.responseText;
+                        networkSection.style.display = 'block';
+                    }
+                };
+                xhr.open('GET', 'network_settings.html', true);
+                xhr.send();
+            } else {
+                networkSection.style.display = 'block';
+            }
         }
 
         // Weitere Funktionen für andere Abschnitte hier
@@ -150,7 +56,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 12</h1>
+                <h1>Rauchmelderadapter - Config 13</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -188,8 +94,12 @@
             </div>
         </div>
         <!-- BEREICH Netzwerk  -->
-        <div id="network" class="section">
-            
+        <div id="networkSection" style="display: none;">
+            <br>
+            <div class="box">
+                <h3>Netzwerk Einstellungen</h3>
+                <div id="networkContent"></div>
+            </div>
         </div>
         <!-- BEREICH Detector  -->
         <div id="detector" class="section">
