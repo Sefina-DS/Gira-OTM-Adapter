@@ -27,24 +27,14 @@
     
     </style>
     <script>
-        function showNetwork() {
+        function changeBackgroundColor() {
             var networkSection = document.getElementById('networkSection');
-            var networkContent = document.getElementById('networkContent');
 
-            if (networkContent.innerHTML === '') {
-                // Hier kannst du AJAX verwenden, um den Inhalt aus einer externen Datei zu laden
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        networkContent.innerHTML = xhr.responseText;
-                        networkSection.style.display = 'block';
-                    }
-                };
-                xhr.open('GET', 'network_settings.html', true);
-                xhr.send();
-            } else {
-                networkSection.style.display = 'block';
-            }
+            // Ändere die Hintergrundfarbe des Body-Elements
+            document.body.style.backgroundColor = 'lightblue';
+
+            // Zeige den Netzwerk-Bereich an
+            networkSection.style.display = 'block';
         }
 
         // Weitere Funktionen für andere Abschnitte hier
@@ -53,7 +43,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 14</h1>
+                <h1>Rauchmelderadapter - Config 15</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -82,7 +72,7 @@
                 <table class="navigation">
                     <tr>
                         <td>
-                            <button onclick="showNetwork()">Netzwerk</button>
+                            <button onclick="changeBackgroundColor()">Netzwerk</button>
                         </td>
                         <!-- Weitere Buttons für andere Abschnitte -->
                     </tr>
@@ -94,7 +84,7 @@
             <br>
             <div class="box">
                 <h3>Netzwerk Einstellungen</h3>
-                <div id="networkContent"></div>
+                <!-- Hier kommt der Inhalt für den Netzwerk-Bereich -->
             </div>
         </div>
         <!-- BEREICH Detector  -->
