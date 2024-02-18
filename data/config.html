@@ -31,13 +31,10 @@
             var networkContentDiv = document.getElementById("networkContent");
             var networkSectionDiv = document.getElementById("networkSection");
             var xhr = new XMLHttpRequest();
-            
             // Zeige den Netzwerkbereich an
             networkSectionDiv.style.display = "block";
-            
             // Passe das Styling an
             document.body.style.backgroundColor = 'lightblue';
-            
             // Lade den Inhalt der Netzwerkeinstellungen
             xhr.open('GET', '/network_settings.html', true);
             xhr.onreadystatechange = function () {
@@ -53,13 +50,97 @@
             };
             xhr.send();
         }
+        function showDetectorSettings() {
+            var networkContentDiv = document.getElementById("detectorContent");
+            var networkSectionDiv = document.getElementById("detectorSection");
+            var xhr = new XMLHttpRequest();
+            // Zeige den Netzwerkbereich an
+            detectorSectionDiv.style.display = "block";
+            // Lade den Inhalt der Netzwerkeinstellungen
+            xhr.open('GET', '/detector_settings.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Füge den Text in das Netzwerk-Inhalts-Div ein
+                        detectorContentDiv.innerHTML = xhr.responseText;
+                    } else {
+                        // Behandele den Fehlerfall hier
+                        console.error("Die Datei konnte nicht abgerufen werden.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+        function showSensorSettings() {
+            var sensorContentDiv = document.getElementById("sensorContent");
+            var sensorSectionDiv = document.getElementById("sensorSection");
+            var xhr = new XMLHttpRequest();
+            // Zeige den Netzwerkbereich an
+            sensorSectionDiv.style.display = "block";
+            // Lade den Inhalt der Netzwerkeinstellungen
+            xhr.open('GET', '/sensor_settings.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Füge den Text in das Netzwerk-Inhalts-Div ein
+                        sensorContentDiv.innerHTML = xhr.responseText;
+                    } else {
+                        // Behandele den Fehlerfall hier
+                        console.error("Die Datei konnte nicht abgerufen werden.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+        function showSystemSettings() {
+            var systemContentDiv = document.getElementById("systemContent");
+            var systemSectionDiv = document.getElementById("systemSection");
+            var xhr = new XMLHttpRequest();
+            // Zeige den Netzwerkbereich an
+            systemSectionDiv.style.display = "block";
+            // Lade den Inhalt der Netzwerkeinstellungen
+            xhr.open('GET', '/system_settings.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Füge den Text in das Netzwerk-Inhalts-Div ein
+                        systemContentDiv.innerHTML = xhr.responseText;
+                    } else {
+                        // Behandele den Fehlerfall hier
+                        console.error("Die Datei konnte nicht abgerufen werden.");
+                    }
+                }
+            };
+            xhr.send();
+        }
+        function showLoggingSettings() {
+            var loggingContentDiv = document.getElementById("loggingContent");
+            var loggingSectionDiv = document.getElementById("loggingSection");
+            var xhr = new XMLHttpRequest();
+            // Zeige den Netzwerkbereich an
+            loggingSectionDiv.style.display = "block";
+            // Lade den Inhalt der Netzwerkeinstellungen
+            xhr.open('GET', '/logging_settings.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Füge den Text in das Netzwerk-Inhalts-Div ein
+                        loggingContentDiv.innerHTML = xhr.responseText;
+                    } else {
+                        // Behandele den Fehlerfall hier
+                        console.error("Die Datei konnte nicht abgerufen werden.");
+                    }
+                }
+            };
+            xhr.send();
+        }
     </script>
       
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 21</h1>
+                <h1>Rauchmelderadapter - Config 22</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -87,9 +168,11 @@
             <div class="box">
                 <table class="navigation">
                     <tr>
-                        <td>
-                            <button onclick="showNetworkSettings()">Netzwerk</button>
-                        </td>
+                        <td><button onclick="showNetworkSettings()">Netzwerk</button></td>
+                        <td><button onclick="showDetectorSettings()">Rauchmelder</button></td>
+                        <td><button onclick="showSensorSettings()">Sensor</button></td>
+                        <td><button onclick="showSystemSettings()">System</button></td>
+                        <td><button onclick="showLoggingSettings()">Logging</button></td>
                         <!-- Weitere Buttons für andere Abschnitte -->
                     </tr>
                 </table>
@@ -99,234 +182,21 @@
         <div id="networkSection" style="display: none;">
             <div id="networkContent"></div>
         </div>
-    
         <!-- BEREICH Detector  -->
-        <div id="detector" class="section">
-            <br>
-            <!-- BEREICH Detector (innen)  -->
-            <div class="box">
-                <h3>Rauchmelder Einstellungen</h3>
-                <form action="/" method="GET">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Komunikation :</td>
-                                <td>
-                                    <select name="detector_komunikation">
-                                        
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Einbauort :</td>
-                                <td><input class="setting" type="text" name="detector_location" placeholder="%ph_detector_location%"></td>
-                            </tr>
-                            <tr>
-                                <td>Meldegruppe :</td>
-                                <td><input class="setting" type="text" name="detector_group" placeholder="%ph_detector_grp%"></td>
-                            </tr>
-                            <tr>
-                                <td>Alarmierungsgruppen :</td>
-                                <td><textarea rows="3" cols="40" name="detector_alarm_group" placeholder="%ph_detector_alarmgrp%"></textarea></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                    <br>
-                </form>
-            </div>
+        <div id="detectorSection" style="display: none;">
+            <div id="detectorContent"></div>
         </div>
         <!-- BEREICH Sensor  -->
-        <div id="sensor" class="section">
-            <br>
-            <!-- BEREICH Sensor (innen)  -->
-            <div class="box">
-                <h3>Sensor Einstellungen</h3>
-                <form action="/" method="GET">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>BME :</td>
-                                <td>
-                                    <select name="bme">
-                                        %button_sensors_bme%
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table %display_sensors_bme%>
-                        <tbody>
-                            <tr>
-                                <td>Temperatur :</td>
-                                <td>
-                                    <select name="bme-temperature">
-                                        %button_sensors_temp%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Feuchtigkeit :</td>
-                                <td>
-                                    <select name="bme-humidity">
-                                        %button_sensors_humidity%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Druck :</td>
-                                <td>
-                                    <select name="bme-pressure">
-                                        %button_sensors_pressure%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Höhe :</td>
-                                <td>
-                                    <select name="bme-high">
-                                        %button_sensors_high%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Gas in KOhm :</td>
-                                <td>
-                                    <select name="bme-gas-ohm">
-                                        %button_sensors_gasohm%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Raumklimabewertung im Score :</td>
-                                <td>
-                                    <select name="bme-gas-score">
-                                        %button_sensors_gasscore%
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Raumklimebewertung im Text :</td>
-                                <td>
-                                    <select name="bme-gas-text">
-                                        %button_sensors_gastext%
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Lichtsensor :</td>
-                                <td>
-                                    <select name="light">
-                                        %button_sensors_light%
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Versorgungsspannung :</td>
-                                <td>
-                                    <select name="ubext">
-                                        %button_sensors_ubext%
-                                    </select>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                    <br>
-                </form>
-            </div>
+        <div id="sensorSection" style="display: none;">
+            <div id="sensorContent"></div>
         </div>
         <!-- BEREICH SYSTEM BEGINN -->
-        <div id="system" class="section">
-            <br>
-            <!-- Firmware -->
-            <div class="box">
-                <h3>Firmware einstellungen</h3>
-                <form action="/get">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Firmware- build</td>
-                                <td>
-                                    <select name="fw_build">
-                                        
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Firmware- version (Vorhanden)</td>
-                                <td>
-                                    %ph_sys_fwold%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Firmware- version (zum download)</td>
-                                <td>
-                                    %ph_sys_fwnew%
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                </form>
-                <br>
-                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
-                <br>
-                <br>
-            </div>
-            <!-- Filemanager -->
-            <br>
-            <div class="box">
-                <h3>File- Manager</h3>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>* SPIFFS Übersicht *</td>
-                        </tr>
-                        <tr>
-                            <td>Speichergröße : %spiff_info_size%</td>
-                            <td>Freier Speicher : %spiff_info_free%</td>
-                            <td>Benutzter Speicher : %spiff_info_use%</td>
-                        </tr>
-                        <tr>
-                            <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
-                            <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
-                        </tr>
-                        <tr>
-                            <td>Name</td>
-                            <td>Größe</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        %spiff_ifo_files%
-                    </tbody>
-                </table>
-            </div>
+        <div id="systemSection" style="display: none;">
+            <div id="systemContent"></div>
         </div>
         <!-- BEREICH LOGGING BEGINN -->
-        <div id="log" class="section">
-            <br>
-            <!-- LOGGING -->
-            <div class="box">
-                <h3>Logging</h3>
-                
-            </div>
+        <div id="loggingSection" style="display: none;">
+            <div id="loggingContent"></div>
         </div>
         <!-- BEREICH UNTEN BEGINN -->
         <div class="unten">

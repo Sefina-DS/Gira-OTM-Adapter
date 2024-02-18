@@ -38,6 +38,10 @@ void setup()
 
     file_download("/config.html");
     file_download("/network_settings.html");
+    file_download("/sensor_settings.html");
+    file_download("/system_settings.html");
+    file_download("/detector_settings.html");
+    file_download("/logging_settings.html");
 
     //SPIFFS.remove("/config.html");
     //SPIFFS.remove("/config.css");
