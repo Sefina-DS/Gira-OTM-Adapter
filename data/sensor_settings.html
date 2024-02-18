@@ -1,0 +1,109 @@
+<br>
+            <!-- BEREICH Sensor (innen)  -->
+            <div class="box">
+                <h3>Sensor Einstellungen</h3>
+                <form action="/" method="GET">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>BME :</td>
+                                <td>
+                                    <select name="bme">
+                                        %button_sensors_bme%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table %display_sensors_bme%>
+                        <tbody>
+                            <tr>
+                                <td>Temperatur :</td>
+                                <td>
+                                    <select name="bme-temperature">
+                                        %button_sensors_temp%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Feuchtigkeit :</td>
+                                <td>
+                                    <select name="bme-humidity">
+                                        %button_sensors_humidity%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Druck :</td>
+                                <td>
+                                    <select name="bme-pressure">
+                                        %button_sensors_pressure%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Höhe :</td>
+                                <td>
+                                    <select name="bme-high">
+                                        %button_sensors_high%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Gas in KOhm :</td>
+                                <td>
+                                    <select name="bme-gas-ohm">
+                                        %button_sensors_gasohm%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimabewertung im Score :</td>
+                                <td>
+                                    <select name="bme-gas-score">
+                                        %button_sensors_gasscore%
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Raumklimebewertung im Text :</td>
+                                <td>
+                                    <select name="bme-gas-text">
+                                        %button_sensors_gastext%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Lichtsensor :</td>
+                                <td>
+                                    <select name="light">
+                                        %button_sensors_light%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Versorgungsspannung :</td>
+                                <td>
+                                    <select name="ubext">
+                                        %button_sensors_ubext%
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <input type="submit" value="Änderungen übernehmen" name="config_save">
+                    <br>
+                    <br>
+                </form>
+            </div>
