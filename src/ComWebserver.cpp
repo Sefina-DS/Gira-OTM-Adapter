@@ -417,9 +417,15 @@ void webserver_setup(){
   
   });
   server->on("/network_settings.html", HTTP_GET, [](AsyncWebServerRequest *request){
-    Serial.println("der Handler wird angesprochen");
-    request->send(SPIFFS, "/network_settings.html", "text/html");
-  });
+    File file = SPIFFS.open("/network_settings.html", "r");
+    if (!file) {
+        request->send(404, "text/plain", "Datei nicht gefunden");
+        return;
+    }
+    String fileContent = file.readString();
+    file.close();
+    request->send(200, "text/html", fileContent);
+});
   
   // Start des Servers
   #ifdef DEBUG_SERIAL_WEBSERVER

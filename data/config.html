@@ -30,6 +30,7 @@
         function showNetworkSettings() {
             var networkContentDiv = document.getElementById("networkContent");
             var xhr = new XMLHttpRequest();
+            document.getElementById("networkSection").style.display = "block";
             document.body.style.backgroundColor = 'lightblue';
             xhr.open('GET', '/network_settings.html', true);
             xhr.onreadystatechange = function () {
@@ -49,7 +50,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 19</h1>
+                <h1>Rauchmelderadapter - Config 20</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
