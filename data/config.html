@@ -27,7 +27,7 @@
     
     </style>
     <script>
-        function changeBackgroundColor() {
+        function showNetworkSection() {
             var networkSection = document.getElementById('networkSection');
 
             // Ändere die Hintergrundfarbe des Body-Elements
@@ -35,6 +35,10 @@
 
             // Zeige den Netzwerk-Bereich an
             networkSection.style.display = 'block';
+
+            // Füge HTML-Code in den Netzwerk-Bereich ein
+            var networkContent = document.getElementById('networkContent');
+            networkContent.innerHTML = '<p>Hier ist der dynamisch hinzugefügte HTML-Code.</p>';
         }
 
         // Weitere Funktionen für andere Abschnitte hier
@@ -43,7 +47,7 @@
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 15</h1>
+                <h1>Rauchmelderadapter - Config 16</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -72,7 +76,7 @@
                 <table class="navigation">
                     <tr>
                         <td>
-                            <button onclick="changeBackgroundColor()">Netzwerk</button>
+                            <button onclick="showNetworkSection()">Netzwerk</button>
                         </td>
                         <!-- Weitere Buttons für andere Abschnitte -->
                     </tr>
@@ -84,9 +88,12 @@
             <br>
             <div class="box">
                 <h3>Netzwerk Einstellungen</h3>
-                <!-- Hier kommt der Inhalt für den Netzwerk-Bereich -->
+                <div id="networkContent">
+                    <!-- Hier wird der dynamisch hinzugefügte HTML-Code angezeigt -->
+                </div>
             </div>
         </div>
+    
         <!-- BEREICH Detector  -->
         <div id="detector" class="section">
             <br>
