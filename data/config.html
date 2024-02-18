@@ -27,27 +27,28 @@
     
     </style>
     <script>
-        function showNetworkSection() {
-            var networkSection = document.getElementById('networkSection');
-
-            // Ändere die Hintergrundfarbe des Body-Elements
-            document.body.style.backgroundColor = 'lightblue';
-
-            // Zeige den Netzwerk-Bereich an
-            networkSection.style.display = 'block';
-
-            // Füge HTML-Code in den Netzwerk-Bereich ein
-            var networkContent = document.getElementById('networkContent');
-            networkContent.innerHTML = '<p>Hier ist der dynamisch hinzugefügte HTML-Code.</p>';
+        function showNetworkSettings() {
+            var networkSettingsDiv = document.getElementById("networkSettings");
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/network_settings.html', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        networkSettingsDiv.innerHTML = xhr.responseText;
+                        alert("Die Datei wurde erfolgreich abgerufen.");
+                    } else {
+                        alert("Die Datei konnte nicht abgerufen werden.");
+                    }
+                }
+            };
+            xhr.send();
         }
-
-        // Weitere Funktionen für andere Abschnitte hier
     </script>
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 16</h1>
+                <h1>Rauchmelderadapter - Config 17</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
@@ -76,7 +77,7 @@
                 <table class="navigation">
                     <tr>
                         <td>
-                            <button onclick="showNetworkSection()">Netzwerk</button>
+                            <button onclick="showNetworkSettings()">Netzwerk</button>
                         </td>
                         <!-- Weitere Buttons für andere Abschnitte -->
                     </tr>
