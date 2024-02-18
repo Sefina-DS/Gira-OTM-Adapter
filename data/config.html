@@ -28,14 +28,14 @@
     </style>
     <script>
         function showNetworkSettings() {
-            var networkSettingsDiv = document.getElementById("networkSettings");
+            var networkContentDiv = document.getElementById("networkContent");
             var xhr = new XMLHttpRequest();
             document.body.style.backgroundColor = 'lightblue';
             xhr.open('GET', '/network_settings.html', true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        networkSettingsDiv.innerHTML = xhr.responseText;
+                        networkContentDiv.innerHTML = xhr.responseText;
                         alert("Die Datei wurde erfolgreich abgerufen.");
                     } else {
                         alert("Die Datei konnte nicht abgerufen werden.");
@@ -44,12 +44,12 @@
             };
             xhr.send();
         }
-    </script>
+    </script>  
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 18</h1>
+                <h1>Rauchmelderadapter - Config 19</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
