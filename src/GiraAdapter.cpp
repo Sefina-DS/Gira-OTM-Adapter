@@ -37,6 +37,7 @@ void setup()
     wlan_config();
 
     file_download("/config.html");
+    file_download("/network_settings.html");
 
     //SPIFFS.remove("/config.html");
     //SPIFFS.remove("/config.css");
