@@ -30,64 +30,10 @@
     
     </style>
     <script>
-        function showSection(sectionId) {
-            // Alle Abschnitte ausblenden
-            var sections = document.getElementsByClassName('section');
-            for (var i = 0; i < sections.length; i++) {
-                sections[i].style.display = 'none';
-            }
-            // Den gewählten Abschnitt anzeigen
-            var sectionToShow = document.getElementById(sectionId);
-            if (sectionToShow) {
-                sectionToShow.style.display = 'block';
-            }
-        }
-        // Standardmäßig die erste Sektion anzeigen
-        showSection('network');
-    </script>
-    <body>
-        <!-- ÜBERSCHRIFT -->
-        <div class="ueberschrift">
-            <div class="box">
-                <h1>Rauchmelderadapter - Config 11</h1>
-                %header_esp_name% | %header_detector_location%
-            </div>
-        </div>
-        <!-- INFOFENSTER -->
-        <br />
-        <div class="infozeile" %ph_web_config%>
-            <div class="box">
-                <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
-                    <tbody>
-                        <tr>
-                            <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
-                            <td style="text-align: left">
-                                <form action="/get">
-                                    <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
-                                </form>
-                            </td>                                            
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <br>
-        </div>
-        <!-- NAVIGATION -->
-        <div class="box">
-            <div class="box">
-                <table class="navigation">
-                    <tr>
-                        <td><input type="button" value="Netzwerk" onclick="showSection('network')" /></td>
-                        <td><input type="button" value="Rauchmelder" onclick="showSection('detector')" /></td>
-                        <td><input type="button" value="Sensoren" onclick="showSection('sensor')" /></td>
-                        <td><input type="button" value="System" onclick="showSection('system')" /></td>
-                        <td><input type="button" value="Logging" onclick="showSection('log')" /></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <!-- BEREICH Netzwerk  -->
-        <div id="network" class="section">
+        function showNetwork() {
+            // Hier kannst du den Code einfügen, der den Netzwerk-Abschnitt dynamisch einfügt
+            var networkSection = document.getElementById('networkSection');
+            networkSection.innerHTML = `
             <br>
             <!-- BEREICH Wifi  -->
             <div class="box">
@@ -194,6 +140,56 @@
                     <br>
                 </form>
             </div>
+            `;
+            networkSection.style.display = 'block';
+        }
+
+        // Weitere Funktionen für andere Abschnitte hier
+    </script>
+    <body>
+        <!-- ÜBERSCHRIFT -->
+        <div class="ueberschrift">
+            <div class="box">
+                <h1>Rauchmelderadapter - Config 12</h1>
+                %header_esp_name% | %header_detector_location%
+            </div>
+        </div>
+        <!-- INFOFENSTER -->
+        <br />
+        <div class="infozeile" %ph_web_config%>
+            <div class="box">
+                <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
+                    <tbody>
+                        <tr>
+                            <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
+                            <td style="text-align: left">
+                                <form action="/get">
+                                    <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
+                                </form>
+                            </td>                                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+        </div>
+        <!-- NAVIGATION -->
+        <div class="box">
+            <div class="box">
+                <table class="navigation">
+                    <tr>
+                        <button onclick="showNetwork()">Netzwerk</button>
+                        <td><input type="button" value="Rauchmelder" onclick="showSection('detector')" /></td>
+                        <td><input type="button" value="Sensoren" onclick="showSection('sensor')" /></td>
+                        <td><input type="button" value="System" onclick="showSection('system')" /></td>
+                        <td><input type="button" value="Logging" onclick="showSection('log')" /></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!-- BEREICH Netzwerk  -->
+        <div id="network" class="section">
+            
         </div>
         <!-- BEREICH Detector  -->
         <div id="detector" class="section">
