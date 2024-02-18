@@ -41,6 +41,7 @@ const String& firmware_path();
 
 void firmwareupdate_http();
 void file_download(String filePath);
+void folder_download(const String& folderPath);
 void led_flash_timer(int timer_on,int timer_off, int number);
 
 String web_request_sys(const String &var);

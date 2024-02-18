@@ -95,6 +95,67 @@ void file_download(String filePath) {
     http.end();
 }
 
+void folder_download(const String& folderPath) {
+    HTTPClient http;
+    
+    // HTTP-Anfrage senden, um den Inhalt des Ordners abzurufen
+    String folderURL = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/data" + folderPath;
+    http.begin(folderURL);
+    int httpCode = http.GET();
+    
+    if (httpCode == HTTP_CODE_OK) {
+        // Lesen des Inhalts der Antwort, der die Dateinamen im Ordner enthält
+        String folderContent = http.getString();
+
+        // Aufteilen des Ordnerinhalts in einzelne Dateinamen
+        int startPos = 0;
+        int endPos = 0;
+        while ((startPos = folderContent.indexOf("href=\"", startPos)) != -1) {
+            startPos += 6; // Länge von "href=\""
+            endPos = folderContent.indexOf("\"", startPos);
+            if (endPos != -1) {
+                String filename = folderContent.substring(startPos, endPos);
+                
+                // Ignorieren von Links auf übergeordnete Ordner und Verzeichnisse
+                if (!filename.endsWith("/")) {
+                    // Herunterladen der Datei
+                    String fileURL = folderURL + "/" + filename;
+                    HTTPClient fileHTTP;
+                    fileHTTP.begin(fileURL);
+                    int fileHTTPCode = fileHTTP.GET();
+                    if (fileHTTPCode == HTTP_CODE_OK) {
+                        // Öffnen und Schreiben der heruntergeladenen Datei im SPIFFS
+                        File file = SPIFFS.open(folderPath + "/" + filename, "w");
+                        if (file) {
+                            String fileContent = fileHTTP.getString();
+                            file.write((const uint8_t*)fileContent.c_str(), fileContent.length());
+                            file.close();
+                            #ifdef DEBUG_SERIAL_OUTPUT
+                                Serial.println("Datei heruntergeladen: " + folderPath + "/" + filename);
+                            #endif
+                        } else {
+                            #ifdef DEBUG_SERIAL_OUTPUT
+                                Serial.println("Fehler beim Öffnen der Datei: " + folderPath + "/" + filename);
+                            #endif
+                        }
+                    } else {
+                        #ifdef DEBUG_SERIAL_OUTPUT
+                            Serial.println("Fehler beim Herunterladen der Datei: " + fileURL);
+                        #endif
+                    }
+                    fileHTTP.end();
+                }
+            }
+        }
+    } else {
+        #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.println("Fehler beim Abrufen des Ordnerinhalts: " + folderURL);
+        #endif
+    }
+
+    http.end();
+}
+
 void firmwareupdate_http() {
     if (WiFi.isConnected() && system_funktion.new_version) {
         system_funktion.new_version = false;
