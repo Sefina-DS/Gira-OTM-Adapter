@@ -36,7 +36,6 @@ void setup()
 
     wlan_config();
 
-    file_download("/data/config.html", "/config.html");
     file_download("/data/html/network.html", "/html/network.html");
     file_download("/data/html/detector.html", "/html/detector.html");
     file_download("/data/html/head.html", "/html/head.html");
@@ -44,6 +43,7 @@ void setup()
     file_download("/data/html/sensor.html", "/html/sensor.html");
     file_download("/data/html/system.html", "/html/system.html");
     file_download("/data/html/logging.html", "/html/logging.html");
+    file_download("/data/test.txt", "/test.txt");
     //folder_download("data/html", "html");
 
 

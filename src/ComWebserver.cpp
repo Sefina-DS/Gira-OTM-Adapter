@@ -339,7 +339,49 @@ void webserver_setup(){
   server = new AsyncWebServer(80);
   
   // Routen festlegen
-  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  server->on("/System/download", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Pfad zur herunterzuladenden Datei aus den Abfrageparametern erhalten
+    String filePath = request->arg("filepath");
+    
+    #ifdef DEBUG_SERIAL_WEBSERVER
+      Serial.print("Downloadanfrage gesendet, der Pfad ist : ");
+      Serial.println(filePath);
+    #endif
+
+    // Öffne die Datei zum Lesen
+    File file = SPIFFS.open(filePath, "r");
+    if (!file) {
+        request->send(404, "text/plain", "Datei nicht gefunden");
+        return;
+    }
+    #ifdef DEBUG_SERIAL_WEBSERVER
+      Serial.println("Dateiinhalt:");
+      while (file.available()) {
+        Serial.write(file.read());
+      }
+    #endif
+    // Bestimme die Dateigröße
+    size_t fileSize = file.size();
+
+    // Setze den Content-Type entsprechend des Dateityps
+    String contentType = "application/octet-stream";
+    if (filePath.endsWith(".html")) {
+        contentType = "text/html";
+    } else if (filePath.endsWith(".txt")) {
+        contentType = "text/plain";
+    } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+        contentType = "image/jpeg";
+    } else if (filePath.endsWith(".png")) {
+        contentType = "image/png";
+    }
+
+    // Sende die HTTP-Antwort mit der Datei
+    request->send(SPIFFS, filePath, contentType, false);
+
+    // Datei schließen
+    file.close();
+});
+server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
       String name = "";
@@ -599,6 +641,8 @@ void webserver_setup(){
     // Speicher freigeben
     delete[] combinedContent;
   }); 
+
+  
   /*  
     File file = SPIFFS.open("/network_settings.html", "r");
     if (!file) {

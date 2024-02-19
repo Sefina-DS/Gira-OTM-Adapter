@@ -228,52 +228,40 @@ String web_spiffs_analyse(){
     while (file)
     {
         String msg = "";
+        size_t fileSize = file.size();
+        float fileSizeKB = (float)fileSize / 1024.0;
         msg += "<tr><td>";
         msg += file.name();
         msg += "</td><td>";
         msg += file.path();
         msg += "</td><td>";
-        msg += file.size();
+        msg += fileSizeKB;
+        msg += " KB</td><td>";
+        msg += "<form action='/System/download' method='GET'><input type='hidden' name='filepath' value='";
+        msg += file.path();
+        msg += "'><input type='submit' value='Download'></form>";
+        msg += "</td><td>";
+        msg += "<form action='/System' method='GET'><input type='submit' name='";
+        msg += file.path();
+        msg += "' value='Löschen'></form>";
         msg += "</td></tr>";
         temp += msg;
-        
-        #ifdef DEBUG_SERIAL_SPIFFS
-            Serial.print("FILE: ");
-            Serial.print(file.name());
-            Serial.print(" // ");
-            Serial.print(file.path());
-            Serial.print(" // ");
-            Serial.println(file.size());
-        #endif
+
         file = root.openNextFile();
     }
-    #ifdef DEBUG_SERIAL_SPIFFS
-        Serial.println("");
-    #endif
-    Serial.println(temp);
     return temp;
 }
-/*
-File root = SPIFFS.open("/");
-    File file = root.openNextFile();
-    #ifdef DEBUG_SERIAL_SPIFFS
-        Serial.println("Spiffs wird nach Datein durchsucht :");
-    #endif
 
-    while (file)
-    {
-        #ifdef DEBUG_SERIAL_SPIFFS
-            Serial.print("FILE: ");
-            Serial.print(file.name());
-            Serial.print(" // ");
-            Serial.println(file.size());
-        #endif
-        file = root.openNextFile();
-    }
-    #ifdef DEBUG_SERIAL_SPIFFS
-        Serial.println("");
-    #endif
-*/
 void web_response_spiff(String name, String value){
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.print("Spiff - Response - Get // name : ");
+        Serial.print(name);
+        Serial.print(" || value : ");
+        Serial.print(value);
+    #endif
+    if          ( value == "Löschen") {
+        if (name != "" ) SPIFFS.remove(name);
+    } else if   ( value == "Download") {
 
+    }
 }
