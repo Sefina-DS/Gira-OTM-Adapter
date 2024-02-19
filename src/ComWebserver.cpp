@@ -339,40 +339,21 @@ void webserver_setup(){
   
   // Routen festlegen
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    String art;
-    String name;
-    String value;
-    int params = request->params();
-    #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.print("URL der Anfrage: ");
-      Serial.println(request->url());
-      Serial.print("HTTP-Methode der Anfrage: ");
-      Serial.println(request->methodToString());
-      Serial.print("IP-Adresse des Clients: ");
-      Serial.println(request->client()->remoteIP().toString());
-    #endif
-    // Behandlung von GET- und POST-Anfragen
     if (request->method() == HTTP_GET) {
-      #ifdef DEBUG_SERIAL_WEBSERVER
-        Serial.printf("-> Get Funktion <-");
-      #endif
-      art = "Get"; // Hier initialisieren
-      name = "";
-      value = "";
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
       for (int i = 0; i < params; i++) {
         AsyncWebParameter *p = request->getParam(i);
         name = p->name().c_str();
         value = p->value().c_str();
-        web_response_GET(name,value);
         #ifdef DEBUG_SERIAL_WEBSERVER
-          Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
         #endif
-            // Hier können Sie die GET-Parameter verarbeiten
-            // z.B. p->name() und p->value()
+        web_response_GET(name,value);
       }
-        // Logik für GET-Anfragen
-        // Hier können Sie die GET-Parameter verarbeiten
-        // und entsprechend reagieren
     } /*else if (request->method() == HTTP_POST) {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.printf("-> Post Funktion <-");
@@ -395,57 +376,60 @@ void webserver_setup(){
         // Hier können Sie die POST-Daten verarbeiten
         // und entsprechend reagieren
     }*/
-    
     if (webserver.notbetrieb) {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Notbetrieb");
       #endif
       // Logik für Notbetriebsseite
-      //request->send_P(200, "text/html", notbetrieb_html);
       request->send_P(200, "text/html", notbetrieb_html, web_request);
     } else {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Normalbetrieb");
-        Serial.print("*Request- Methode : ");
-        Serial.println(request->method());
       #endif
       String temp = "";
-    temp += loadFileContent("/html/head.html");
-    temp += "";
-    temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
-    size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
+      temp += loadFileContent("/html/head.html");
+      temp += "";
+      temp += loadFileContent("/html/bottom.html");
+      size_t combinedContentLength = temp.length();
 
-    // Speicher für den kombinierten Inhalt vorbereiten
-    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
-    size_t index = 0;
+      // Speicher für den kombinierten Inhalt vorbereiten
+      uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+      size_t index = 0;
 
-    for (size_t i = 0; i < temp.length(); i++) {
+      for (size_t i = 0; i < temp.length(); i++) {
         combinedContent[index++] = temp[i];
-    }
-    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+      }
+      combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
 
-    // Senden der Antwort
-    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+      // Senden der Antwort
+      request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
 
-    // Speicher freigeben
-    delete[] combinedContent;
-    }
-  
-    
-  
+      // Speicher freigeben
+      delete[] combinedContent;
+    } 
   });
   server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->method() == HTTP_GET) {
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        name = p->name().c_str();
+        value = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
+        #endif
+        web_response_GET(name,value);
+      }
+    }
     String temp = "";
     temp += loadFileContent("/html/head.html");
     temp += loadFileContent("/html/network.html");
     temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
     size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
 
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
@@ -463,15 +447,28 @@ void webserver_setup(){
     delete[] combinedContent;
   });
   server->on("/Rauchmelder", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->method() == HTTP_GET) {
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        name = p->name().c_str();
+        value = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
+        #endif
+        web_response_GET(name,value);
+      }
+    }
     String temp = "";
     temp += loadFileContent("/html/head.html");
     temp += loadFileContent("/html/detector.html");
     temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
     size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
-
+  
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
     size_t index = 0;
@@ -488,14 +485,27 @@ void webserver_setup(){
     delete[] combinedContent;
   });
   server->on("/Sensoren", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->method() == HTTP_GET) {
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        name = p->name().c_str();
+        value = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
+        #endif
+        web_response_GET(name,value);
+      }
+    }
     String temp = "";
     temp += loadFileContent("/html/head.html");
     temp += loadFileContent("/html/sensor.html");
     temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
     size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
 
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
@@ -513,14 +523,27 @@ void webserver_setup(){
     delete[] combinedContent;
   });
   server->on("/System", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->method() == HTTP_GET) {
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        name = p->name().c_str();
+        value = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
+        #endif
+        web_response_GET(name,value);
+      }
+    }
     String temp = "";
     temp += loadFileContent("/html/head.html");
     temp += loadFileContent("/html/system.html");
     temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
     size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
 
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
@@ -538,14 +561,27 @@ void webserver_setup(){
     delete[] combinedContent;
   });
   server->on("/Logging", HTTP_GET, [](AsyncWebServerRequest *request){
+    if (request->method() == HTTP_GET) {
+      String art = "Get"; // Hier initialisieren
+      String name = "";
+      String value = "";
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter *p = request->getParam(i);
+        name = p->name().c_str();
+        value = p->value().c_str();
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          String logMessage = "GET - " + request->url() + " [%s]: %s\n";
+          Serial.printf(logMessage.c_str(), p->name().c_str(), p->value().c_str());
+        #endif
+        web_response_GET(name,value);
+      }
+    }
     String temp = "";
     temp += loadFileContent("/html/head.html");
     temp += loadFileContent("/html/logging.html");
     temp += loadFileContent("/html/bottom.html");
-    Serial.println("HTML SEITE AB HIER");
-    Serial.println(temp);
     size_t combinedContentLength = temp.length();
-    Serial.println(combinedContentLength);
 
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen

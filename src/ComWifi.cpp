@@ -121,27 +121,27 @@ IPAddress ipwandeln(String temp)
     return temp_ip;
 }
 
-String scan_wifi_ssid()
-{
+String scan_wifi_ssid() {
     String temp = "";
     int n = WiFi.scanNetworks();
-    if (n > 0)
-    {
-        for (int i = 0; i < n; ++i)
-        {
-            if (WiFi.SSID(i) != "")
-            {
-                temp += F("<option value='");
-                temp += WiFi.SSID(i);
-                temp += F("'>");
-                temp += WiFi.SSID(i);
-                temp += F(" | ");
-                temp += WiFi.RSSI(i);
-                temp += F("</option>");
+    int count = 0; // Zähler für die Anzahl der gefundenen SSIDs
+    const int max_networks = 50; // Maximal zulässige Anzahl von SSIDs
+    if (n > 0) {
+        for (int i = 0; i < n; ++i) {
+            if (count >= max_networks) break; // Maximalanzahl erreicht, Schleife beenden
+            if (WiFi.SSID(i) != "") {
+                // Überprüfen, ob SSID bereits in temp enthalten ist
+                if (temp.indexOf(WiFi.SSID(i)) == -1) {
+                    temp += F("<option value='");
+                    temp += WiFi.SSID(i);
+                    temp += F("'>");
+                    temp += WiFi.SSID(i);
+                    temp += F("</option>");
+                    count++; // Zähler erhöhen
+                }
             }
         }
     }
-    Serial.println(temp);
     return temp;
 }
 
