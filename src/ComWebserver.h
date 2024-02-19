@@ -23,6 +23,7 @@ String humanReadableSize(const size_t bytes);
 String listFiles(bool ishtml);
 void webserver_notbetrieb();
 void webserver_normalbetrieb();
+String loadFileContent(const char *filePath);
 
 String web_request(const String &var);
 void web_response_GET(String name, String value);

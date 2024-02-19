@@ -401,7 +401,8 @@ void webserver_setup(){
         Serial.println("Notbetrieb");
       #endif
       // Logik für Notbetriebsseite
-      request->send_P(200, "text/html", notbetrieb_html);
+      //request->send_P(200, "text/html", notbetrieb_html);
+      request->send_P(200, "text/html", notbetrieb_html, web_request);
     } else {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Normalbetrieb");
@@ -417,7 +418,34 @@ void webserver_setup(){
   
   });
   server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/html/network.html", String(), false, web_request);
+    String detectorContent = loadFileContent("/html/detector.html");
+    String networkContent = loadFileContent("/html/network.html");
+    String sensorContent = loadFileContent("/html/sensor.html");
+
+    size_t combinedContentLength = networkContent.length() + detectorContent.length() + sensorContent.length();
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    // Kopiere den Inhalt jedes Strings in das kombinierte Array
+    for (size_t i = 0; i < networkContent.length(); i++) {
+        combinedContent[index++] = networkContent[i];
+    }
+    for (size_t i = 0; i < detectorContent.length(); i++) {
+        combinedContent[index++] = detectorContent[i];
+    }
+    for (size_t i = 0; i < sensorContent.length(); i++) {
+        combinedContent[index++] = sensorContent[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
+    
   });
   server->on("/Rauchmelder", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/html/detector.html", String(), false, web_request);
@@ -466,4 +494,20 @@ void webserver_file(AsyncWebServerRequest *request, String path, String contentT
   } else {
     request->send(404, "text/plain", "Datei nicht gefunden");
   }
+}
+
+String loadFileContent(const char *filePath) {
+    File file = SPIFFS.open(filePath, "r");
+    if (!file) {
+        Serial.println("Fehler beim Öffnen der Datei");
+        return String();
+    }
+
+    String fileContent;
+    while (file.available()) {
+        fileContent += (char)file.read();
+    }
+
+    file.close();
+    return fileContent;
 }
