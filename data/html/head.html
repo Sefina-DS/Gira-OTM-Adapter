@@ -43,17 +43,16 @@
             window.location.href = "/Logging";
         }
     </script>
-
     <body>
         <!-- ÜBERSCHRIFT -->
         <div class="ueberschrift">
             <div class="box">
-                <h1>Rauchmelderadapter - Config 24</h1>
+                <h1>Rauchmelderadapter - Config 30</h1>
                 %header_esp_name% | %header_detector_location%
             </div>
         </div>
-        <!-- INFOFENSTER -->
         <br />
+        <!-- INFOFENSTER -->
         <div class="infozeile" %ph_web_config%>
             <div class="box">
                 <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
@@ -73,16 +72,14 @@
         </div>
         <!-- NAVIGATION -->
         <div class="box">
-            <div class="box">
-                <table class="navigation">
-                    <tr>
-                        <td><button onclick="redirectToNetwork()">Netzwerk</button></td>
-                        <td><button onclick="redirectToDetector()">Rauchmelder</button></td>
-                        <td><button onclick="redirectToSensors()">Sensoren</button></td>
-                        <td><button onclick="redirectToSystem()">System</button></td>
-                        <td><button onclick="redirectToLogging()">Logging</button></td>
-                        <!-- Weitere Buttons für andere Abschnitte -->
-                    </tr>
-                </table>
-            </div>
+            <table class="navigation">
+                <tr>
+                    <td><button onclick="redirectToNetwork()">Netzwerk</button></td>
+                    <td><button onclick="redirectToDetector()">Rauchmelder</button></td>
+                    <td><button onclick="redirectToSensors()">Sensoren</button></td>
+                    <td><button onclick="redirectToSystem()">System</button></td>
+                    <td><button onclick="redirectToLogging()">Logging</button></td>
+                </tr>
+            </table>
         </div>
+  

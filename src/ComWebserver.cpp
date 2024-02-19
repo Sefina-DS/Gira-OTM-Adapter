@@ -409,34 +409,21 @@ void webserver_setup(){
         Serial.print("*Request- Methode : ");
         Serial.println(request->method());
       #endif
-      // Seite aus dem SPIFFS laden
-      request->send(SPIFFS, "/config.html", String(), false, web_request);
-      //request->send(SPIFFS, "/config.css", "text/css");
-    }
-  
-    
-  
-  });
-  server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
-    String detectorContent = loadFileContent("/html/detector.html");
-    String networkContent = loadFileContent("/html/network.html");
-    String sensorContent = loadFileContent("/html/sensor.html");
-
-    size_t combinedContentLength = networkContent.length() + detectorContent.length() + sensorContent.length();
+      String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += "";
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
 
     // Speicher für den kombinierten Inhalt vorbereiten
     uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
     size_t index = 0;
 
-    // Kopiere den Inhalt jedes Strings in das kombinierte Array
-    for (size_t i = 0; i < networkContent.length(); i++) {
-        combinedContent[index++] = networkContent[i];
-    }
-    for (size_t i = 0; i < detectorContent.length(); i++) {
-        combinedContent[index++] = detectorContent[i];
-    }
-    for (size_t i = 0; i < sensorContent.length(); i++) {
-        combinedContent[index++] = sensorContent[i];
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
     }
     combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
 
@@ -445,19 +432,135 @@ void webserver_setup(){
 
     // Speicher freigeben
     delete[] combinedContent;
+    }
+  
     
+  
+  });
+  server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
+    String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += loadFileContent("/html/network.html");
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
   });
   server->on("/Rauchmelder", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/html/detector.html", String(), false, web_request);
+    String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += loadFileContent("/html/detector.html");
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
   });
   server->on("/Sensoren", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/html/sensor.html", String(), false, web_request);
+    String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += loadFileContent("/html/sensor.html");
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
   });
   server->on("/System", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/html/system.html", String(), false, web_request);
+    String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += loadFileContent("/html/system.html");
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
   });
   server->on("/Logging", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/html/logging.html", String(), false, web_request);
+    String temp = "";
+    temp += loadFileContent("/html/head.html");
+    temp += loadFileContent("/html/logging.html");
+    temp += loadFileContent("/html/bottom.html");
+    Serial.println("HTML SEITE AB HIER");
+    Serial.println(temp);
+    size_t combinedContentLength = temp.length();
+    Serial.println(combinedContentLength);
+
+    // Speicher für den kombinierten Inhalt vorbereiten
+    uint8_t *combinedContent = new uint8_t[combinedContentLength + 1]; // +1 für das Nullterminierungszeichen
+    size_t index = 0;
+
+    for (size_t i = 0; i < temp.length(); i++) {
+        combinedContent[index++] = temp[i];
+    }
+    combinedContent[combinedContentLength] = '\0'; // Nullterminierungszeichen hinzufügen
+
+    // Senden der Antwort
+    request->send_P(200, "text/html", combinedContent, combinedContentLength, web_request);
+
+    // Speicher freigeben
+    delete[] combinedContent;
   }); 
   /*  
     File file = SPIFFS.open("/network_settings.html", "r");

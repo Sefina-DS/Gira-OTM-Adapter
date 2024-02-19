@@ -1,123 +1,35 @@
-<!DOCTYPE html>
-<html lang="de">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Konfiguration</title>
-        <link rel="stylesheet" type="text/css" href="/config.css">
-    </head>
-    <style>
-        body {
-            background-color: rgb(39, 37, 37);
-            color: rgb(140, 143, 143);
-        }
-        div.box {
-            background-color: rgb(20, 19, 19);
-            text-align: center;
-            padding: 5px;
-            box-sizing: border-box;
-            border-radius: 30px;
-        }
-        table {
-            width: 500px;
-            text-align: center;
-            margin: 0 auto;
-        }
-        
-    
-    </style>
-    <script>
-        function redirectToSensors() {
-            window.location.href = "/Sensoren";
-        }
-        function redirectToNetwork() {
-            window.location.href = "/Netzwerk";
-        }
-        function redirectToDetector() {
-            window.location.href = "/Rauchmelder";
-        }
-        function redirectToSystem() {
-            window.location.href = "/System";
-        }
-        function redirectToLogging() {
-            window.location.href = "/Logging";
-        }
-    </script>
-
-    <body>
-        <!-- ÜBERSCHRIFT -->
-        <div class="ueberschrift">
-            <div class="box">
-                <h1>Rauchmelderadapter - Config 22</h1>
-                %header_esp_name% | %header_detector_location%
-            </div>
-        </div>
-        <!-- INFOFENSTER -->
-        <br />
-        <div class="infozeile" %ph_web_config%>
-            <div class="box">
-                <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
-                    <tbody>
-                        <tr>
-                            <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
-                            <td style="text-align: left">
-                                <form action="/get">
-                                    <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
-                                </form>
-                            </td>                                            
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <br>
-        </div>
-        <!-- NAVIGATION -->
-        <div class="box">
-            <div class="box">
-                <table class="navigation">
-                    <tr>
-                        <td><button onclick="redirectToNetwork()">Netzwerk</button></td>
-                        <td><button onclick="redirectToDetector()">Rauchmelder</button></td>
-                        <td><button onclick="redirectToSensors()">Sensoren</button></td>
-                        <td><button onclick="redirectToSystem()">System</button></td>
-                        <td><button onclick="redirectToLogging()">Logging</button></td>
-                        <!-- Weitere Buttons für andere Abschnitte -->
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <br>
-        <!-- BEREICH Detector (innen)  -->
-        <div class="box">
-            <h3>Rauchmelder Einstellungen</h3>
-            <form action="/Rauchmelder" method="GET">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Komunikation :</td>
-                            <td>
-                                <select name="detector_komunikation">
+<br>
+<!-- BEREICH Detector (innen)  -->        
+<div class="box">
+    <h3>Rauchmelder Einstellungen</h3>
+    <form action="/Rauchmelder" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Komunikation :</td>
+                    <td>
+                        <select name="detector_komunikation">
                                         
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Einbauort :</td>
-                            <td><input class="setting" type="text" name="detector_location" placeholder="%ph_detector_location%"></td>
-                        </tr>
-                        <tr>
-                            <td>Meldegruppe :</td>
-                            <td><input class="setting" type="text" name="detector_group" placeholder="%ph_detector_grp%"></td>
-                            </tr>
-                            <tr>
-                                <td>Alarmierungsgruppen :</td>
-                                <td><textarea rows="3" cols="40" name="detector_alarm_group" placeholder="%ph_detector_alarmgrp%"></textarea></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                    <br>
-                </form>
-            </div>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Einbauort :</td>
+                    <td><input class="setting" type="text" name="detector_location" placeholder="%ph_detector_location%"></td>
+                </tr>
+                <tr>
+                    <td>Meldegruppe :</td>
+                    <td><input class="setting" type="text" name="detector_group" placeholder="%ph_detector_grp%"></td>
+                </tr>
+                <tr>
+                    <td>Alarmierungsgruppen :</td>
+                    <td><textarea rows="3" cols="40" name="detector_alarm_group" placeholder="%ph_detector_alarmgrp%"></textarea></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+        <br>
+    </form>
+</div>

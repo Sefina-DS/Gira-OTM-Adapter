@@ -1,154 +1,66 @@
-<!DOCTYPE html>
-<html lang="de">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Konfiguration</title>
-        <link rel="stylesheet" type="text/css" href="/config.css">
-    </head>
-    <style>
-        body {
-            background-color: rgb(39, 37, 37);
-            color: rgb(140, 143, 143);
-        }
-        div.box {
-            background-color: rgb(20, 19, 19);
-            text-align: center;
-            padding: 5px;
-            box-sizing: border-box;
-            border-radius: 30px;
-        }
-        table {
-            width: 500px;
-            text-align: center;
-            margin: 0 auto;
-        }
-        
-    
-    </style>
-    <script>
-        function redirectToSensors() {
-            window.location.href = "/Sensoren";
-        }
-        function redirectToNetwork() {
-            window.location.href = "/Netzwerk";
-        }
-        function redirectToDetector() {
-            window.location.href = "/Rauchmelder";
-        }
-        function redirectToSystem() {
-            window.location.href = "/System";
-        }
-        function redirectToLogging() {
-            window.location.href = "/Logging";
-        }
-    </script>
-
-    <body>
-        <!-- ÜBERSCHRIFT -->
-        <div class="ueberschrift">
-            <div class="box">
-                <h1>Rauchmelderadapter - Config 22</h1>
-                %header_esp_name% | %header_detector_location%
-            </div>
-        </div>
-        <!-- INFOFENSTER -->
-        <br />
-        <div class="infozeile" %ph_web_config%>
-            <div class="box">
-                <table style="background-color: rgb(240, 131, 7); width: 800px; border-radius: 30px;">
-                    <tbody>
-                        <tr>
-                            <td style="width: 600px; color: rgb(0, 0, 0)">Es wurden Einstellungen geändert, <br> um diese zu Aktivieren ist ein Neustart notwendig !</td>
-                            <td style="text-align: left">
-                                <form action="/get">
-                                    <input type="submit" name="ESP-Neustart" value="Neustart ausführem" title="ESP-Neustart" style="white-space: pre-line; padding: 5px 10px;">
-                                </form>
-                            </td>                                            
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <br>
-        </div>
-        <!-- NAVIGATION -->
-        <div class="box">
-            <div class="box">
-                <table class="navigation">
-                    <tr>
-                        <td><button onclick="redirectToNetwork()">Netzwerk</button></td>
-                        <td><button onclick="redirectToDetector()">Rauchmelder</button></td>
-                        <td><button onclick="redirectToSensors()">Sensoren</button></td>
-                        <td><button onclick="redirectToSystem()">System</button></td>
-                        <td><button onclick="redirectToLogging()">Logging</button></td>
-                        <!-- Weitere Buttons für andere Abschnitte -->
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <br>
-            <!-- Firmware -->
-            <div class="box">
-                <h3>Firmware einstellungen</h3>
-                <form action="/System" method="GET">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Firmware- build</td>
-                                <td>
-                                    <select name="fw_build">
+<br>
+<!-- Firmware -->
+<div class="box">
+    <h3>Firmware einstellungen</h3>
+    <form action="/System" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Firmware- build</td>
+                    <td>
+                        <select name="fw_build">
                                         
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Firmware- version (Vorhanden)</td>
-                                <td>
-                                    %ph_sys_fwold%
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Firmware- version (zum download)</td>
-                                <td>
-                                    %ph_sys_fwnew%
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <input type="submit" value="Änderungen übernehmen" name="config_save">
-                    <br>
-                </form>
-                <br>
-                <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
-                <br>
-                <br>
-            </div>
-            <!-- Filemanager -->
-            <br>
-            <div class="box">
-                <h3>File- Manager</h3>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>* SPIFFS Übersicht *</td>
-                        </tr>
-                        <tr>
-                            <td>Speichergröße : %spiff_info_size%</td>
-                            <td>Freier Speicher : %spiff_info_free%</td>
-                            <td>Benutzter Speicher : %spiff_info_use%</td>
-                        </tr>
-                        <tr>
-                            <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
-                            <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
-                        </tr>
-                        <tr>
-                            <td>Name</td>
-                            <td>Größe</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        %spiff_ifo_files%
-                    </tbody>
-                </table>
-            </div>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Firmware- version (Vorhanden)</td>
+                    <td>
+                        %ph_sys_fwold%
+                    </td>
+                </tr>
+                <tr>
+                    <td>Firmware- version (zum download)</td>
+                    <td>
+                        %ph_sys_fwnew%
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+    </form>
+    <br>
+    <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+    <br>
+    <br>
+</div>
+<!-- Filemanager -->
+<br>
+<div class="box">
+    <h3>File- Manager</h3>
+    <table>
+        <tbody>
+            <tr>
+                <td>* SPIFFS Übersicht *</td>
+            </tr>
+            <tr>
+                <td>Speichergröße : %spiff_info_size%</td>
+                <td>Freier Speicher : %spiff_info_free%</td>
+                <td>Benutzter Speicher : %spiff_info_use%</td>
+            </tr>
+            <tr>
+                <td><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td>
+                <td><input type="submit" name="upload" value="Upload" title="Upload File"></form></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>Größe</td>
+                <td></td>
+                <td></td>
+            </tr>
+            %spiff_ifo_files%
+        </tbody>
+    </table>
+</div>
