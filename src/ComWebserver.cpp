@@ -364,19 +364,20 @@ void webserver_setup(){
     size_t fileSize = file.size();
 
     // Setze den Content-Type entsprechend des Dateityps
-    String contentType = "application/octet-stream";
-    if (filePath.endsWith(".html")) {
-        contentType = "text/html";
-    } else if (filePath.endsWith(".txt")) {
-        contentType = "text/plain";
-    } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
-        contentType = "image/jpeg";
-    } else if (filePath.endsWith(".png")) {
-        contentType = "image/png";
-    }
+String contentType = "application/octet-stream";
+if (filePath.endsWith(".html")) {
+    contentType = "text/html";
+} else if (filePath.endsWith(".txt")) {
+    contentType = "text/plain";
+} else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+    contentType = "image/jpeg";
+} else if (filePath.endsWith(".png")) {
+    contentType = "image/png";
+}
 
-    // Sende die HTTP-Antwort mit der Datei
-    request->send(SPIFFS, filePath, contentType, false);
+// Sende die HTTP-Antwort mit der Datei
+request->send(SPIFFS, filePath, contentType, true); // Hier wurde der letzte Parameter auf "true" geändert
+
 
     // Datei schließen
     file.close();

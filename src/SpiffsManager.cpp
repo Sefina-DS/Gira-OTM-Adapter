@@ -161,7 +161,12 @@ void log_write(String msg){
         Serial.print( "LOGG-FILE-WRITE : ");
         Serial.println(temp);
     #endif
-
+    if ( SPIFFS.exists(LOG_FILE_PATH)) {
+        Serial.println("Die Datei existiert");
+    } else {
+        Serial.println("die Datei ist nicht da");
+        SPIFFS.open(LOG_FILE_PATH, "w");
+    }
     File file = SPIFFS.open(LOG_FILE_PATH, "r+");
     if (!file) {
         file = SPIFFS.open(LOG_FILE_PATH, "w+");
