@@ -12,5 +12,9 @@ void spiffs_config_load();
 void spiffs_config_read();
 
 String web_request_spiff(const String &var);
+void web_response_spiff(String name, String value);
 
 void log_write(String msg);
+
+
+String web_spiffs_analyse();

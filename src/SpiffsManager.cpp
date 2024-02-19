@@ -155,17 +155,6 @@ void spiffs_config_read()
     fileTemp.close();
 }
 
-String web_request_spiff(const String &var)
-{
-    String temp = "";
-    if          (var == "FILELIST")     { return listFiles(true);
-    } else if   (var == "FREESPIFFS")   { return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes())); 
-    } else if   (var == "USEDSPIFFS")   { return humanReadableSize(SPIFFS.usedBytes());
-    } else if   (var == "TOTALSPIFFS")  { return humanReadableSize(SPIFFS.totalBytes());
-    }
-    return String();
-}
-
 void log_write(String msg){
     String temp = wifi.ntp_date + ";" + timeClient->getFormattedTime() + " ;; " + msg;
     #ifdef DEBUG_SERIAL_SPIFFS
@@ -215,4 +204,76 @@ void log_write(String msg){
             Serial.println("Fehler beim Öffnen der Log-Datei!");
         #endif
     }
+}
+
+String web_request_spiff(const String &var)
+{
+    String temp = "";
+    if          (var == "spiff_info_files")     { return web_spiffs_analyse();
+    } else if   (var == "spiff_info_free")      { return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes())); 
+    } else if   (var == "spiff_info_use")       { return humanReadableSize(SPIFFS.usedBytes());
+    } else if   (var == "spiff_info_size")      { return humanReadableSize(SPIFFS.totalBytes());
+    }
+    return String();
+}
+
+String web_spiffs_analyse(){
+    String temp = "";
+    File root = SPIFFS.open("/");
+    File file = root.openNextFile();
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.println("Spiffs wird nach Datein durchsucht :");
+    #endif
+
+    while (file)
+    {
+        String msg = "";
+        msg += "<tr><td>";
+        msg += file.name();
+        msg += "</td><td>";
+        msg += file.path();
+        msg += "</td><td>";
+        msg += file.size();
+        msg += "</td></tr>";
+        temp += msg;
+        
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.print("FILE: ");
+            Serial.print(file.name());
+            Serial.print(" // ");
+            Serial.print(file.path());
+            Serial.print(" // ");
+            Serial.println(file.size());
+        #endif
+        file = root.openNextFile();
+    }
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.println("");
+    #endif
+    Serial.println(temp);
+    return temp;
+}
+/*
+File root = SPIFFS.open("/");
+    File file = root.openNextFile();
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.println("Spiffs wird nach Datein durchsucht :");
+    #endif
+
+    while (file)
+    {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.print("FILE: ");
+            Serial.print(file.name());
+            Serial.print(" // ");
+            Serial.println(file.size());
+        #endif
+        file = root.openNextFile();
+    }
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.println("");
+    #endif
+*/
+void web_response_spiff(String name, String value){
+
 }

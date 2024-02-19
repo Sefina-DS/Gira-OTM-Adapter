@@ -242,6 +242,7 @@ void web_response_GET(String name, String value)
     Serial.println(value);
   #endif 
   
+  web_response_spiff(name,value);
   web_response_sys(name,value);
   webserver_triger_wifi(name, value);
   web_response_mqtt(name, value);
