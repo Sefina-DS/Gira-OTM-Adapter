@@ -141,6 +141,7 @@ String scan_wifi_ssid()
             }
         }
     }
+    Serial.println(temp);
     return temp;
 }
 
