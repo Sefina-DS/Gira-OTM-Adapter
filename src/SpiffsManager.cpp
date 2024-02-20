@@ -197,9 +197,9 @@ String web_request_spiff(const String &var)
                         String tempContent;
                         File file = SPIFFS.open(LOG_FILE_PATH, "r");
                         while (file.available()) {
-                            tempContent += "<tr>";
+                            tempContent += "<tr><td>";
                             tempContent += file.readStringUntil('\n');
-                            tempContent += "</tr>";
+                            tempContent += "</tr></td>";
                         }
                         file.close();
                         return tempContent;
