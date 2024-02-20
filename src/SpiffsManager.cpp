@@ -155,59 +155,32 @@ void spiffs_config_read()
     fileTemp.close();
 }
 
-void log_write(String msg){
-    String temp = wifi.ntp_date + ";" + timeClient->getFormattedTime() + " ;; " + msg;
+void log_write(String msg) {
+    String temp = wifi.ntp_date + ";" + timeClient->getFormattedTime() + " ;; " + msg + '\n';
+    String templine;
     #ifdef DEBUG_SERIAL_SPIFFS
-        Serial.print( "LOGG-FILE-WRITE : ");
+        Serial.print("LOGG-FILE-WRITE : ");
         Serial.println(temp);
     #endif
-    if ( SPIFFS.exists(LOG_FILE_PATH)) {
-        Serial.println("Die Datei existiert");
-    } else {
-        Serial.println("die Datei ist nicht da");
-        SPIFFS.open(LOG_FILE_PATH, "w");
-    }
-    File file = SPIFFS.open(LOG_FILE_PATH, "r+");
-    if (!file) {
-        file = SPIFFS.open(LOG_FILE_PATH, "w+");
-    }
 
-    if (file) {
-        int lineCount = 0;
-        while (file.available()) {
-            if (file.read() == '\n') {
-                lineCount++;
-            }
+    // lesen der log datei
+    if (SPIFFS.exists(LOG_FILE_PATH)) {
+        File loggfile = SPIFFS.open( LOG_FILE_PATH, "r");
+        int line = 0;
+        while ( loggfile.available() && line < 19 ) {
+            templine = loggfile.readStringUntil('\n'); // lesen bis Zeilenumbruch..
+            templine += '\n';
+            temp += templine;
+            line ++;
         }
-
-        while (lineCount >= MAX_LINES) {
-            file.seek(0);
-            while (file.available()) {
-                char c = file.read();
-                if (c == '\n') {
-                    break;
-                }
-            }
-            lineCount--;
-        }
-
-        file.seek(0);
-
-        String existingContent = file.readString();
-        
-        file.seek(0);
-        file.print(temp);
-        file.print('\n');
-        file.print(existingContent);
-
-        file.close();
-        #ifdef DEBUG_SERIAL_SPIFFS
-            Serial.println("Logeintragung erfolgreich");
-        #endif
+        loggfile.close();
+        loggfile = SPIFFS.open( LOG_FILE_PATH, "w");
+        loggfile.print(temp);
+        loggfile.close();
     } else {
-        #ifdef DEBUG_SERIAL_SPIFFS
-            Serial.println("Fehler beim Öffnen der Log-Datei!");
-        #endif
+        File loggfile = SPIFFS.open( LOG_FILE_PATH, "w");
+        loggfile.print(temp);
+        loggfile.close();
     }
 }
 
@@ -218,6 +191,18 @@ String web_request_spiff(const String &var)
     } else if   (var == "spiff_info_free")      { return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes())); 
     } else if   (var == "spiff_info_use")       { return humanReadableSize(SPIFFS.usedBytes());
     } else if   (var == "spiff_info_size")      { return humanReadableSize(SPIFFS.totalBytes());
+    } else if   (var == "display_loggfile")      { 
+                        if ( !SPIFFS.exists(LOG_FILE_PATH) ) return String();
+                        unsigned int zeilenZaehler = 0;
+                        String tempContent;
+                        File file = SPIFFS.open(LOG_FILE_PATH, "r");
+                        while (file.available()) {
+                            tempContent += "<tr>";
+                            tempContent += file.readStringUntil('\n');
+                            tempContent += "</tr>";
+                        }
+                        file.close();
+                        return tempContent;
     }
     return String();
 }
