@@ -60,18 +60,12 @@
         <tbody>
             <tr>
                 <form method="POST" action="/system/upload" enctype="multipart/form-data">
-                    <td>
-                        <input type="file" name="data">
-                    </td>
-                    <td>
-                        <input type="submit" name="upload" value="Upload" title="Upload File">
-                    </td>
-                    <td>
-                        <label for="uploadPath">Zieladresse:</label>
-                        <input type="text" id="uploadPath" name="uploadPath" value="/"><br>
-                        <input type="submit" value="Setzen">
-                    </td>
+                    <input type="file" name="data">
+                    <input type="submit" name="upload" value="Upload" title="Upload File">
+                    <input type="text" id="uploadPath" name="uploadPath" value="/"><br>
+                    <input type="submit" value="Setzen">
                 </form>
+                
             </tr>
             
         </tbody>
