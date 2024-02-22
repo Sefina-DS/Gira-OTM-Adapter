@@ -156,7 +156,7 @@ void spiffs_config_read()
 }
 
 void log_write(String msg) {
-    String temp = wifi.ntp_date + ";" + timeClient->getFormattedTime() + " ;; " + msg + '\n';
+    String temp = wifi.ntp_date + " ; " + timeClient->getFormattedTime() + " ;; " + msg + '\n';
     String templine;
     #ifdef DEBUG_SERIAL_SPIFFS
         Serial.print("LOGG-FILE-WRITE : ");
@@ -178,6 +178,9 @@ void log_write(String msg) {
         loggfile.print(temp);
         loggfile.close();
     } else {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.print("Loggdatei ist nicht vorhanden und muss erstellt werden");
+        #endif
         File loggfile = SPIFFS.open( LOG_FILE_PATH, "w");
         loggfile.print(temp);
         loggfile.close();
@@ -193,7 +196,6 @@ String web_request_spiff(const String &var)
     } else if   (var == "spiff_info_size")      { return humanReadableSize(SPIFFS.totalBytes());
     } else if   (var == "display_loggfile")      { 
                         if ( !SPIFFS.exists(LOG_FILE_PATH) ) return String();
-                        unsigned int zeilenZaehler = 0;
                         String tempContent;
                         File file = SPIFFS.open(LOG_FILE_PATH, "r");
                         while (file.available()) {

@@ -237,8 +237,8 @@ StaticJsonDocument<1024> safe_conf_wifi(StaticJsonDocument<1024> doc)
 }
 
 void time_setup(){
+    timeClient->setTimeOffset(3600);
     timeClient->begin();
-    timeClient->setTimeOffset(3600); // Mitteleuropäische Zeit (UTC+1)
     time_sync();
 }
 

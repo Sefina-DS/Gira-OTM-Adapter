@@ -185,50 +185,6 @@ String web_request(const String &var)
   // System
   temp = web_request_sys(var);          if (temp != "") return temp;
   temp = web_request_spiff(var);        if (temp != "") return temp;
-  
-  if ( var == "ph_web_config" ) { return (!webserver.config)   ? "display: none; " 
-                                                              : "";
-  }
-  
-  if          (var == "display_network")    { return ( webserver.navigation == "Netzwerk")      ? ""
-                                                                                                : "style= 'display: none'";
-  } else if   (var == "display_detector")   { return ( webserver.navigation == "Rauchmelder")   ? ""
-                                                                                                : "style= 'display: none'";
-  } else if   (var == "display_sensors")    { return ( webserver.navigation == "Sensoren")      ? ""
-                                                                                                : "style= 'display: none'";
-  } else if   (var == "display_system")     { return ( webserver.navigation == "System")        ? ""
-                                                                                                : "style= 'display: none'";
-  } else if   (var == "display_logging")    { return ( webserver.navigation == "Logging")       ? ""
-                                                                                                : "style= 'display: none'";
-  }
-  
-  
-  Serial.println("Variable - navigation = " + webserver.navigation);
-  if (var == "navigation-network" &&
-      webserver.navigation != "Netzwerk")
-  {
-    return "display: none;";
-  }
-  if (var == "navigation-detector" &&
-      webserver.navigation != "Rauchmelder")
-  {
-    return "display: none;";
-  }
-  if (var == "navigation-sensor" &&
-      webserver.navigation != "Sensoren")
-  {
-    return "display: none;";
-  }
-  if (var == "navigation-system" &&
-      webserver.navigation != "System")
-  {
-    return "display: none;";
-  }
-  if (var == "navigation-log" &&
-      webserver.navigation != "Logging")
-  {
-    return "display: none;";
-  }
  
   return String();
 }
@@ -341,13 +297,11 @@ void webserver_setup(){
   // Routen festlegen
   server->on("/System/download", HTTP_GET, [](AsyncWebServerRequest *request) {
     // Pfad zur herunterzuladenden Datei aus den Abfrageparametern erhalten
-    String filePath = request->arg("filepath");
-    
+    String filePath = request->arg("filepath");  
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.print("Downloadanfrage gesendet, der Pfad ist : ");
       Serial.println(filePath);
     #endif
-
     // Öffne die Datei zum Lesen
     File file = SPIFFS.open(filePath, "r");
     if (!file) {
@@ -362,27 +316,67 @@ void webserver_setup(){
     #endif
     // Bestimme die Dateigröße
     size_t fileSize = file.size();
-
     // Setze den Content-Type entsprechend des Dateityps
-String contentType = "application/octet-stream";
-if (filePath.endsWith(".html")) {
-    contentType = "text/html";
-} else if (filePath.endsWith(".txt")) {
-    contentType = "text/plain";
-} else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
-    contentType = "image/jpeg";
-} else if (filePath.endsWith(".png")) {
-    contentType = "image/png";
-}
-
-// Sende die HTTP-Antwort mit der Datei
-request->send(SPIFFS, filePath, contentType, true); // Hier wurde der letzte Parameter auf "true" geändert
-
-
+    String contentType = "application/octet-stream";
+    if (filePath.endsWith(".html")) {
+      contentType = "text/html";
+    } else if (filePath.endsWith(".txt")) {
+      contentType = "text/plain";
+    } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
+      contentType = "image/jpeg";
+    } else if (filePath.endsWith(".png")) {
+      contentType = "image/png";
+    }
+    // Sende die HTTP-Antwort mit der Datei
+    request->send(SPIFFS, filePath, contentType, true); // Hier wurde der letzte Parameter auf "true" geändert
     // Datei schließen
     file.close();
-});
-server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+  });
+  
+  server->on("/system/upload", HTTP_POST, [](AsyncWebServerRequest *request){
+    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "Upload erfolgreich!");
+    response->addHeader("Connection", "close");
+    request->send(response);
+
+    const String uploadPath = request->getParam("uploadPath")->value();
+    const String fileName = request->getParam("data")->value();
+
+    #ifdef DEBUG_SERIAL_WEBSERVER
+      Serial.print("Upload-Pfad: ");
+      Serial.println(uploadPath);
+      Serial.print("Dateiname: ");
+      Serial.println(fileName);
+    #endif
+
+    // Verarbeitung des Dateiinhalts
+    if(request->hasParam("data", true)) {
+      AsyncWebParameter* file = request->getParam("data", true);
+      size_t fileSize = file->size();
+
+      if(fileSize) {
+        // Öffne die Datei im SPIFFS mit dem gewünschten Pfad und Dateinamen
+        String filePath = uploadPath + fileName;
+        File f = SPIFFS.open(filePath, "w");
+        if (!f) {
+          #ifdef DEBUG_SERIAL_WEBSERVER
+            Serial.println("Fehler beim Öffnen der Datei im SPIFFS!");
+          #endif
+          return;
+        }
+
+        // Schreibe den Dateiinhalt in die Datei im SPIFFS
+        size_t bytesWritten = f.write((const uint8_t *)file->value().c_str(), fileSize);
+        f.close();
+
+        #ifdef DEBUG_SERIAL_WEBSERVER
+          Serial.print("Datei erfolgreich gespeichert. Dateigröße: ");
+          Serial.println(bytesWritten);
+        #endif
+      }
+    }
+  });
+
+  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
       String name = "";
@@ -452,6 +446,7 @@ server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
       delete[] combinedContent;
     } 
   });
+  
   server->on("/Netzwerk", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
@@ -490,6 +485,7 @@ server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     // Speicher freigeben
     delete[] combinedContent;
   });
+  
   server->on("/Rauchmelder", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
@@ -528,6 +524,7 @@ server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     // Speicher freigeben
     delete[] combinedContent;
   });
+  
   server->on("/Sensoren", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
@@ -566,6 +563,7 @@ server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     // Speicher freigeben
     delete[] combinedContent;
   });
+  
   server->on("/System", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
@@ -604,6 +602,7 @@ server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     // Speicher freigeben
     delete[] combinedContent;
   });
+  
   server->on("/Logging", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren

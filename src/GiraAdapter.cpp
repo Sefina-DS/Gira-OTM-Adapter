@@ -49,15 +49,14 @@ void setup()
 
     //SPIFFS.remove("/config.html");
     //SPIFFS.remove("/config.css");
-    if (SPIFFS.exists("/config.html")) webserver.notbetrieb = false;
+    if (SPIFFS.exists("/html/head.html")) webserver.notbetrieb = false;
     webserver_setup();
 
 
     //webserver_art();
 
     version_check();
-
-    void time_setup();
+    time_setup();
 
     if ( mqtt.aktiv )     mqtt_setup(); 
     if ( sensors.bme )    bme_setup();
@@ -74,6 +73,7 @@ void setup()
     delay(1000);
     ESP.restart();
   }
+  log_write("Startsequenz vollständig");
 }
 
 void loop()
@@ -86,14 +86,6 @@ void loop()
   if ( comserial.aktiv ) serial_receive();
   if ( comserial.aktiv ) serial_transceive_diagnose();
 
-  #ifdef DEBUG_SERIAL_WIFI
-      if ( millis() >= ntp_timer ) {
-        ntp_timer = millis() + 10000;
-        Serial.println(wifi.ntp_date + " " + timeClient->getFormattedTime() + " // " + timeClient->getDay());
-        log_counter++;
-        log_write("Logcounter = " + log_counter);
-      }
-  #endif
 
   
   
