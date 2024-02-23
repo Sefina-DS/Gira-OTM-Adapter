@@ -341,7 +341,7 @@ void webserver_setup(){
   });
   
   server->on(
-    "/system/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+    "/System/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
         request->send(200);
     },
     handleUpload
