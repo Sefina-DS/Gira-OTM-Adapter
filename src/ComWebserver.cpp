@@ -61,14 +61,14 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
 {
   // Überprüfe, ob das uploadPath-Feld vorhanden ist und lese den Wert aus
     Serial.print("Wert des uploadPath-Feldes FUNKTION : ");
-    Serial.println(webserver.teststring);
+    Serial.println(webserver.uploadFolder);
   
   #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
   #endif
   if (!index) {
     // open the file on first call and store the file handle in the request object
-    request->_tempFile = SPIFFS.open("/" + filename, "w");
+    request->_tempFile = SPIFFS.open(webserver.uploadFolder + filename, "w");
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Start: " + String(filename));
     #endif
@@ -87,7 +87,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Complete: " + String(filename) + ",size: " + String(index + len));
     #endif
-    request->redirect("/");
+    request->redirect("/System/");
   }
 }
 
@@ -170,8 +170,9 @@ String web_request(const String &var)
   #endif
   String temp = "";
   // Überschrift
-  if (var == "header_esp_name" ) return wifi.esp_name;
-  if (var == "header_detector_location" ) return detector.location;
+  if (var == "header_esp_name" )            return wifi.esp_name;
+  if (var == "header_detector_location" )   return detector.location;
+  if (var == "textarea_system_upload" )     return "<input type='text' id='uploadPath' name='uploadPath' value='" + webserver.uploadFolder + "'>";
   
   // Netzwerk
   temp = web_request_wifi(var);         if (temp != "") return temp; 
@@ -211,6 +212,7 @@ void web_response_GET(String name, String value)
   else if   (name == "config_save" && value == "Änderungen übernehmen") {     spiffs_config_save();
                                                                             webserver.config = true; }
   else if   (name == "ESP-Neustart")                                        ESP.restart();
+  else if   (name == "uploadPath")                                          webserver.uploadFolder = value;
   
   if (name == "reset_config") {
     if (value == "Werkseinstellungen laden !") {
