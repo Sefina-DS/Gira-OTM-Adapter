@@ -8,6 +8,7 @@ struct WEBSERVER
     boolean config = false;
     unsigned long timer = 0;
     bool notbetrieb = true;
+    String teststring;
 };
 extern WEBSERVER webserver;
 

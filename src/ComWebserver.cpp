@@ -2,6 +2,7 @@
 
 WEBSERVER webserver;
 
+
 void webserver_art()
 {
   server = new AsyncWebServer(80);
@@ -58,21 +59,21 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
 {
+  // Überprüfe, ob das uploadPath-Feld vorhanden ist und lese den Wert aus
+    Serial.print("Wert des uploadPath-Feldes FUNKTION : ");
+    Serial.println(webserver.teststring);
+  
   #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Client:" + request->client()->remoteIP().toString() + " " + request->url());
   #endif
-
-  if (!index)
-  {
+  if (!index) {
     // open the file on first call and store the file handle in the request object
     request->_tempFile = SPIFFS.open("/" + filename, "w");
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Start: " + String(filename));
     #endif
   }
-
-  if (len)
-  {
+  if (len) {
     // stream the incoming chunk to the opened file
     request->_tempFile.write(data, len);
     #ifdef DEBUG_SERIAL_WEBSERVER
@@ -80,8 +81,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     #endif
   }
 
-  if (final)
-  {
+  if (final) {
     // close the file handle as the upload is now done
     request->_tempFile.close();
     #ifdef DEBUG_SERIAL_WEBSERVER
@@ -90,6 +90,7 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     request->redirect("/");
   }
 }
+
 
 String humanReadableSize(const size_t bytes)
 {
@@ -227,11 +228,16 @@ void web_response_GET(String name, String value)
 
 void webserver_config()
 {
+    /*
     // run handleUpload function when any file is uploaded
-    server->on(
-        "/upload", HTTP_POST, [](AsyncWebServerRequest *request)
-        { request->send(200); },
-        handleUpload);
+    server->on("/system/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+    String targetFolder = "/"; // Standard-Zielordner
+    if (request->hasParam("uploadPath", true)) {
+      targetFolder = request->getParam("uploadPath", true)->value(); // Hole den Zielordner aus den Parametern
+      }
+    request->send(200);
+    }, //std::bind(handleUpload, std::placeholders::_1, "filename", targetFolder, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
+    );*/
 
     server->on(
         "/post", HTTP_POST, [](AsyncWebServerRequest *request)
@@ -289,6 +295,7 @@ void webserver_config()
 }
 
 void webserver_setup(){
+  String uploadFolder;
   #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Webserver wird konfiguriert");
   #endif
@@ -333,67 +340,12 @@ void webserver_setup(){
     file.close();
   });
   
-  server->on("/system/upload", HTTP_POST, [](AsyncWebServerRequest *request){
-    Serial.println("HTTP-POST-Anfrage auf /system/upload empfangen.");
-
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "Upload erfolgreich!");
-    response->addHeader("Connection", "close");
-    request->send(response);
-
-    // Debugging-Ausgabe: Anzahl der Parameter in der Anfrage
-    Serial.print("Anzahl der Parameter in der Anfrage: ");
-    Serial.println(request->params());
-
-    // Debugging-Ausgabe: Namen der Parameter in der Anfrage
-    Serial.println("Namen der Parameter in der Anfrage:");
-    for(size_t i=0; i<request->params(); i++){
-        Serial.println(request->getParam(i)->name());
-    }
-
-    // Überprüfe, ob Datei hochgeladen wurde
-    if(request->hasParam("data", true)){
-        AsyncWebParameter* p = request->getParam("data", true);
-
-        // Debugging-Ausgabe: Dateiname und Dateigröße
-        Serial.println("Datei gefunden.");
-        Serial.print("Dateiname: ");
-        Serial.println(p->name());
-        Serial.print("Dateigröße: ");
-        Serial.println(p->size());
-
-        // Überprüfe, ob die Dateigröße größer als 0 ist
-        if(p->size() > 0){
-            // Extrahiere den Dateinamen aus dem Parameter
-            String fileName = p->name();
-
-            // Öffne eine Datei zum Schreiben im SPIFFS
-            String filePath = "/testordner/" + fileName;
-            Serial.print("Dateipfad: ");
-            Serial.println(filePath);
-            File file = SPIFFS.open(filePath, "w");
-            if(!file){
-                Serial.println("Fehler beim Öffnen der Datei im SPIFFS!");
-                return;
-            }
-
-            // Schreibe die Datei im SPIFFS
-            size_t dataSize = p->size();
-            size_t bytesWritten = file.write((const uint8_t*)p->value().c_str(), dataSize);
-            if(bytesWritten != dataSize){
-                Serial.println("Fehler beim Schreiben der Datei im SPIFFS!");
-                file.close();
-                return;
-            }
-
-            Serial.println("Datei erfolgreich hochgeladen: " + filePath);
-            file.close();
-        } else {
-            Serial.println("Die Dateigröße ist 0. Keine Datei hochgeladen!");
-        }
-    } else {
-        Serial.println("Keine Datei gefunden.");
-    }
-});
+  server->on(
+    "/system/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        request->send(200);
+    },
+    handleUpload
+);
 
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
