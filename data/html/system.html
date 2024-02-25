@@ -9,20 +9,20 @@
                     <td>Firmware- build</td>
                     <td>
                         <select name="fw_build">
-                                        
+                            %button_firmware%            
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td>Firmware- version (Vorhanden)</td>
                     <td>
-                        %ph_sys_fwold%
+                        %text_firmware_old%
                     </td>
                 </tr>
                 <tr>
                     <td>Firmware- version (zum download)</td>
                     <td>
-                        %ph_sys_fwnew%
+                        %text_firmware_new%
                     </td>
                 </tr>
             </tbody>
@@ -32,7 +32,7 @@
         <br>
     </form>
     <br>
-    <form action="/get"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+    <form action="/System" method="GET"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
     <br>
     <br>
 </div>

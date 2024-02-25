@@ -18,8 +18,9 @@ void version_check()
         #ifdef DEBUG_SERIAL_OUTPUT
             Serial.println("Version- Update wird geprüfft ... ");
         #endif
+        String url = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/" + "firmware/version.txt";
         HTTPClient http;
-        http.begin( "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + + "firmware/version.txt" );
+        http.begin( url );
         int httpCode = http.GET();
         if(httpCode > 0) 
         {
@@ -38,6 +39,8 @@ void version_check()
             system_funktion.new_version = false;
         }
         #ifdef DEBUG_SERIAL_OUTPUT
+            Serial.print("Frimwareversion von : ");
+            Serial.println(url);
             Serial.print("alte Version : ");
             Serial.print(system_funktion.version_old);
             Serial.print(" // neue Version : ");
@@ -52,7 +55,7 @@ void version_check()
     }
 }
 
-void file_download(String download_file_path, String spiff_file_path) {
+bool file_download(String download_file_path, String spiff_file_path) {
     #ifdef DEBUG_SERIAL_OUTPUT
         Serial.println("Fieledownload URL : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + download_file_path);
     #endif
@@ -69,7 +72,7 @@ void file_download(String download_file_path, String spiff_file_path) {
             #ifdef DEBUG_SERIAL_OUTPUT
                 Serial.println("File kann nicht erstellt werden");
             #endif
-            return;
+            return false;
         }
     
         // Dateiinhalt von der HTTP-Antwort lesen und im SPIFFS speichern
@@ -82,10 +85,12 @@ void file_download(String download_file_path, String spiff_file_path) {
     
         // Datei schließen
         file.close();
+        return true;
         #ifdef DEBUG_SERIAL_OUTPUT
             Serial.println("File " + spiff_file_path + " erfolgreich gedownloadet");
         #endif
     } else {
+        return false;
         #ifdef DEBUG_SERIAL_OUTPUT
             Serial.printf("File download fehlgeschlagen mit : : %d\n", httpCode);
         #endif
@@ -162,6 +167,7 @@ void folder_download(const String& download_folder_path, const String& spiffs_fo
     http.end();
 }
 */
+/*
 void folder_download(const String& download_folder_path, const String& spiffs_folder_path) {
     HTTPClient http;
     
@@ -182,7 +188,8 @@ void folder_download(const String& download_folder_path, const String& spiffs_fo
 
     http.end();
 }
-
+*/
+/*
 void processJsonStream(WiFiClient& client, const String& spiffs_folder_path) {
     DynamicJsonDocument doc(2048); // Größe des JSON-Dokuments anpassen
 
@@ -263,7 +270,8 @@ void processJsonStream(WiFiClient& client, const String& spiffs_folder_path) {
         }
     }
 }
-
+*/
+/*
 void processJsonArray(const String& jsonContent, const String& spiffs_folder_path) {
     // JSON-Daten analysieren
     StaticJsonDocument<2048> doc;
@@ -311,8 +319,8 @@ void processJsonArray(const String& jsonContent, const String& spiffs_folder_pat
         Serial.println("Ungültiges JSON-Array");
     }
 }
-
-
+*/
+/*
 void downloadFile(const String& url, const String& filePath) {
     HTTPClient http;
     http.begin(url);
@@ -326,7 +334,8 @@ void downloadFile(const String& url, const String& filePath) {
     }
     http.end();
 }
-
+*/
+/*
 void test(const String& folderPath) {
     HTTPClient http;
     
@@ -387,9 +396,10 @@ void test(const String& folderPath) {
 
     http.end();
 }
-
+*/
 void firmwareupdate_http() {
     if (WiFi.isConnected() && system_funktion.new_version) {
+        String url = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin";
         system_funktion.new_version = false;
         webserver.sperre = true;
         //file_download("/config.html");
@@ -397,11 +407,10 @@ void firmwareupdate_http() {
 
         #ifdef DEBUG_SERIAL_OUTPUT
             Serial.println("Firmware-Update wird gestartet...");
-            Serial.println("Url ist : https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
+            Serial.println("Url ist : " + url );
         #endif
 
-        //String firmwareURL = "https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin";
-        t_httpUpdate_return ret = ESPhttpUpdate.update("https://raw.githubusercontent.com/Sefina-DS/Gira-OTM-Adapter/" + system_funktion.fw_art + "/firmware/firmware.bin");
+        t_httpUpdate_return ret = ESPhttpUpdate.update(url);
                 
         switch (ret) {
             case HTTP_UPDATE_FAILED:
@@ -462,14 +471,14 @@ StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
 
 
 String web_request_sys(const String &var) {
-    if          (var == "ph_sys_fwtyp") {
-        return (system_funktion.fw_art == "main" )  ? "'main' selected='main'>main</option><option value='beta'>beta" 
-                                                    : "'beta' selected='beta'>beta</option><option value='main'>main";
-    } else if   (var == "ph_sys_fwold") {
-        return system_funktion.version_old ;
-    } else if   (var == "ph_sys_fwnew") {
-        return system_funktion.version_new ;
+    if              (var == "button_firmware")      { 
+        if          ( system_funktion.fw_art == "main" ) {   return "<option value='main' selected>main</option><option value='beta'>beta</option>" ; 
+        }else if    ( system_funktion.fw_art == "beta" ) {   return "<option value='beta' selected>beta</option><option value='main'>main</option>";
+        }                                                                                     
+    } else if       (var == "text_firmware_old")    { return system_funktion.version_old;
+    } else if       (var == "text_firmware_new")    { return system_funktion.version_new;
     }
+    
     return String();
 }
 void web_response_sys(String name, String msg) {

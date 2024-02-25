@@ -253,7 +253,7 @@ void web_response_spiff(String name, String value){
         Serial.print("Spiff - Response - Get // name : ");
         Serial.print(name);
         Serial.print(" || value : ");
-        Serial.print(value);
+        Serial.println(value);
     #endif
     if          ( value == "Löschen") {
         if (name != "" ) SPIFFS.remove(name);

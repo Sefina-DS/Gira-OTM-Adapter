@@ -144,7 +144,12 @@ void web_response_GET(String name, String value)
 void webserver_setup(){
   String uploadFolder;
   #ifdef DEBUG_SERIAL_WEBSERVER
-    Serial.println("Webserver wird konfiguriert");
+    Serial.print("Webserver wird konfiguriert : ");
+    if ( webserver.notbetrieb ) { 
+      Serial.println( " -> für Notbetrieb <-");
+    } else {
+      Serial.println( " -> für Normalbetrieb <-");
+    }
   #endif
   server = new AsyncWebServer(80);
   
@@ -470,17 +475,24 @@ String loadFileContent(const char *filePath) {
 
 bool check_files(){
   if (!WiFi.isConnected()){
-    if ( !SPIFFS.exists("/html/network.html"))  return false;
-    if ( !SPIFFS.exists("/html/head.html"))     return false;
-    if ( !SPIFFS.exists("/html/bottom.html"))   return false;
+    if ( !SPIFFS.exists("/html/network.html"))  return true;
+    if ( !SPIFFS.exists("/html/head.html"))     return true;
+    if ( !SPIFFS.exists("/html/bottom.html"))   return true;
   } else {
-    if ( SPIFFS.exists("/html/network.html"))   file_download("/data/html/network.html", "/html/network.html");
-    if ( SPIFFS.exists("/html/detector.html"))  file_download("/data/html/detector.html", "/html/detector.html");
-    if ( SPIFFS.exists("/html/sensor.html"))    file_download("/data/html/sensor.html", "/html/sensor.html");
-    if ( SPIFFS.exists("/html/system.html"))    file_download("/data/html/system.html", "/html/system.html");
-    if ( SPIFFS.exists("/html/logging.html"))   file_download("/data/html/logging.html", "/html/logging.html");
-    if ( SPIFFS.exists("/html/head.html"))      file_download("/data/html/head.html", "/html/head.html");
-    if ( SPIFFS.exists("/html/bottom.html"))    file_download("/data/html/bottom.html", "/html/bottom.html");
+    int error = 0;
+    if ( !SPIFFS.exists("/html/network.html"))   if (!file_download("/data/html/network.html", "/html/network.html"))   ++error ;
+    if ( !SPIFFS.exists("/html/detector.html"))  if (file_download("/data/html/detector.html", "/html/detector.html"))  ++error ;
+    if ( !SPIFFS.exists("/html/sensor.html"))    if (file_download("/data/html/sensor.html", "/html/sensor.html"))      ++error ;
+    if ( !SPIFFS.exists("/html/system.html"))    if (file_download("/data/html/system.html", "/html/system.html"))      ++error ;
+    if ( !SPIFFS.exists("/html/logging.html"))   if (file_download("/data/html/logging.html", "/html/logging.html"))    ++error ;
+    if ( !SPIFFS.exists("/html/head.html"))      if (file_download("/data/html/head.html", "/html/head.html"))          ++error ;
+    if ( !SPIFFS.exists("/html/bottom.html"))    if (file_download("/data/html/bottom.html", "/html/bottom.html"))      ++error ;
+    if ( error == 0 ) {
+      return false;
+    } else {
+      return true;
+    }
+    return true;
   }
   return true;
 }
