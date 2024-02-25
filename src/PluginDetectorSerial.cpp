@@ -242,6 +242,7 @@ void serial_receive_diagnose(String msg) {
         #endif
     } else if       (topic == "C2" || topic == "82") {
         // -> Erstes Byte
+        bool error = false;
         temp_string = msg.substring(2, 4);
         #ifdef DEBUG_SERIAL_DETECTOR
             Serial.print("Byte 1 : ");
@@ -250,11 +251,11 @@ void serial_receive_diagnose(String msg) {
         temp_string = msg.substring(2, 3);
         if      ( temp_string == "0" )  { detectordiag.ub_ext = "true"; } 
         else if ( temp_string == "2" )  { detectordiag.ub_ext = "false"; }
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
+        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
         temp_string = msg.substring(3, 4);
         if      ( temp_string == "0" ) mqtt_publish ( "Detector-Status/Taster", "false");
         else if ( temp_string == "8" ) mqtt_publish ( "Detector-Status/Taster", "true");
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
+        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);  error = true;
 
         // Zweites Byte
         temp_string = msg.substring(4, 6);
@@ -272,11 +273,11 @@ void serial_receive_diagnose(String msg) {
         else if ( temp_string == "2" || temp_string == "8" || temp_string == "A" ) {     
                 mqtt_publish ( "Detector-Status/Alarm", "false");
                 mqtt_publish ( "Detector-Status/Alarm-Test", "true");  }
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
+        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);  error = true;
         temp_string = msg.substring(5, 6);
         if      ( temp_string == "0" ) mqtt_publish ( "Detector-Status/Störung-Batterie", "false");
         else if ( temp_string == "1" ) mqtt_publish ( "Detector-Status/Störung-Batterie", "true");
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
+        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
         
 
         // Drites Byte
@@ -285,7 +286,7 @@ void serial_receive_diagnose(String msg) {
             Serial.print("Byte 3 : ");
             Serial.println(temp_string);
         #endif
-        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
+        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
         
 
         // Fiertes Byte
@@ -294,153 +295,8 @@ void serial_receive_diagnose(String msg) {
             Serial.print("Byte 4 : ");
             Serial.println(temp_string);
         #endif
-        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg);
-    }
-   
-    // Hier kannst du den Code einfügen, um die extrahierten Stellen zu verarbeiten
-    // Zum Beispiel: Vergleiche mit einem anderen Wert
+        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
 
-}
-
-/*
-void filter(byte msg[10], int size)
-{
-    String topic_temp = "";
-    int bitTemp = 0;
-    int order = 0;
-    String orderSTR = "";
-    char temp_input2[10];
-    char temp_input4[10];
-    char temp_input6[10];
-    char temp_input8[10];
-    char letter;
-    String temp_msg = "";
-    float temp_float = 0;
-    unsigned long temp_long = 0;
-    char *endptr;
-    order = (((int)msg[0]) * 100) + (int)msg[1];
-    for (int i = 0; i < 2; i++)
-    {
-        letter = msg[i];
-        orderSTR += letter;
-    }
-    #ifdef DEBUG_SERIAL_OUTPUT
-        Serial.print("Variable orderSTR : ");
-        Serial.println(orderSTR);
-    #endif
-    //      "order" wird ab hier gifiltert
-    //      ACHTUNG in 2x DECIMAL !!!!!
-    switch (order)
-    {
-    
-    //      C2 / 6750 || 82 / 5650 Statusmeldungen
-    case 6750:
-    case 5650:
-        bitTemp = msg[2];
-        switch (bitTemp)
-        {
-        case 48: // 0
-            //mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "true");
-            detectordiag.ub_ext = "true";
-            mqtt_link("Melder-Status/Alarm Thermisch", "false");
-            break;
-        case 49: // 1
-            //mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "true");
-            detectordiag.ub_ext = "true";
-            mqtt_link("Melder-Status/Alarm Thermisch", "true");
-            if (detector.timer < millis())
-            {
-                detector.timer = millis() + 300000;
-                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true", "filter");
-            }
-            break;
-        case 50: // 2
-            //mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "false");
-            detectordiag.ub_ext = "false";
-            mqtt_link("Melder-Status/Alarm Thermisch", "false");
-            break;
-        case 51: // 3
-            //mqtt_link("Melder-Diagnose/Spannungsversorgung Ext.", "false");
-            detectordiag.ub_ext = "false";
-            mqtt_link("Melder-Status/Alarm Thermisch", "true");
-            if (detector.timer < millis())
-            {
-                detector.timer = millis() + 300000;
-                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true", "filter");
-            }
-            break;
-        default:
-            break;
-        }
-        bitTemp = msg[3];
-        switch (bitTemp)
-        {
-        case 48: // 0
-            mqtt_link("Melder-Status/Taster Melder", "false");
-            break;
-        case 56: // 8
-            if (comserial.com_status > 0) //serial_send("030200", 1);
-            topic_temp = "";
-            for (int i = 0; i < detector.alarm_group_size + 1; i++)
-            {
-                topic_temp = mqtt.topic_base + "/" + group_control + detector.alarm_group[i] + "/";
-                mqtt_publish(topic_temp + "Alarm_Funk", "false", "filter");
-                mqtt_publish(topic_temp + "Testalarm_Funk", "false", "filter");
-            }
-            mqtt_link("Melder-Status/Taster Melder", "true");
-            mqtt_link("Melder-Status/Alarm-Funk", "false");
-            mqtt_link("Melder-Status/Alarm Optisch", "false");
-            mqtt_link("Melder-Status/Alarm Thermisch", "false");
-            break;
-        default:
-            break;
-        }
-        bitTemp = msg[4];
-        switch (bitTemp)
-        {
-        case 48: // 0
-            mqtt_link("Melder-Status/Testalarm-Funk", "false");
-            mqtt_link("Melder-Status/Alarm-Funk", "false");
-            break;
-        case 49: // 1
-            mqtt_link("Melder-Status/Alarm-Funk", "true");
-            break;
-        case 56: // 8
-            mqtt_link("Melder-Status/Testalarm-Funk", "true");
-            break;
-
-        default:
-            break;
-        }
-        bitTemp = msg[5];
-        switch (bitTemp)
-        {
-        case 48: // 0
-            mqtt_link("Melder-Status/Alarm Optisch", "false");
-            break;
-        case 52: // 4
-            mqtt_link("Melder-Status/Alarm Optisch", "true");
-            if (detector.timer < millis())
-            {
-                detector.timer = millis() + 300000;
-                mqtt_publish(mqtt.topic_base + "/" + group_control + detector.group + "/" + "Alarm_Funk", "true", "filter");
-            }
-            break;
-        default:
-            break;
-        }
-        if ( detectordiag.status == 3 ) detectordiag.status ++;
-        break;
-    default:
-        #ifdef DEBUG_SERIAL_OUTPUT
-            Serial.print("Achtung, falscher Wert / ");
-            Serial.print("Order String : ");
-            Serial.print(orderSTR);
-            Serial.print(" | Decimal : ");
-            Serial.println(order);
-        #endif
-        break;
+        if ( error ) log_write("Rauchmelder-Übertragungsfehler : " + msg );
     }
 }
-
-*/

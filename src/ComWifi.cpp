@@ -108,7 +108,6 @@ void wlan_config()
             Serial.println("mit der SSID : " + wifi.esp_name);
             Serial.println();
         #endif
-        server->begin();
     }
 }
 
@@ -165,7 +164,7 @@ String web_request_wifi(const String &var) {
     return String();
 }
 
-void webserver_triger_wifi(String name, String msg)
+void web_response_wifi(String name, String msg)
 {
     if (msg != "")
     {
@@ -244,10 +243,12 @@ void time_setup(){
 
 void time_sync(){
     wifi.ntp_timer = millis() + 900000;
-    timeClient->update();
-    time_t rawTime = timeClient->getEpochTime();
-    struct tm *timeInfo = localtime(&rawTime);
-    char formattedDate[11];
-    strftime(formattedDate, sizeof(formattedDate), "%d.%m.%Y", timeInfo);
-    wifi.ntp_date = formattedDate;
+    if ( WiFi.isConnected() ) {
+        timeClient->update();
+        time_t rawTime = timeClient->getEpochTime();
+        struct tm *timeInfo = localtime(&rawTime);
+        char formattedDate[11];
+        strftime(formattedDate, sizeof(formattedDate), "%d.%m.%Y", timeInfo);
+        wifi.ntp_date = formattedDate;
+    }
 }

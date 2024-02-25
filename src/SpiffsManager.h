@@ -18,3 +18,4 @@ void log_write(String msg);
 
 
 String web_spiffs_analyse();
+String humanReadableSize(const size_t bytes);

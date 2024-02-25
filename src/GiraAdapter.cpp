@@ -36,24 +36,13 @@ void setup()
 
     wlan_config();
 
-    file_download("/data/html/network.html", "/html/network.html");
-    file_download("/data/html/detector.html", "/html/detector.html");
-    file_download("/data/html/head.html", "/html/head.html");
-    file_download("/data/html/bottom.html", "/html/bottom.html");
-    file_download("/data/html/sensor.html", "/html/sensor.html");
-    file_download("/data/html/system.html", "/html/system.html");
-    file_download("/data/html/logging.html", "/html/logging.html");
-    file_download("/data/test.txt", "/test.txt");
-    //folder_download("data/html", "html");
-
-
-    //SPIFFS.remove("/config.html");
-    //SPIFFS.remove("/config.css");
-    if (SPIFFS.exists("/html/head.html")) webserver.notbetrieb = false;
-    webserver_setup();
-
-
-    //webserver_art();
+    if ( !SPIFFS.exists("/config.json") ) {
+      webserver.notbetrieb = true;
+      webserver_setup();
+    } else {
+      webserver.notbetrieb = check_files();
+      webserver_setup();
+    }
 
     version_check();
     time_setup();
@@ -64,61 +53,17 @@ void setup()
 
   serial_setup();
 
-  if ( webserver.notbetrieb && WiFi.isConnected() == true ) {
-    #ifdef DEBUG_SERIAL_OUTPUT
-      Serial.print("Wifi ist vorhanden, nötige Daten werden gedownloadet");
-    #endif
-    //file_download("/config.html");
-    //file_download("/config.css");
-    delay(1000);
-    ESP.restart();
-  }
   log_write("Startsequenz vollständig");
 }
 
 void loop()
 {
-  
+  sensor_data();
+
   if ( !WiFi.isConnected() && !AP_Mode )    wlan_connect(); 
   if ( mqtt.configured )                    mqtt_reconnect() ;
-  sensor_data();
   if ( millis() > wifi.ntp_timer )          time_sync();
-  if ( comserial.aktiv ) serial_receive();
-  if ( comserial.aktiv ) serial_transceive_diagnose();
-
-
-  
-  
-  /*
-  
-  if ( WiFi.isConnected() && mqtt.aktiv && !client.connected() )      mqtt_connect(); 
-  if ( client.connected() && mqtt.aktiv )                             client.loop();
-  
-  
-  serial_status();
-  if ( client.connected() && detectordiag.timer <= millis() && comserial.gestartet == true ) detector_serial_timer(); 
-  if ( client.connected() && mqtt.timer <= millis() ) mqtt_esp_status();
-  if ( system_funktion.timer <= millis() ) system_timer();
-
-  // Rücksetzen Alarmtimer
-  if (millis() >= detector.timer && detector.timer != 0) detector.timer = 0;
-  
-  // MQTT Funktion
-  if (mqtt.aktiv) client.loop();
-  // Seriele Funktionen
-  serial_read();
-  if (comserial.com_status > 0) serial_send("", comserial.com_status);
-  // 30 Sekunden intervall für Erweiterungen
-  if (millis() >= sensor.timer)
-  {
-    sensor.timer = millis() + 30000;
-    bme_refresh();
-  }
-  */
-
-
-
-
-
+  if ( comserial.aktiv )                    serial_receive();
+  if ( comserial.aktiv )                    serial_transceive_diagnose();
 
 }

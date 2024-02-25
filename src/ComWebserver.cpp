@@ -2,27 +2,6 @@
 
 WEBSERVER webserver;
 
-
-void webserver_art()
-{
-  server = new AsyncWebServer(80);
-  if (SPIFFS.exists("/config.html"))
-  {
-    #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.println("config.html ist vorhanden = Normalbetrieb");
-    #endif
-    webserver_normalbetrieb();
-  }
-  else
-  {
-    #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.println("config.html ist nicht vorhanden = Notbetrieb");
-    #endif
-    webserver.notbetrieb=true;
-    webserver_notbetrieb();
-  }
-}
-
 const char notbetrieb_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML>
 <html lang="en">
@@ -34,24 +13,23 @@ const char notbetrieb_html[] PROGMEM = R"rawliteral(
 <center>
 <h1>! Notbetrieb !</h1>
 <h3>Netzwerk Einstellungen</h3>
-<form action="/get"><table><tbody>
+<form action="/" method="GET">
+<table><tbody>
 <tr><td>ESP- Name :</td><td><input class="setting" type="text" name="esp_name" placeholder="%textarea_network_esp%"></td></tr>
-<tr><td>WiFi - SSID :</td><td>
-<select name="wifi_ssid">
-%button_network_ssid_selected%
-%button_network_ssid_option%
-</select></td></tr>
+<tr><td>WiFi - SSID :</td><td><select name="wifi_ssid">%button_network_ssid_selected% %button_network_ssid_option% </select></td></tr>
 <tr><td>WiFi - Passwort :</td><td><input class="setting" type="text" name="wifi_pw" placeholder="%textarea_network_pw%"></td></tr>
 </tbody></table><br><input type="submit" value="Änderungen übernehmen" name="config_save"></form>
 <br>
 <h3>Datein Upload</h3>
-<tr><td align=center height=50>Free Storage: %FREESPIFFS% | Used Storage: %USEDSPIFFS% | Total Storage: %TOTALSPIFFS%</td></tr>
-<tr><td align=center height=25><form method="POST" action="/upload" enctype="multipart/form-data"><input type="file" name="data"/></td></tr>
-<tr><td align=center height=25><input type="submit" name="upload" value="Upload" title="Upload File"></form></td></tr>
+<table><tbody>
+<tr><td><form method="POST" action="/upload" enctype="multipart/form-data">
+<input type="file" name="data"><input type="submit" name="upload" value="Upload" title="Upload File">
+</form></td></tr></tbody></table>
 <br>
-<tr><td align=center height=50>Auf dem ESP vorhandene Daten :</td></tr>
-<tr><td align=center>%FILELIST%</td></tr>
-</table>
+<h3>Auf dem ESP vorhandene Daten :</h3>
+<table><tbody>
+%spiff_info_files%
+</tbody></table>
 </center>
 </body>
 </html>
@@ -87,79 +65,14 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     #ifdef DEBUG_SERIAL_WEBSERVER
       Serial.println("Upload Complete: " + String(filename) + ",size: " + String(index + len));
     #endif
-    request->redirect("/System/");
-  }
-}
-
-
-String humanReadableSize(const size_t bytes)
-{
-  if (bytes < 1024)
-    return String(bytes) + " B";
-  else if (bytes < (1024 * 1024))
-    return String(bytes / 1024.0) + " KB";
-  else if (bytes < (1024 * 1024 * 1024))
-    return String(bytes / 1024.0 / 1024.0) + " MB";
-  else
-    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
-}
-
-String listFiles(bool ishtml)
-{
-  String returnText = "";
-  #ifdef DEBUG_SERIAL_WEBSERVER
-    Serial.println("Listing files stored on SPIFFS");
-  #endif
-  File root = SPIFFS.open("/");
-  File foundfile = root.openNextFile();
-  if (ishtml)
-  {
-    returnText += "<table class='upload-50b'><tr><th align=' left '>Name</th><th align=' left'>Size</th></tr>";
-  }
-  while (foundfile)
-  {
-    if (ishtml)
-    {
-      returnText += "<tr align='left'><td>" + String(foundfile.name()) + "</td><td>" + humanReadableSize(foundfile.size()) + "</td></tr>";
+    if ( request->url() == "/System/upload" ){
+      request->redirect("/System/");
+    } else {
+      request->redirect("/");
     }
-    else
-    {
-      returnText += "File: " + String(foundfile.name()) + "\n";
-    }
-    foundfile = root.openNextFile();
   }
-  if (ishtml)
-  {
-    returnText += "</table>";
-  }
-  root.close();
-  foundfile.close();
-  return returnText;
 }
 
-void webserver_notbetrieb()
-{
-  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-             {
-    #ifdef DEBUG_SERIAL_WEBSERVER
-      Serial.println("Client:" + request->client()->remoteIP().toString() + + " " + request->url());
-    #endif
-    request->send_P(200, "text/html", notbetrieb_html, web_request); });
-
-  webserver_config();
-}
-
-void webserver_normalbetrieb()
-{
-  server->on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-             { request->send(SPIFFS, "/config.html", String(), false, web_request); });
-  
-
-  server->on("/config.css", HTTP_GET, [](AsyncWebServerRequest *request)
-             { request->send(SPIFFS, "/config.css", "text/css"); });
-
-  webserver_config();
-}
 
 String web_request(const String &var)
 {
@@ -202,9 +115,9 @@ void web_response_GET(String name, String value)
   
   web_response_spiff(name,value);
   web_response_sys(name,value);
-  webserver_triger_wifi(name, value);
+  web_response_wifi(name, value);
   web_response_mqtt(name, value);
-  webserver_triger_detector(name, value);
+  web_response_detector(name, value);
   web_response_sensor(name, value);
 
   if        (name == "navigation")                                      {    webserver.navigation = value; Serial.println("Variable - navigation = " + webserver.navigation);}
@@ -226,74 +139,6 @@ void web_response_GET(String name, String value)
       ESP.restart();
     }
   }
-}
-
-void webserver_config()
-{
-    /*
-    // run handleUpload function when any file is uploaded
-    server->on("/system/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
-    String targetFolder = "/"; // Standard-Zielordner
-    if (request->hasParam("uploadPath", true)) {
-      targetFolder = request->getParam("uploadPath", true)->value(); // Hole den Zielordner aus den Parametern
-      }
-    request->send(200);
-    }, //std::bind(handleUpload, std::placeholders::_1, "filename", targetFolder, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5));
-    );*/
-
-    server->on(
-        "/post", HTTP_POST, [](AsyncWebServerRequest *request)
-        { request->send(200, "text/plain", "Post route"); });
-
-    server->on(
-        "/get", HTTP_GET, [](AsyncWebServerRequest *request)
-        {   scan_wifi_ssid();
-            String art;
-            String id;
-            String msg;
-            int params = request->params();
-            for (int i = 0; i < params; i++)
-            {
-                AsyncWebParameter *p = request->getParam(i);
-                if (p->isPost())
-                { 
-                    art = "File";
-                    id = p->name().c_str();
-                    msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_WEBSERVER
-                      Serial.printf("FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
-                    #endif
-                }
-                else if (p->isPost())
-                {
-                    art = "Post";
-                    id = p->name().c_str();
-                    msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_WEBSERVER
-                      Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-                    #endif
-                }
-                else
-                {
-                    art = "Get";
-                    id = p->name().c_str();
-                    msg = p->value().c_str();
-                    #ifdef DEBUG_SERIAL_WEBSERVER
-                      Serial.printf("GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
-                    #endif
-                }
-                //web_response(id,msg);
-
-                #ifdef DEBUG_SERIAL_WEBSERVER
-                  Serial.print("MSG : ");
-                  Serial.print(art);
-                  Serial.print(" | ");
-                  Serial.print(id);
-                  Serial.print(" | ");
-                  Serial.println(msg);
-                #endif
-            }
-            request->send(SPIFFS, "/config.html", String(), false, web_request); });
 }
 
 void webserver_setup(){
@@ -347,8 +192,15 @@ void webserver_setup(){
         request->send(200);
     },
     handleUpload
-);
+  );
 
+  server->on(
+    "/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
+        request->send(200);
+    },
+    handleUpload
+  );
+  
   server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     if (request->method() == HTTP_GET) {
       String art = "Get"; // Hier initialisieren
@@ -365,28 +217,7 @@ void webserver_setup(){
         #endif
         web_response_GET(name,value);
       }
-    } /*else if (request->method() == HTTP_POST) {
-      #ifdef DEBUG_SERIAL_WEBSERVER
-        Serial.printf("-> Post Funktion <-");
-      #endif
-      art = "Post"; // Hier initialisieren
-      id = "";
-      msg = "";
-      for (int i = 0; i < params; i++) {
-        AsyncWebParameter *p = request->getParam(i);
-        id = p->name().c_str();
-        msg = p->value().c_str();
-        #ifdef DEBUG_SERIAL_WEBSERVER
-          Serial.println("WIR TESTEN EIN POST");
-          Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
-        #endif
-            // Hier können Sie die POST-Daten verarbeiten
-            // z.B. p->name() und p->value()
-      }
-        // Logik für POST-Anfragen
-        // Hier können Sie die POST-Daten verarbeiten
-        // und entsprechend reagieren
-    }*/
+    }      
     if (webserver.notbetrieb) {
       #ifdef DEBUG_SERIAL_WEBSERVER
         Serial.println("Notbetrieb");
@@ -615,42 +446,10 @@ void webserver_setup(){
     delete[] combinedContent;
   }); 
 
-  
-  /*  
-    File file = SPIFFS.open("/network_settings.html", "r");
-    if (!file) {
-        request->send(404, "text/plain", "Datei nicht gefunden");
-        return;
-    }
-    String fileContent = file.readString();
-    file.close();
-
-    // Verarbeite die Platzhalter in fileContent mit dem Callback web_request
-    fileContent = web_request(fileContent);
-
-    request->send(200, "text/html", fileContent);
-});*/
-  
-  // Start des Servers
   #ifdef DEBUG_SERIAL_WEBSERVER
     Serial.println("Starten des Webservers");
   #endif
   server->begin();
-}
-
-void webserver_file(AsyncWebServerRequest *request, String path, String contentType) {
-  #ifdef DEBUG_SERIAL_WEBSERVER
-    Serial.println("das funktioniert auch");
-  #endif
-  #ifdef DEBUG_SERIAL_WEBSERVER
-    Serial.println("Daten von den File laden : " + path );
-  #endif
-  if (SPIFFS.exists(path)) {
-    AsyncWebServerResponse *response = request->beginResponse(SPIFFS, path, contentType);
-    request->send(response);
-  } else {
-    request->send(404, "text/plain", "Datei nicht gefunden");
-  }
 }
 
 String loadFileContent(const char *filePath) {
@@ -667,4 +466,21 @@ String loadFileContent(const char *filePath) {
 
     file.close();
     return fileContent;
+}
+
+bool check_files(){
+  if (!WiFi.isConnected()){
+    if ( !SPIFFS.exists("/html/network.html"))  return false;
+    if ( !SPIFFS.exists("/html/head.html"))     return false;
+    if ( !SPIFFS.exists("/html/bottom.html"))   return false;
+  } else {
+    if ( SPIFFS.exists("/html/network.html"))   file_download("/data/html/network.html", "/html/network.html");
+    if ( SPIFFS.exists("/html/detector.html"))  file_download("/data/html/detector.html", "/html/detector.html");
+    if ( SPIFFS.exists("/html/sensor.html"))    file_download("/data/html/sensor.html", "/html/sensor.html");
+    if ( SPIFFS.exists("/html/system.html"))    file_download("/data/html/system.html", "/html/system.html");
+    if ( SPIFFS.exists("/html/logging.html"))   file_download("/data/html/logging.html", "/html/logging.html");
+    if ( SPIFFS.exists("/html/head.html"))      file_download("/data/html/head.html", "/html/head.html");
+    if ( SPIFFS.exists("/html/bottom.html"))    file_download("/data/html/bottom.html", "/html/bottom.html");
+  }
+  return true;
 }

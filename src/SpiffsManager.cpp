@@ -228,15 +228,19 @@ String web_spiffs_analyse(){
         msg += file.path();
         msg += "</td><td>";
         msg += fileSizeKB;
-        msg += " KB</td><td>";
-        msg += "<form action='/System/download' method='GET'><input type='hidden' name='filepath' value='";
-        msg += file.path();
-        msg += "'><input type='submit' value='Download'></form>";
-        msg += "</td><td>";
-        msg += "<form action='/System' method='GET'><input type='submit' name='";
-        msg += file.path();
-        msg += "' value='Löschen'></form>";
-        msg += "</td></tr>";
+        msg += " KB</td>";
+        if (!webserver.notbetrieb) {
+            msg += "<td>";
+            msg += "<form action='/System/download' method='GET'><input type='hidden' name='filepath' value='";
+            msg += file.path();
+            msg += "'><input type='submit' value='Download'></form>";
+            msg += "</td><td>";
+            msg += "<form action='/System' method='GET'><input type='submit' name='";
+            msg += file.path();
+            msg += "' value='Löschen'></form>";
+            msg += "</td>";
+        }
+        msg += "</tr>";
         temp += msg;
 
         file = root.openNextFile();
@@ -256,4 +260,16 @@ void web_response_spiff(String name, String value){
     } else if   ( value == "Download") {
 
     }
+}
+
+String humanReadableSize(const size_t bytes)
+{
+  if (bytes < 1024)
+    return String(bytes) + " B";
+  else if (bytes < (1024 * 1024))
+    return String(bytes / 1024.0) + " KB";
+  else if (bytes < (1024 * 1024 * 1024))
+    return String(bytes / 1024.0 / 1024.0) + " MB";
+  else
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + " GB";
 }
