@@ -1,0 +1,109 @@
+<br>
+<!-- Firmware -->
+<div class="box">
+    <h3>Firmware einstellungen</h3>
+    <form action="/System" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Firmware- build</td>
+                    <td>
+                        <select name="fw_build">
+                            %button_firmware%            
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Firmware- version (Vorhanden)</td>
+                    <td>
+                        %text_firmware_old%
+                    </td>
+                </tr>
+                <tr>
+                    <td>Firmware- version (zum download)</td>
+                    <td>
+                        %text_firmware_new%
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+    </form>
+    <br>
+    <form action="/System" method="GET"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
+    <br>
+    <form action="/System" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Firmware - OTA</td>
+                    <td>
+                        <select name="fw_ota">
+                            %button_ota%            
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>OTA - Passwort</td>
+                    <td><input class="setting" type="text" name="ota_pw" value="%textarea_fw_pw%"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+    </form>
+    <br>
+</div>
+<!-- Filemanager -->
+<br>
+<div class="box">
+    <h3>File- Manager</h3>
+    <table>
+        <tbody>
+            <tr>
+                <td>* SPIFFS Übersicht *</td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <tbody>
+            <tr>
+                <td>Speichergröße : %spiff_info_size%</td>
+                <td>Freier Speicher : %spiff_info_free%</td>
+                <td>Benutzter Speicher : %spiff_info_use%</td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <tbody>
+            <tr>
+                <form method="POST" action="/System/upload" enctype="multipart/form-data">
+                    <input type="file" name="data">
+                    <input type="submit" name="upload" value="Upload" title="Upload File">
+                </form>
+                <form action="/System" method="GET">
+                    %textarea_system_upload%
+                    <br>
+                    <input type="submit" value="Setzen">
+                </form>
+                
+            </tr>
+            
+        </tbody>
+    </table>
+    <table>
+        <tbody>
+            <tr>
+                <td>Name</td>
+                <td>Pfad</td>
+                <td>Größe</td>
+                <td></td>
+                <td></td>
+            </tr>
+            %spiff_info_files%
+        </tbody>
+    </table>
+</div>

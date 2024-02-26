@@ -1,0 +1,35 @@
+<br>
+<!-- BEREICH Detector (innen)  -->        
+<div class="box">
+    <h3>Rauchmelder Einstellungen</h3>
+    <form action="/Rauchmelder" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Komunikation :</td>
+                    <td>
+                        <select name="detector_komunikation">
+                            %button_detector%       
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Einbauort :</td>
+                    <td><input class="setting" type="text" name="detector_location" placeholder="%textarea_detector_location%"></td>
+                </tr>
+                <tr>
+                    <td>Meldegruppe :</td>
+                    <td><input class="setting" type="text" name="detector_group" placeholder="%textarea_detector_grp%"></td>
+                </tr>
+                <tr>
+                    <td>Alarmierungsgruppen :</td>
+                    <td><textarea rows="3" cols="40" name="detector_alarm_group" placeholder="%textarea_detector_alarmgrp%"></textarea></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+        <br>
+    </form>
+</div>
