@@ -68,38 +68,40 @@
                     <td>MQTT :</td>
                     <td>
                         <select name="mqtt">
-                                        
+                            %button_mqtt%            
                         </select>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <table >
+        <table %display_mqtt% >
             <tbody>
                 <tr>
                     <td>IP Broker :</td>
-                    <td><input class="setting" type="text" name="mqtt_ip" placeholder="%ph_mqtt_ip%"></td>
+                    <td><input class="setting" type="text" name="mqtt_ip" placeholder="%textarea_mqtt_ip%"></td>
                 </tr>
                 <tr>
                     <td>Port Broker :</td>
-                    <td><input class="setting" type="text" name="mqtt_port" placeholder="%ph_mqtt_port%"></td>
+                    <td><input class="setting" type="text" name="mqtt_port" placeholder="%textarea_mqtt_port%"></td>
                 </tr>
                 <tr>
                     <td colspan="2"> MQTT - Topic <br>Achtung : Grund- Topic / Melder- Topic / <br>der Aufbau darf nicht geändert werden ! <br></td>
                 </tr>
                 <tr>
                     <td>Grund- Topic :</td>
-                    <td><input class="setting" type="text" name="mqtt_base" placeholder="%ph_mqtt_base%"></td>
+                    <td><input class="setting" type="text" name="mqtt_base" placeholder="%textarea_mqtt_base%"></td>
                 </tr>
                 <tr>
                     <td>Melder- Topic :</td>
-                    <td><input class="setting" type="text" name="mqtt_define" placeholder="%ph_mqtt_define%"></td>
+                    <td><input class="setting" type="text" name="mqtt_define" placeholder="%textarea_mqtt_define%"></td>
                 </tr>
             </tbody>
         </table>
         <br>
         <input type="submit" value="Änderungen übernehmen" name="config_save">
-        <br>
-        <br>
     </form>
+    <form action="/Netzwerk" method="GET">
+        <input type="submit" value="MQTT Topics erstellen" name="mqtt_einrichten">
+    </form>
+    <br>
 </div>
