@@ -40,6 +40,10 @@
 #include <HTTPClient.h>
 #include <ESP32httpUpdate.h>
 
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+
 // Datein
 
 #include "SpiffsManager.h"

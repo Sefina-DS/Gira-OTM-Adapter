@@ -167,7 +167,7 @@ void log_write(String msg) {
     if (SPIFFS.exists(LOG_FILE_PATH)) {
         File loggfile = SPIFFS.open( LOG_FILE_PATH, "r");
         int line = 0;
-        while ( loggfile.available() && line < 19 ) {
+        while ( loggfile.available() && line < 29 ) {
             templine = loggfile.readStringUntil('\n'); // lesen bis Zeilenumbruch..
             templine += '\n';
             temp += templine;
@@ -209,16 +209,38 @@ String web_request_spiff(const String &var)
     return String();
 }
 
-String web_spiffs_analyse(){
+String web_spiffs_analyse() {
     String temp = "";
+    
+    // Überprüfe, ob das Dateisystem erfolgreich initialisiert wurde
+    if (!SPIFFS.begin(true)) {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.println("Failed to mount file system");
+        #endif
+        return temp;
+    }
+    
+    // Öffne das Stammverzeichnis
     File root = SPIFFS.open("/");
+    
+    // Überprüfe, ob das Stammverzeichnis erfolgreich geöffnet wurde
+    if (!root) {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.println("Failed to open root directory");
+        #endif
+        return temp;
+    }
+
+    // Durchsuche das Stammverzeichnis nach Dateien
     File file = root.openNextFile();
     #ifdef DEBUG_SERIAL_SPIFFS
-        Serial.println("Spiffs wird nach Datein durchsucht :");
+        Serial.println("SPIFFS wird nach Dateien durchsucht:");
     #endif
 
-    while (file)
-    {
+    while (file) {
+        #ifdef DEBUG_SERIAL_SPIFFS
+            Serial.println("Eine weitere Datei wird aufgelistet");
+        #endif
         String msg = "";
         size_t fileSize = file.size();
         float fileSizeKB = (float)fileSize / 1024.0;
@@ -245,6 +267,13 @@ String web_spiffs_analyse(){
 
         file = root.openNextFile();
     }
+    
+    // Schließe das Stammverzeichnis
+    root.close();
+    #ifdef DEBUG_SERIAL_SPIFFS
+        Serial.println("Das durchsuchen ist zu ende ....");
+    #endif
+    
     return temp;
 }
 

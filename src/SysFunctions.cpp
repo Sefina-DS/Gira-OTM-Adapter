@@ -457,6 +457,8 @@ void load_conf_sys(StaticJsonDocument<1024> doc)
         Serial.println("... Sys- Variablen ...");
     #endif
     system_funktion.fw_art = doc["fw"] | "main";
+    system_funktion.ota = doc["ota"] | false;
+    system_funktion.ota_pw = doc["ota-pw"] | "";
 }
 
 StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
@@ -465,6 +467,8 @@ StaticJsonDocument<1024> safe_conf_sys(StaticJsonDocument<1024> doc)
         Serial.println("... Sys- Variablen ...");
     #endif
     doc["fw"] = system_funktion.fw_art;
+    doc["ota"] = system_funktion.ota;
+    doc["ota-pw"] = system_funktion.ota_pw;
 
     return doc;
 }
@@ -477,6 +481,10 @@ String web_request_sys(const String &var) {
         }                                                                                     
     } else if       (var == "text_firmware_old")    { return system_funktion.version_old;
     } else if       (var == "text_firmware_new")    { return system_funktion.version_new;
+    } else if       (var == "button_ota")           { return ( system_funktion.ota )                ? "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert</option>"
+                                                                                                    : "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert</option>";
+    } else if       (var == "textarea_fw_pw")       { return (system_funktion.ota_pw        != "")  ? "---FFF---FFF---" 
+                                                                                                    : "Bitte eintragen !"; 
     }
     
     return String();
@@ -486,5 +494,14 @@ void web_response_sys(String name, String msg) {
     {
         if (name == "fw_build")         { system_funktion.fw_art = msg; version_check(); }
         if (name == "Firmwareupdate")   { firmwareupdate_http(); }
+        if (name == "fw_ota")           { if (msg == "aktiviert")   system_funktion.ota = true; }
+        if (name == "fw_ota")           { if (msg == "deaktiviert") system_funktion.ota = false; }
+        if (name == "ota_pw")   {
+                                        if          ( msg == "") {                      system_funktion.ota_pw = "";
+                                        } else if   ( msg == "Bitte eintragen !") {     system_funktion.ota_pw = "";
+                                        } else if   ( msg == "---FFF---FFF---") {       return;
+                                        } else if   ( msg != "") {                      system_funktion.ota_pw = msg;
+                                        }
+        }
     }
 }

@@ -86,6 +86,8 @@ String web_request(const String &var)
   if (var == "header_esp_name" )            return wifi.esp_name;
   if (var == "header_detector_location" )   return detector.location;
   if (var == "textarea_system_upload" )     return "<input type='text' id='uploadPath' name='uploadPath' value='" + webserver.uploadFolder + "'>";
+  if (var == "display_div_menue" )          return (webserver.config)     ? ""
+                                                                          : "style='display: none'";
   
   // Netzwerk
   temp = web_request_wifi(var);         if (temp != "") return temp; 
@@ -112,6 +114,7 @@ void web_response_GET(String name, String value)
     Serial.print(" value : ");
     Serial.println(value);
   #endif 
+  if ( name == "config_save" && value == "Änderungen übernehmen" ) webserver.config = true;
   
   web_response_spiff(name,value);
   web_response_sys(name,value);

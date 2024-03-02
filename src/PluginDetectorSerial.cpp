@@ -91,7 +91,7 @@ void serial_transceive_diagnose() {
             temp_json["Seriennummer"]               = detectordiag.serial_nr;
             temp_json["Betriebsstunden"]            = detectordiag.time;
             serializeJson(temp_json, temp_string);
-            if ( mqtt_publish ( "Detector-Status/Diagnose", temp_string ) ) {
+            if ( mqtt_publish ( "Detector-Status/0-Diagnose-0", temp_string ) ) {
                 #ifdef DEBUG_SERIAL_DETECTOR
                     Serial.println("Erfolgreich, Diagnose startet in 15 Minuten.");
                 #endif
@@ -241,62 +241,130 @@ void serial_receive_diagnose(String msg) {
             Serial.println(temp_long); // Gebe die Anzahl der Testalarme über Funk für Debug-Zwecke aus
         #endif
     } else if       (topic == "C2" || topic == "82") {
-        // -> Erstes Byte
-        bool error = false;
-        temp_string = msg.substring(2, 4);
-        #ifdef DEBUG_SERIAL_DETECTOR
-            Serial.print("Byte 1 : ");
-            Serial.println(temp_string);
-        #endif
+        int error = 0;
+        // -> Bit 1
         temp_string = msg.substring(2, 3);
-        if      ( temp_string == "0" )  { detectordiag.ub_ext = "true"; } 
-        else if ( temp_string == "2" )  { detectordiag.ub_ext = "false"; }
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
+        #ifdef DEBUG_SERIAL_DETECTOR
+            Serial.print("Bit 1 : ");
+            Serial.println(temp_string);
+        #endif
+        /*      UB-Ext-use  Temp-Alarm     
+            0       X           -               
+            1       X           X
+            2       -           -
+            3       -           X                                 
+             
+        */
+        if ( temp_string == "0" || temp_string == "1" ) {   detectordiag.ub_ext = "true";       }
+        else                                            {   detectordiag.ub_ext = "false";      }
+        if ( temp_string == "1" || temp_string == "3" ) {   mqtt_publish ( "Detector-Status/Alarm-Temperatur", "true");
+                                                            detector.alarm = true;
+                                                            mqtt_publish_group ( detector.group, "Alarm", "true");     
+                                                            if ( detector.alarm ) {
+                                                                detector.alarm = false;
+                                                                mqtt_publish_group ( detector.group, "Alarm", "false");}    }
+        else                                            {   mqtt_publish ( "Detector-Status/Alarm-Temperatur", "false");    }
+        //////
+        if ( temp_string != "0" && temp_string != "1" && temp_string != "2" && temp_string != "3" ) ++error;
+        
+        // -> Bit 2
         temp_string = msg.substring(3, 4);
-        if      ( temp_string == "0" ) mqtt_publish ( "Detector-Status/Taster", "false");
-        else if ( temp_string == "8" ) mqtt_publish ( "Detector-Status/Taster", "true");
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);  error = true;
-
-        // Zweites Byte
-        temp_string = msg.substring(4, 6);
         #ifdef DEBUG_SERIAL_DETECTOR
-            Serial.print("Byte 2 : ");
+            Serial.print("Bit 2 : ");
             Serial.println(temp_string);
         #endif
+        if ( temp_string == "0" )                       {   mqtt_publish ( "Detector-Status/Taster", "false");      }
+        else                                            {   mqtt_publish ( "Detector-Status/Taster", "true");
+                                                            if ( detector.remote ) {
+                                                                mqtt_publish_group ( detector.remote_grp, "Alarm", "false");}    }
+                                                                
+        //////
+        if ( temp_string != "0" && temp_string != "8" ) ++error;
+        
+        // -> Bit 3
         temp_string = msg.substring(4, 5);
-        if      ( temp_string == "0" ) {     
-                mqtt_publish ( "Detector-Status/Alarm", "false");
-                mqtt_publish ( "Detector-Status/Alarm-Test", "false");  }
-        else if ( temp_string == "1" ) {     
-                mqtt_publish ( "Detector-Status/Alarm", "true");
-                mqtt_publish ( "Detector-Status/Alarm-Test", "false");  }
-        else if ( temp_string == "2" || temp_string == "8" || temp_string == "A" ) {     
-                mqtt_publish ( "Detector-Status/Alarm", "false");
-                mqtt_publish ( "Detector-Status/Alarm-Test", "true");  }
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg);  error = true;
+        #ifdef DEBUG_SERIAL_DETECTOR
+            Serial.print("Bit 3 : ");
+            Serial.println(temp_string);
+        #endif
+        /*      Test-Local  Test-Remote     Alarm-Remote
+            0       -           -               -
+            1       -           -               X
+            2       X           -               -
+            3       X           -               X
+            8       -           X               -
+            A       X           X               -
+            Wenn Alarm-Remote ankommt wird der Test-Remote überschrieben !
+        */
+        if ( temp_string == "2" || temp_string == "3" || temp_string == "A" )   {   mqtt_publish ( "Detector-Status/Test-Local", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Test-Local", "false");    }
+        if ( temp_string == "8" || temp_string == "A" )                         {   mqtt_publish ( "Detector-Status/Test-Remote", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Test-Remote", "false");    }
+        if ( temp_string == "1" || temp_string == "3" )                         {   mqtt_publish ( "Detector-Status/Alarm-Remote", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Alarm-Remote", "false");    }
+        //////
+        if ( temp_string != "0" && temp_string != "1" && temp_string != "2" && temp_string != "3" && temp_string != "8" && temp_string != "A" ) ++error;
+        
+        // -> Bit 4
         temp_string = msg.substring(5, 6);
-        if      ( temp_string == "0" ) mqtt_publish ( "Detector-Status/Störung-Batterie", "false");
-        else if ( temp_string == "1" ) mqtt_publish ( "Detector-Status/Störung-Batterie", "true");
-        else                           mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
-        
-
-        // Drites Byte
-        temp_string = msg.substring(6, 8);
         #ifdef DEBUG_SERIAL_DETECTOR
-            Serial.print("Byte 3 : ");
+            Serial.print("Bit 4 : ");
             Serial.println(temp_string);
         #endif
-        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
+        /*       Batterie    Optisch    Alarm-Kabel
+            0       -           -           -
+            1       X           -           -
+            4       -           X           -
+            5       X           X           -
+            8       -           -           X
+            9       X           -           X
+        */
+        if ( temp_string == "1" || temp_string == "5" || temp_string == "9" )   {   mqtt_publish ( "Detector-Status/Störung-Batterie", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Störung-Batterie", "false");    }
+        if ( temp_string == "4" || temp_string == "5" )                         {   mqtt_publish ( "Detector-Status/Alarm-Optisch", "true");
+                                                                                    detector.alarm = true;
+                                                                                    mqtt_publish_group ( detector.group, "Alarm", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Alarm-Optisch", "false");
+                                                                                    if ( detector.alarm ) {
+                                                                                        detector.alarm = false;
+                                                                                        mqtt_publish_group ( detector.group, "Alarm", "false");}    }
+        if ( temp_string == "8" || temp_string == "9" )                         {   mqtt_publish ( "Detector-Status/Alarm-Kabel", "true");     }
+        else                                                                    {   mqtt_publish ( "Detector-Status/Alarm-Kabel", "false");    }
+        //////
+        if ( temp_string != "0" && temp_string != "1" && temp_string != "4" && temp_string != "5" && temp_string != "8" && temp_string != "9" ) ++error;
         
-
-        // Fiertes Byte
-        temp_string = msg.substring(8, 10);
+        // -> Bit 5
+        temp_string = msg.substring(6, 7);
         #ifdef DEBUG_SERIAL_DETECTOR
-            Serial.print("Byte 4 : ");
+            Serial.print("Bit 5 : ");
             Serial.println(temp_string);
         #endif
-        if      ( temp_string != "00" )   mqtt_publish ( "Detector-Status/Serial-Fehler", msg); error = true;
+        if      ( temp_string != "0" )  ++error;
+        
+        // -> Bit 6
+        temp_string = msg.substring(7, 8);
+        #ifdef DEBUG_SERIAL_DETECTOR
+            Serial.print("Bit 6 : ");
+            Serial.println(temp_string);
+        #endif
+        if      ( temp_string != "0" )  ++error;
 
-        if ( error ) log_write("Rauchmelder-Übertragungsfehler : " + msg );
+        // -> Bit 7
+        temp_string = msg.substring(8, 9);
+        #ifdef DEBUG_SERIAL_DETECTOR
+            Serial.print("Bit 7 : ");
+            Serial.println(temp_string);
+        #endif
+        if      ( temp_string != "0" )  ++error;
+
+        // -> Bit 8
+        temp_string = msg.substring(9, 10);
+        #ifdef DEBUG_SERIAL_DETECTOR
+            Serial.print("Bit 8 : ");
+            Serial.println(temp_string);
+        #endif
+        if      ( temp_string != "0" )  ++error;
+
+        if ( error != 0 ) log_write("Rauchmelder-Übertragungsfehler (" + String(error) + "): " + msg );
     }
 }

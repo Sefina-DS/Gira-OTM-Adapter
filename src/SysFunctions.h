@@ -8,18 +8,25 @@ struct SYSTEM_FUNKTION
     String version_new ;
     String fw_art ;
     boolean new_version ;
+    bool ota = false ;
+    String ota_pw ;
+    bool config = false;
 };
 extern SYSTEM_FUNKTION system_funktion;
 extern HTTPClient http;
 
-#define DEBUG_SERIAL_START
-#define DEBUG_SERIAL_OUTPUT // Aktivieren für Serial- Ausgabe
-//#define DEBUG_SERIAL_SENSOR
-#define DEBUG_SERIAL_SPIFFS
-//#define DEBUG_SERIAL_MQTT
-#define DEBUG_SERIAL_WIFI
-#define DEBUG_SERIAL_WEBSERVER
-//#define DEBUG_SERIAL_DETECTOR
+#define DEBUG_SERIAL
+
+#ifdef DEBUG_SERIAL
+    #define DEBUG_SERIAL_START
+    #define DEBUG_SERIAL_OUTPUT // Aktivieren für Serial- Ausgabe
+    #define DEBUG_SERIAL_SENSOR
+    #define DEBUG_SERIAL_SPIFFS
+    //#define DEBUG_SERIAL_MQTT
+    #define DEBUG_SERIAL_WIFI
+    #define DEBUG_SERIAL_WEBSERVER
+    #define DEBUG_SERIAL_DETECTOR
+#endif
 
 //      Inputs
 #define RXD2 17

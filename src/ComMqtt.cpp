@@ -173,15 +173,15 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 }
 
 String web_request_mqtt(const String &var) {
-    if        ( var == "ph_mqtt_aktivdisplay" )     { return ( !mqtt.aktiv )    ? "display: none; "
-                                                                                : "";
-    } else if   ( var == "ph_mqtt_aktiv")            { return ( mqtt.aktiv )      ? "'aktiviert' selected>aktiviert</option><option value='deaktiviert'</option>deaktiviert"
-                                                                                : "'deaktiviert' selected>deaktiviert</option><option value='aktiviert'</option>aktiviert";
-    } else if   ( var == "ph_mqtt_ip")                { return  mqtt.ip;
-    } else if   ( var == "ph_mqtt_port")              { return  mqtt.port;
-    } else if   ( var == "ph_mqtt_base")              { return  mqtt.topic_base;
-    } else if   ( var == "ph_mqtt_define")            { return  mqtt.topic_define;
-    }
+  if          (var == "button_mqtt")       { return (mqtt.aktiv)            ? "<option value='aktiviert' selected>aktiviert</option><option value='deaktiviert'>deaktiviert</option>"
+                                                                            : "<option value='deaktiviert' selected>deaktiviert</option><option value='aktiviert'>aktiviert</option>";
+  } else if   (var == "display_mqtt")      { return (mqtt.aktiv)            ? ""
+                                                                            : "style='display: none'";
+  } else if   ( var == "textarea_mqtt_ip")                { return  mqtt.ip;
+  } else if   ( var == "textarea_mqtt_port")              { return  mqtt.port;
+  } else if   ( var == "textarea_mqtt_base")              { return  mqtt.topic_base;
+  } else if   ( var == "textarea_mqtt_define")            { return  mqtt.topic_define;
+  }
 
     return String();
 }

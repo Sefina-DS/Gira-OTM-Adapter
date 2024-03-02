@@ -53,13 +53,23 @@ void setup()
 
   serial_setup();
 
+  // Setzen Sie das Passwort für das OTA-Update
+  //ArduinoOTA.setPassword("Rauchmelder");
+  // Setzen Sie den Port für das OTA-Update
+  if (system_funktion.ota) {
+    const char* otaPassword = system_funktion.ota_pw.c_str();
+    ArduinoOTA.setPassword(otaPassword);
+    ArduinoOTA.begin();
+  }
+  
+
   log_write("Startsequenz vollständig");
 }
 
 void loop()
 {
   sensor_data();
-
+  if ( system_funktion.ota )                ArduinoOTA.handle();
   if ( !WiFi.isConnected() && !AP_Mode )    wlan_connect(); 
   if ( mqtt.configured )                    mqtt_reconnect() ;
   if ( millis() > wifi.ntp_timer )          time_sync();

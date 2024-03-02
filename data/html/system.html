@@ -34,6 +34,27 @@
     <br>
     <form action="/System" method="GET"><input type="submit" name="Firmwareupdate" value="Firmwareupdate" title="Firmwareupdate"></form>
     <br>
+    <form action="/System" method="GET">
+        <table>
+            <tbody>
+                <tr>
+                    <td>Firmware - OTA</td>
+                    <td>
+                        <select name="fw_ota">
+                            %button_ota%            
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>OTA - Passwort</td>
+                    <td><input class="setting" type="text" name="ota_pw" value="%textarea_fw_pw%"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Änderungen übernehmen" name="config_save">
+        <br>
+    </form>
     <br>
 </div>
 <!-- Filemanager -->

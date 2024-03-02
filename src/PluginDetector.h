@@ -7,12 +7,15 @@
 
 struct DETECTOR
 {
-    int group;
+    int group = 0;
     String groups_safestring = "0";
     int alarm_group[99];
     int alarm_group_size;
     String location;
     unsigned long timer = 0;
+    bool alarm = false;
+    bool remote = false;
+    int remote_grp = -1;
 };
 extern DETECTOR detector;
 
