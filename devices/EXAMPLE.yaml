@@ -1,20 +1,36 @@
 # =============================================================================
-# Gira Rauchmelder 01 — Referenz-Stand vom 07.08.2026
+# EXAMPLE.yaml — Vorlage fuer einen Gira-Rauchmelder
 # =============================================================================
-# Diese YAML entspricht dem Stand, mit dem am 07.08.2026 gegen 21:00 der
-# vollstaendige Poll-Zyklus (9 Kommandos) erfolgreich validiert wurde:
-#   - alle Kommandos vom ESP werden vom Melder mit ACK + Antwort quittiert
-#   - alle Antworten werden von der Component korrekt dekodiert
-#   - keine Retries mehr
+# Kopiere diese Datei mit einem sprechenden Namen deiner Wahl, z.B.:
 #
-# Nach jeder Refactoring-Aenderung (Package-Extraktion, Sensor-Anhang etc.)
-# muss der Melder mit den daraus abgeleiteten YAMLs sich exakt genauso
-# verhalten wie hier.
+#   cp EXAMPLE.yaml Gira-RM_HG_EG_Flur.yaml
+#
+# Namens-Konvention:
+#   Datei:         Gira-RM_<Standort_mit_Unterstrichen>.yaml
+#   esphome.name:  gira-rm-<standort-mit-bindestrichen>  (lowercase, mDNS-safe)
+#   friendly_name: "Gira-RM <Standort mit Leerzeichen>"
+#
+# Nach dem Kopieren: Werte unter 'substitutions:' anpassen — mehr ist im
+# Regelfall nicht noetig. Alle Hardware-Details stecken im gemeinsamen
+# Hardware-Template unter packages/gira_hardware.yaml (kommt nach
+# Auftrag 02 Phase B).
+#
+# Bis Auftrag 02 Phase B abgeschlossen ist, enthaelt diese Vorlage noch den
+# vollstaendigen Hardware-Block. Nach Phase B wird der Hardware-Teil ersetzt
+# durch:
+#
+#   packages:
+#     hardware: !include ../packages/gira_hardware.yaml
 # =============================================================================
 
+substitutions:
+  device_name: gira-rm-standort-example       # z.B. gira-rm-hg-eg-flur
+  friendly_name: "Gira-RM Standort Example"   # z.B. "Gira-RM HG EG Flur"
+  update_interval: "60s"
+
 esphome:
-  name: gira-rauchmelder-01
-  friendly_name: Gira-Rauchmelder-01
+  name: ${device_name}
+  friendly_name: ${friendly_name}
 
 external_components:
   - source:
@@ -110,8 +126,8 @@ uart:
 gira_rauchmelder:
   id: melder_hub
   uart_id: uart_bus
-  update_interval: 60s        # kompletter Poll-Zyklus alle 60 s
-                              # (9 Kommandos, dauert ca. 1,5 s)
+  update_interval: ${update_interval}   # kompletter Poll-Zyklus alle 60 s
+                                        # (9 Kommandos, dauert ca. 1,5 s)
 
 # Bewusst NICHT enthalten in diesem Stand:
 #   - sensor: / binary_sensor: / text_sensor: mit Platform gira_rauchmelder

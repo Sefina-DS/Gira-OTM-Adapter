@@ -28,3 +28,8 @@ __pycache__/
 .pio/
 lib/
 workspace.code-workspace
+
+# Konkrete Melder-Instanzen — pro Installation lokal
+devices/Gira-RM_*.yaml
+# Alt-Praefix, Uebergangs-Absicherung
+devices/gira-rauchmelder-*.yaml
