@@ -1,46 +1,37 @@
 # =============================================================================
 # EXAMPLE.yaml — Vorlage fuer einen Gira-Rauchmelder
 # =============================================================================
-# Kopiere diese Datei mit einem sprechenden Namen deiner Wahl, z.B.:
+# Kopiere diese Datei mit einem sprechenden Namen deiner Wahl in deinen
+# ESPHome-Config-Ordner (nicht in devices/, sondern direkt in den Config-Root,
+# damit das ESPHome-Dashboard sie sieht), z.B.:
 #
-#   cp EXAMPLE.yaml Gira-RM_HG_EG_Flur.yaml
+#   cp devices/EXAMPLE.yaml Gira-RM_HG_EG_Flur.yaml
 #
 # Namens-Konvention:
 #   Datei:         Gira-RM_<Standort_mit_Unterstrichen>.yaml
 #   esphome.name:  gira-rm-<standort-mit-bindestrichen>  (lowercase, mDNS-safe)
 #   friendly_name: "Gira-RM <Standort mit Leerzeichen>"
 #
-# Nach dem Kopieren: Werte unter 'substitutions:' anpassen — mehr ist im
-# Regelfall nicht noetig. Alle Hardware-Details stecken im gemeinsamen
-# Hardware-Template unter packages/gira_hardware.yaml (kommt nach
-# Auftrag 02 Phase B).
+# Nach dem Kopieren: nur Werte unter 'substitutions:' anpassen — mehr ist im
+# Regelfall nicht noetig. Alle Hardware-Details (UART, Pins, Debug-Logger,
+# Component-Instanz) stecken im gemeinsamen Hardware-Template unter
+# packages/gira_hardware.yaml und werden per !include eingebunden.
 #
-# Bis Auftrag 02 Phase B abgeschlossen ist, enthaelt diese Vorlage noch den
-# vollstaendigen Hardware-Block. Nach Phase B wird der Hardware-Teil ersetzt
-# durch:
-#
-#   packages:
-#     hardware: !include ../packages/gira_hardware.yaml
+# secrets.yaml muss wifi_ssid, wifi_password, api_key, ota_password enthalten
+# (siehe secrets.yaml.example im Repo-Root).
 # =============================================================================
 
 substitutions:
   device_name: gira-rm-standort-example       # z.B. gira-rm-hg-eg-flur
   friendly_name: "Gira-RM Standort Example"   # z.B. "Gira-RM HG EG Flur"
-  update_interval: "60s"
+  update_interval: "60s"                      # Poll-Rhythmus der Component
 
 esphome:
   name: ${device_name}
   friendly_name: ${friendly_name}
 
-external_components:
-  - source:
-      type: local
-      path: components
-
-esp32:
-  board: esp32dev
-  framework:
-    type: esp-idf
+packages:
+  hardware: !include ../packages/gira_hardware.yaml
 
 wifi:
   ssid: !secret wifi_ssid
@@ -62,74 +53,3 @@ ota:
 web_server:
   version: 3
   local: true
-
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: GPIO15
-      mode:
-        input: true
-        pullup: true
-      inverted: true
-    name: "Rauchmelder RS232 aktiv ?"
-
-switch:
-  - platform: gpio
-    name: "Rauchmelder RS232 aktivieren"
-    pin:
-      number: GPIO23
-      inverted: true          # An = physisch LOW = laut Doku "aktiv"
-    restore_mode: ALWAYS_ON   # RS232-Bus soll bei Boot sofort aktiv sein
-
-uart:
-  id: uart_bus
-  tx_pin: GPIO16              # TXD2 laut SysFunctions.h der Alt-Firmware
-  rx_pin: GPIO17              # RXD2 laut SysFunctions.h der Alt-Firmware
-  baud_rate: 9600
-  data_bits: 8
-  parity: NONE
-  stop_bits: 1
-
-  debug:
-    direction: BOTH
-    after:
-      timeout: 100ms
-    sequence:
-      - lambda: |-
-          std::string label = (direction == uart::UART_DIRECTION_RX)
-                              ? "Melder -> ESP"
-                              : "ESP -> Melder";
-
-          // Einzelnes Kontrollbyte klar benennen
-          if (bytes.size() == 1) {
-            uint8_t b = bytes[0];
-            if (b == 0x06) { ESP_LOGD("gira_uart", "%s: ACK (0x06)", label.c_str()); return; }
-            if (b == 0x15) { ESP_LOGD("gira_uart", "%s: NAK (0x15)", label.c_str()); return; }
-            if (b == 0x00) { ESP_LOGD("gira_uart", "%s: NUL-Fuell (0x00)", label.c_str()); return; }
-          }
-
-          // Frames als ASCII + Hex nebeneinander
-          std::string ascii;
-          for (auto b : bytes) {
-            if (b == 0x02) ascii += "<STX>";
-            else if (b == 0x03) ascii += "<ETX>";
-            else if (b == 0x06) ascii += "<ACK>";
-            else if (b == 0x15) ascii += "<NAK>";
-            else if (b == 0x00) ascii += ".";
-            else if (b >= 0x20 && b <= 0x7E) ascii += (char)b;
-            else ascii += "?";
-          }
-          ESP_LOGD("gira_uart", "%s: %s  |  hex: %s",
-                   label.c_str(), ascii.c_str(),
-                   format_hex_pretty(bytes).c_str());
-
-gira_rauchmelder:
-  id: melder_hub
-  uart_id: uart_bus
-  update_interval: ${update_interval}   # kompletter Poll-Zyklus alle 60 s
-                                        # (9 Kommandos, dauert ca. 1,5 s)
-
-# Bewusst NICHT enthalten in diesem Stand:
-#   - sensor: / binary_sensor: / text_sensor: mit Platform gira_rauchmelder
-#     (kommt in einem spaeteren Schritt, wenn Sensor-Anhang dran ist)
-#   - mqtt: (kommt in einem spaeteren Schritt, Topic-Struktur noch offen)

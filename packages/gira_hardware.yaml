@@ -1,0 +1,109 @@
+# =============================================================================
+# gira_hardware.yaml — Hardware-Template fuer die Gira-OTM-Adapter-Platine
+# =============================================================================
+# Feste Pin-Belegung der ESP32-WROOM-32D-Adapterplatine. In jede Melder-YAML
+# unter devices/ per:
+#
+#   packages:
+#     hardware: !include ../packages/gira_hardware.yaml
+#
+# einbinden. Melder-spezifische Werte (Name, Meldegruppe, WiFi etc.) stehen
+# weiterhin in der jeweiligen devices/Gira-RM_<Standort>.yaml.
+#
+# --- Ueber Substitutions steuerbar ------------------------------------------
+# Die einbindende YAML muss in 'substitutions:' setzen:
+#
+#   update_interval: "60s"    # Poll-Rhythmus der Component (60s ist Default
+#                             # aus dem Referenz-Stand; 9 Kommandos je Zyklus,
+#                             # ca. 1,5 s Netto-Traffic).
+#
+# --- Nicht in diesem Package ------------------------------------------------
+# - sensor: / binary_sensor: / text_sensor: mit Platform gira_rauchmelder
+#   (Sensor-Anhang kommt in Auftrag 03)
+# - mqtt: (Topic-Struktur bewusst offen, kommt in Auftrag 04)
+# - Peripherie-Ausbau: LED (GPIO 27), externer LED-Header, Lichtsensor
+#   (GPIO 36), I2C (GPIO 21/22) — kommen in Folge-Auftraegen
+#
+# --- Zukunft: Runtime-Config (Auftrag 10) -----------------------------------
+# Fuer den spaeteren Consumer-Onboarding-Pfad soll die Component-API so
+# erweitert werden, dass Meldegruppe, Meldernummer usw. entweder aus
+# Substitutions (Power-User) ODER aus Runtime-Entities (Consumer) kommen
+# koennen. In diesem Auftrag wird noch nichts davon implementiert — die
+# Erweiterung wird spaeter unterhalb des 'gira_rauchmelder:'-Blocks
+# eingesetzt (globals, number/text-Entities mit initial_value aus Preferences).
+# =============================================================================
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO16              # TXD2 laut SysFunctions.h der Alt-Firmware
+  rx_pin: GPIO17              # RXD2 laut SysFunctions.h der Alt-Firmware
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+  debug:
+    direction: BOTH
+    after:
+      timeout: 100ms
+    sequence:
+      - lambda: |-
+          std::string label = (direction == uart::UART_DIRECTION_RX)
+                              ? "Melder -> ESP"
+                              : "ESP -> Melder";
+
+          // Einzelnes Kontrollbyte klar benennen
+          if (bytes.size() == 1) {
+            uint8_t b = bytes[0];
+            if (b == 0x06) { ESP_LOGD("gira_uart", "%s: ACK (0x06)", label.c_str()); return; }
+            if (b == 0x15) { ESP_LOGD("gira_uart", "%s: NAK (0x15)", label.c_str()); return; }
+            if (b == 0x00) { ESP_LOGD("gira_uart", "%s: NUL-Fuell (0x00)", label.c_str()); return; }
+          }
+
+          // Frames als ASCII + Hex nebeneinander
+          std::string ascii;
+          for (auto b : bytes) {
+            if (b == 0x02) ascii += "<STX>";
+            else if (b == 0x03) ascii += "<ETX>";
+            else if (b == 0x06) ascii += "<ACK>";
+            else if (b == 0x15) ascii += "<NAK>";
+            else if (b == 0x00) ascii += ".";
+            else if (b >= 0x20 && b <= 0x7E) ascii += (char)b;
+            else ascii += "?";
+          }
+          ESP_LOGD("gira_uart", "%s: %s  |  hex: %s",
+                   label.c_str(), ascii.c_str(),
+                   format_hex_pretty(bytes).c_str());
+
+switch:
+  - platform: gpio
+    name: "Rauchmelder RS232 aktivieren"
+    pin:
+      number: GPIO23
+      inverted: true          # An = physisch LOW = laut Doku "aktiv"
+    restore_mode: ALWAYS_ON   # RS232-Bus soll bei Boot sofort aktiv sein
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO15
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "Rauchmelder RS232 aktiv ?"
+
+gira_rauchmelder:
+  id: melder_hub
+  uart_id: uart_bus
+  update_interval: ${update_interval}
