@@ -1,0 +1,119 @@
+# =============================================================================
+# Gira Rauchmelder 01 — Referenz-Stand vom 07.08.2026
+# =============================================================================
+# Diese YAML entspricht dem Stand, mit dem am 07.08.2026 gegen 21:00 der
+# vollstaendige Poll-Zyklus (9 Kommandos) erfolgreich validiert wurde:
+#   - alle Kommandos vom ESP werden vom Melder mit ACK + Antwort quittiert
+#   - alle Antworten werden von der Component korrekt dekodiert
+#   - keine Retries mehr
+#
+# Nach jeder Refactoring-Aenderung (Package-Extraktion, Sensor-Anhang etc.)
+# muss der Melder mit den daraus abgeleiteten YAMLs sich exakt genauso
+# verhalten wie hier.
+# =============================================================================
+
+esphome:
+  name: gira-rauchmelder-01
+  friendly_name: Gira-Rauchmelder-01
+
+external_components:
+  - source:
+      type: local
+      path: components
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+logger:
+  level: DEBUG
+  logs:
+    gira_rauchmelder: DEBUG
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+web_server:
+  version: 3
+  local: true
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO15
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "Rauchmelder RS232 aktiv ?"
+
+switch:
+  - platform: gpio
+    name: "Rauchmelder RS232 aktivieren"
+    pin:
+      number: GPIO23
+      inverted: true          # An = physisch LOW = laut Doku "aktiv"
+    restore_mode: ALWAYS_ON   # RS232-Bus soll bei Boot sofort aktiv sein
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO16              # TXD2 laut SysFunctions.h der Alt-Firmware
+  rx_pin: GPIO17              # RXD2 laut SysFunctions.h der Alt-Firmware
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+  debug:
+    direction: BOTH
+    after:
+      timeout: 100ms
+    sequence:
+      - lambda: |-
+          std::string label = (direction == uart::UART_DIRECTION_RX)
+                              ? "Melder -> ESP"
+                              : "ESP -> Melder";
+
+          // Einzelnes Kontrollbyte klar benennen
+          if (bytes.size() == 1) {
+            uint8_t b = bytes[0];
+            if (b == 0x06) { ESP_LOGD("gira_uart", "%s: ACK (0x06)", label.c_str()); return; }
+            if (b == 0x15) { ESP_LOGD("gira_uart", "%s: NAK (0x15)", label.c_str()); return; }
+            if (b == 0x00) { ESP_LOGD("gira_uart", "%s: NUL-Fuell (0x00)", label.c_str()); return; }
+          }
+
+          // Frames als ASCII + Hex nebeneinander
+          std::string ascii;
+          for (auto b : bytes) {
+            if (b == 0x02) ascii += "<STX>";
+            else if (b == 0x03) ascii += "<ETX>";
+            else if (b == 0x06) ascii += "<ACK>";
+            else if (b == 0x15) ascii += "<NAK>";
+            else if (b == 0x00) ascii += ".";
+            else if (b >= 0x20 && b <= 0x7E) ascii += (char)b;
+            else ascii += "?";
+          }
+          ESP_LOGD("gira_uart", "%s: %s  |  hex: %s",
+                   label.c_str(), ascii.c_str(),
+                   format_hex_pretty(bytes).c_str());
+
+gira_rauchmelder:
+  id: melder_hub
+  uart_id: uart_bus
+  update_interval: 60s        # kompletter Poll-Zyklus alle 60 s
+                              # (9 Kommandos, dauert ca. 1,5 s)
+
+# Bewusst NICHT enthalten in diesem Stand:
+#   - sensor: / binary_sensor: / text_sensor: mit Platform gira_rauchmelder
+#     (kommt in einem spaeteren Schritt, wenn Sensor-Anhang dran ist)
+#   - mqtt: (kommt in einem spaeteren Schritt, Topic-Struktur noch offen)

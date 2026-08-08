@@ -1,5 +1,30 @@
-.pio
-.vscode
-lib
-debug.log
+# ESPHome Build-Artefakte
+.esphome/
+build/
+*.bin
+*.elf
+
+# Secrets — echtes File niemals ins Repo
+secrets.yaml
+
+# Persoenliche Arbeits-Dokumente (bleiben lokal)
+DEV-README.md
+UMBAU_PLAN.md
+*_PLAN.md
+
+# IDE-Kruscht
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+# PlatformIO-Artefakte (aus dem legacy-Branch)
+.pio/
+lib/
 workspace.code-workspace

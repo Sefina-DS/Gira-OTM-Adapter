@@ -1,21 +1,27 @@
 # Gira-OTM-Adapter
-Adapterplatine für einen Gira - DualQ Rauchmelder (zum Vernetzen der Melder über MQTT und vieles mehr
 
-<a href="https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki">Anleitungen (Wiki)</a>
+ESPHome-basierte Firmware fuer die Adapter-Platine an Gira DualQ Rauchmeldern.
 
-<img src="https://github.com/Sefina-DS/Gira-OTM-Adapter/blob/main/pictures/00-Grundlagen-01.jpg" width="200px" height="200px">
+Zwei-teilige Dokumentation im Ordner `docs/`:
 
+- **`docs/protokoll/`** — Universelles Wissen ueber die Adapter-Platine und
+  das serielle Gira-Protokoll. Wer eine eigene Firmware, ein anderes Framework
+  oder einen anderen Anwendungsfall bauen moechte, findet hier die Referenz.
+- **`docs/projekt/`** — Unser konkretes ESPHome-Setup. Wer unsere Firmware
+  reproduzieren oder verwenden moechte, findet hier die Anleitungen.
 
-26.06.2022
+## Verzeichnisse
 
-<a href="https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki/Hardware-:-Platine-(%C3%9Cberpr%C3%BCfung)">Zur überprüfung der Platine wurde eine neue Anleitung erstellt</a>
+- `components/gira_rauchmelder/` — ESPHome External Component (Protokoll-Logik in C++)
+- `packages/` — ESPHome-Hardware-Template (feste PCB-Belegung)
+- `devices/` — Konkrete Melder-YAMLs (duenn, nur Parameter)
+- `firmware/` — Optional: fertige Binaries
 
-Status LED wurde integriert und kann zur Analyse genutzt werden
+## Setup
 
-19.06.2022 - Alarmierungsgruppen hinzugefügt + Anleitung
+1. `secrets.yaml.example` nach `secrets.yaml` kopieren und ausfuellen
+2. (weitere Schritte kommen — siehe `docs/projekt/inbetriebnahme.md`)
 
-<a href="https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki/Sonderfunktionen-:-Melder-und-Alarmierungsgruppen">Melder - Alarmierungsgruppen / Anleitung</a>
+## Lizenz
 
-13.06.2022 - Anpassen / Hinzufügen von Anleitungen
-
-<a href="https://github.com/Sefina-DS/Gira-OTM-Adapter/wiki/MQTT-:-Grundlagen-und-Erweiterungen">MQTT Anleitung</a>
+MIT. Siehe `LICENSE`.
